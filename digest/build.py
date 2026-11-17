@@ -424,6 +424,11 @@ class GeminiLLM:
         url = GEMINI_URL.format(model=self.models[step])
         for attempt in range(5):
             r = self.http.post(url, json=body, headers={"x-goog-api-key": self.key})
+            if r.status_code == 429 and "limit: 0" in r.text:
+                # не перегрузка, а модель недоступна на бесплатном уровне — повторять бессмысленно
+                raise RuntimeError(f"Модель {self.models[step]} недоступна на бесплатном уровне Gemini API. "
+                                   "Включите оплату проекта в AI Studio (Set up billing) или выберите бесплатную "
+                                   "модель Flash в переменных GEMINI_MODEL_*.")
             if r.status_code in self.RETRY_STATUSES and attempt < 4:
                 wait = min(120, 10 * 2 ** attempt)
                 log.warning("Gemini %s, повтор через %d с", r.status_code, wait)

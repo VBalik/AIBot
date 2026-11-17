@@ -218,6 +218,18 @@ def check_provider_logic():
     assert C(gemini_key="g", anthropic_key="a", provider="claude").second_provider() == "gemini"
     assert C(gemini_key="g", anthropic_key="a", compare_provider="off").second_provider() is None
     assert C(gemini_key="g", anthropic_key="a", compare_limit=0).second_provider() is None
+    # 429 с «limit: 0» (модель не входит в бесплатный уровень) — без повторов и с понятной ошибкой
+    hits = []
+    def free_tier(req):
+        hits.append(1)
+        return httpx.Response(429, json={"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", "message":
+            "Quota exceeded for metric: generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro"}})
+    g = build.GeminiLLM(C(gemini_key="g-key"), http=httpx.Client(transport=httpx.MockTransport(free_tier)))
+    try:
+        g.text("translate", "sys", "user")
+        raise AssertionError("ошибка бесплатного уровня не распознана")
+    except RuntimeError as exc:
+        assert "бесплатном уровне" in str(exc) and len(hits) == 1, (exc, hits)
     sch = build.to_gemini_schema(build.SCORE_TOOL["input_schema"])
     assert sch == {"type": "OBJECT", "properties": {
         "score": {"type": "INTEGER", "description": "1 = неинтересно, 10 = обязательно к прочтению"},
