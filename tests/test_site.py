@@ -3,10 +3,20 @@
 Запуск: python tests/test_build.py && python tests/test_site.py
 Скриншоты сохраняются в tests/out/.
 """
-import functools, http.server, sys, threading
+import base64, functools, http.server, os, sys, threading
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
+os.environ["PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS"] = "1"  # route видит и запросы service worker
+from playwright.sync_api import sync_playwright  # noqa: E402
+
+PNG = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAGElEQVR4nGNk+M+AFTDhEh8VAAJEAQGzAA2DAAFB2AB6Fb7lyAAAAABJRU5ErkJggg==")
+
+
+def stub_external(ctx):
+    """В песочнице нет интернета: шрифты Google и картинки с CDN подменяются заглушками."""
+    ctx.route("https://fonts.googleapis.com/**", lambda r: r.fulfill(status=200, content_type="text/css", body=""))
+    ctx.route("https://substackcdn.com/**", lambda r: r.fulfill(status=200, content_type="image/png", body=PNG))
+    return ctx
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "tests" / "out"
@@ -21,7 +31,7 @@ URL = f"http://localhost:{srv.server_port}/site/index.html?data=/tests/out/data/
 errors = []
 with sync_playwright() as p:
     browser = p.chromium.launch()
-    ctx = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx = stub_external(browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True))
     page = ctx.new_page()
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.on("console", lambda m: m.type == "error" and "ERR_TUNNEL_CONNECTION_FAILED" not in m.text and errors.append(m.text))
@@ -93,18 +103,18 @@ with sync_playwright() as p:
     page.wait_for_selector("#reader", state="hidden")
 
     # тёмная тема
-    dark = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, color_scheme="dark", is_mobile=True)
+    dark = stub_external(browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, color_scheme="dark", is_mobile=True))
     dp = dark.new_page()
     dp.goto(URL)
     dp.wait_for_selector(".entry")
     dp.screenshot(path=str(OUT / "5-dark.png"))
 
     # широкий экран
-    wide = browser.new_context(viewport={"width": 1280, "height": 900})
+    wide = stub_external(browser.new_context(viewport={"width": 1024, "height": 1366}, device_scale_factor=2))  # iPad
     wp = wide.new_page()
     wp.goto(URL)
     wp.wait_for_selector(".entry")
-    wp.screenshot(path=str(OUT / "6-desktop.png"))
+    wp.screenshot(path=str(OUT / "6-ipad.png"))
     browser.close()
 
 srv.shutdown()

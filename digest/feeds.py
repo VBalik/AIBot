@@ -9,11 +9,14 @@
     url      — RSS/Atom-лента с полным текстом
     site     — главная страница блога
     exclude  — (необязательно) регулярное выражение: посты с таким заголовком пропускаются
+    paywall  — (необязательно) False, если у блога нет платных постов: проверка «Read more / paid subscribers»
+               нужна только для Substack, а в бесплатных рассылках такие слова встречаются в призывах подписаться
 """
 
 FEEDS = [
     {
         "id": "willison",
+        "paywall": False,
         "symbol": "Sw",
         "name": "Simon Willison",
         "author": "Саймон Уиллисон",
@@ -23,6 +26,7 @@ FEEDS = [
     },
     {
         "id": "importai",
+        "paywall": False,
         "symbol": "Ia",
         "name": "Import AI",
         "author": "Джек Кларк",
@@ -88,6 +92,7 @@ FEEDS = [
     },
     {
         "id": "karpathy",
+        "paywall": False,
         "symbol": "Ka",
         "name": "Andrej Karpathy",
         "author": "Андрей Карпатый",
@@ -106,6 +111,7 @@ FEEDS = [
     },
     {
         "id": "evans",
+        "paywall": False,
         "symbol": "Be",
         "name": "Benedict Evans",
         "author": "Бенедикт Эванс",

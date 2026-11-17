@@ -10,6 +10,9 @@
 <meta name="apple-mobile-web-app-title" content="Дайджест ИИ">
 <title>Дайджест ИИ</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&display=swap">
@@ -56,6 +59,8 @@ a { color: inherit; }
 }
 .masthead p { margin: 0; color: var(--ink-2); font-size: .9375rem; max-width: 30rem; }
 .masthead .updated { margin-top: .75rem; font-size: .8125rem; }
+.masthead .offline-status { margin-top: .25rem; font-size: .8125rem; }
+.masthead .offline-status.off { color: var(--accent); font-weight: 500; }
 
 /* ---------- плитки ---------- */
 .tile {
@@ -214,6 +219,7 @@ footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 
     <h1>Дайджест ИИ</h1>
     <p>Лучшие англоязычные тексты об искусственном интеллекте: короткий абстракт и полный перевод на русский.</p>
     <p class="updated" id="updated"></p>
+    <p class="offline-status" id="offline-status" aria-live="polite"></p>
   </header>
 
   <nav aria-label="Источники">
@@ -297,7 +303,10 @@ async function load() {
     if (!r.ok) throw new Error("HTTP " + r.status);
     FEED = await r.json();
   } catch (e) {
-    return showEmpty("Не удалось загрузить ленту. Проверьте соединение и обновите страницу.");
+    renderOfflineStatus();
+    return showEmpty(navigator.onLine
+      ? "Не удалось загрузить ленту. Проверьте соединение и обновите страницу."
+      : "Нет сети, а сохранённой копии ленты пока нет. Откройте страницу один раз с интернетом — дальше она будет работать и без него.");
   }
   FEED.sources.forEach((s, i) => SOURCES.set(s.id, { ...s, hue: HUES[i % HUES.length] }));
   FEED.items.forEach((it) => ITEMS.set(it.id, it));
@@ -306,6 +315,8 @@ async function load() {
   renderFilters();
   renderEntries();
   renderColophon();
+  renderOfflineStatus();
+  syncOffline();
   store.set("aid.lastVisit", String(Date.now()));
   const m = location.hash.match(/^#\/p\/([\w-]+)$/);
   if (m && ITEMS.has(m[1])) openReader(m[1], false);
@@ -418,6 +429,7 @@ async function unlock(password) {
   store.set(keyName(), btoa(String.fromCharCode(...raw)));
   cryptoKey = key;
   $("#forget-wrap").hidden = false;
+  setTimeout(syncOffline, 300);  // теперь можно найти иллюстрации внутри переводов и сохранить их
   return true;
 }
 
@@ -573,6 +585,81 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !reader.
 $("#forget").addEventListener("click", () => {
   store.del(keyName()); cryptoKey = null; $("#forget-wrap").hidden = true;
 });
+
+/* ---------- чтение без сети ---------- */
+const offlineInfo = { translations: 0, images: 0, imagesSaved: null };
+let syncing = false, resync = false;
+
+function renderOfflineStatus() {
+  const el = $("#offline-status");
+  if (!navigator.onLine) {
+    el.className = "offline-status off";
+    el.textContent = FEED ? "Нет сети — показана сохранённая версия." : "Нет сети.";
+    return;
+  }
+  el.className = "offline-status";
+  const t = offlineInfo.translations, i = offlineInfo.imagesSaved ?? offlineInfo.images;
+  if (!t) { el.textContent = ""; return; }
+  let text = `Без сети доступно: ${t} ${plural(t, "перевод", "перевода", "переводов")}`;
+  if (i) text += ` и ${i} ${plural(i, "иллюстрация", "иллюстрации", "иллюстраций")}`;
+  else if (!cryptoKey) text += " (иллюстрации сохранятся после ввода пароля)";
+  el.textContent = text + ".";
+}
+
+async function syncOffline() {
+  if (!FEED || !("serviceWorker" in navigator) || !navigator.onLine) return;
+  if (syncing) { resync = true; return; }
+  syncing = true;
+  try {
+    await navigator.serviceWorker.ready;
+    if (!navigator.serviceWorker.controller) {  // первый визит: ждём, пока SW возьмёт страницу под контроль
+      await new Promise((ok) => {
+        navigator.serviceWorker.addEventListener("controllerchange", ok, { once: true });
+        setTimeout(ok, 5000);
+      });
+    }
+    const sw = navigator.serviceWorker.controller;
+    if (!sw) return;
+    // при первом визите лента загрузилась ещё до SW — запросим её снова, чтобы она попала в кэш
+    try { await fetch(DATA_BASE + "feed.json?v=" + Math.floor(Date.now() / 60000), { cache: "no-store" }); } catch {}
+    const files = [];
+    for (const it of FEED.items) {
+      if (it.full !== "ok") continue;
+      files.push([it.id, `full/${it.id}.json`]);
+      for (const a of it.alt || []) files.push([it.id, `full/${it.id}--${typeof a === "string" ? a : a.id}.json`]);
+    }
+    const savedItems = new Set();
+    const images = new Set();
+    for (const [id, f] of files) {
+      try {
+        const r = await fetch(DATA_BASE + f);  // SW сохранит файл в кэш
+        if (!r.ok) continue;
+        savedItems.add(id);
+        if (cryptoKey) {
+          const data = JSON.parse(await gunzip(await decryptRaw(cryptoKey, await r.json())));
+          for (const m of String(data.html).matchAll(/<img\b[^>]*\bsrc="(https:\/\/[^"]+)"/g)) images.add(m[1].replace(/&amp;/g, "&"));
+        }
+      } catch { /* файл недоступен — попробуем в следующий раз */ }
+    }
+    offlineInfo.translations = savedItems.size;
+    offlineInfo.images = images.size;
+    if (images.size) sw.postMessage({ type: "cache-images", urls: [...images] });
+    renderOfflineStatus();
+  } finally {
+    syncing = false;
+    if (resync) { resync = false; syncOffline(); }
+  }
+}
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+  navigator.serviceWorker.addEventListener("message", (e) => {
+    if (e.data && e.data.type === "images-cached") { offlineInfo.imagesSaved = e.data.saved; renderOfflineStatus(); }
+  });
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
+}
+window.addEventListener("online", () => { renderOfflineStatus(); syncOffline(); });
+window.addEventListener("offline", renderOfflineStatus);
 
 load();
 </script>

@@ -383,6 +383,27 @@ def main():
     except SystemExit:
         pass
 
+    # --- Пейволл: в бесплатных рассылках (Import AI с jack-clark.net) призыв подписаться — не пейволл ---
+    ia_feed = by_id["importai"]
+    assert ia_feed.get("paywall") is False
+    teaser = para * 2 + '<p><a href="https://x/sub"><span>Read more</span></a> for paid subscribers</p>'
+    assert not build.parse_feed(ia_feed, rss([("pp", "Free post", 1, teaser)]))[0].paywalled
+    assert build.parse_feed(by_id["interconnects"], rss([("pp", "Paid post", 1, teaser)]))[0].paywalled
+    # пост, ошибочно помеченный платным, пересматривается: новый абстракт и перевод
+    out_p = Path(tempfile.mkdtemp()) / "data"
+    shutil.copytree(OUT, out_p)
+    fp = json.loads((out_p / "feed.json").read_text())
+    for it in fp["items"]:
+        if it["id"] == ia["id"]:
+            it["full"], it["abstract"] = "paywalled", "старый абстракт"
+            it.pop("alt", None)
+    (out_p / "feed.json").write_text(json.dumps(fp, ensure_ascii=False))
+    (out_p / "full" / f"{ia['id']}.json").unlink()
+    st_p = run_pass(build.Config(gemini_key="g-key", password=PASSWORD, chunk_chars=9000, max_translations_per_run=1), out_p)
+    ia_p = next(it for it in json.loads((out_p / "feed.json").read_text())["items"] if it["id"] == ia["id"])
+    assert st_p["translated"] == 1 and ia_p["full"] == "ok" and ia_p["abstract"] != "старый абстракт", (st_p, ia_p["full"])
+    assert (out_p / "full" / f"{ia['id']}.json").exists()
+
     # --- Сценарий B: только ключ Claude — перевод Sonnet, для сравнения Haiku ---
     out_b = Path(tempfile.mkdtemp()) / "data"
     cfg_b = build.Config(anthropic_key="a-key", password=PASSWORD, chunk_chars=9000, max_translations_per_run=1)

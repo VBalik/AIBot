@@ -291,7 +291,8 @@ def parse_feed(feed: dict, raw: bytes | str) -> list[Post]:
         if len(body) < len(e.get("summary", "")):
             body = e.get("summary", "")
         posts.append(Post(id=post_id(feed, guid), feed=feed, title=title, url=url, published=published,
-                          html=body, paywalled=bool(PAYWALL_RE.search(body[-3000:]))))
+                          html=body,
+                          paywalled=feed.get("paywall", True) and bool(PAYWALL_RE.search(body[-3000:]))))
     return posts
 
 
@@ -855,6 +856,19 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
                 stats["shown"] += 1
             data.mark(post, "shown" if abstract else "skipped", score, reason)
             log.info("[%2d] %-9s %s — %s", score, "показан" if abstract else "пропущен", post.title, reason)
+            data.save()
+
+    # 1б. Посты, ошибочно помеченные платными (например, после смены ленты), — пересмотреть
+    for it in data.items.values():
+        post = live.get(it["id"])
+        if it["full"] == "paywalled" and post is not None and not post.paywalled:
+            it["full"] = full_status_for(cfg, post, it["score"])
+            try:
+                fresh = writer.abstract(post)  # прежний абстракт писался как для «начала платного поста»
+                it["title_ru"], it["abstract"] = fresh["title_ru"], fresh["abstract_ru"]
+            except Exception as exc:
+                log.warning("Не удалось обновить абстракт «%s»: %s", post.title, exc)
+            log.info("Пост больше не считается платным: %s → %s", post.title, it["full"])
             data.save()
 
     # 2. Полные переводы: сначала самые свежие
