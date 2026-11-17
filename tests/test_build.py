@@ -291,6 +291,8 @@ class FakeTelegram:
             return httpx.Response(200, json={"ok": True, "result": [u for u in self.updates if u["update_id"] >= off]})
         if method == "getChat":
             return httpx.Response(200, json={"ok": True, "result": self.chat})
+        if method == "getMe":
+            return httpx.Response(200, json={"ok": True, "result": {"id": 123456, "is_bot": True, "username": "ai_digest_test_bot"}})
         if method == "sendMessage":
             if self.fail_send:
                 self.fail_send -= 1

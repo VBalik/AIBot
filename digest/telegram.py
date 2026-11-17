@@ -203,7 +203,7 @@ def build_messages(item: dict, source: dict, html_ru: str | None, site_url: str)
 class TelegramAPI:
     def __init__(self, token: str, http: httpx.Client | None = None):
         self.base = f"https://api.telegram.org/bot{token.strip()}"  # при копировании с телефона цепляются пробелы
-        self.http = http or httpx.Client(timeout=30)
+        self.http = http or httpx.Client(timeout=httpx.Timeout(20, connect=10))
 
     def call(self, method: str, payload: dict) -> dict | list:
         last = ""
@@ -212,6 +212,7 @@ class TelegramAPI:
                 r = self.http.post(f"{self.base}/{method}", json=payload)
             except httpx.TransportError as exc:  # обрыв соединения, таймаут
                 last = f"нет связи ({type(exc).__name__})"
+                log.warning("Telegram %s, попытка %d: %s", method, attempt + 1, last)
                 time.sleep(5 * (attempt + 1))
                 continue
             try:
@@ -226,6 +227,7 @@ class TelegramAPI:
                 time.sleep(min(int(retry), 60) + 1)
                 continue
             if r.status_code >= 500:  # «Bad Gateway» и подобное у Telegram обычно проходит за секунды
+                log.warning("Telegram %s, попытка %d: HTTP %d %s", method, attempt + 1, r.status_code, last)
                 time.sleep(5 * (attempt + 1))
                 continue
             if r.status_code == 401:
@@ -294,6 +296,12 @@ def mirror(items: list[dict], sources: dict, load_full, state: dict, *, api: Tel
     Статья готова, когда судьба полного перевода решена (переведена, платная, слишком длинная…).
     В личный чат или закрытый канал уходит полный перевод, в публичный — только абстракт и ссылки.
     """
+    try:  # сначала проверить токен и связь: имя бота в журнале помогает понять, тот ли это бот
+        me = api.call("getMe", {})
+        log.info("Telegram: бот @%s", me.get("username"))
+    except Exception as exc:
+        problem(str(exc))
+        return 0
     try:
         answer_start(api, state, chat_id)
     except Exception as exc:
