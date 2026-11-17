@@ -26,7 +26,7 @@
 - Платные посты (определяются по «Read more»/«paid subscribers» в конце HTML) и тексты длиннее `MAX_TRANSLATE_CHARS` получают только абстракт.
 
 ## Источники (`digest/feeds.py`)
-Simon Willison (только /atom/entries/), Import AI, One Useful Thing, Interconnects, Latent Space (без ежедневных `[AINews]`), Ahead of AI (Raschka), Understanding AI, AI as Normal Technology, Andrej Karpathy, Dwarkesh Podcast (расшифровки длинные → обычно только абстракт), Benedict Evans. Все ленты проверены 17.11.2026: живые, с полным текстом (у Interconnects и Understanding AI часть постов платные).
+Simon Willison (только /atom/entries/), Import AI (лента берётся с зеркала jack-clark.net/feed/: importai.substack.com/feed отдаёт серверам GitHub Actions 403), One Useful Thing, Interconnects, Latent Space (без ежедневных `[AINews]`), Ahead of AI (Raschka), Understanding AI, AI as Normal Technology, Andrej Karpathy, Dwarkesh Podcast (расшифровки длинные → обычно только абстракт), Benedict Evans. Все ленты проверены 17.11.2026: живые, с полным текстом (у Interconnects и Understanding AI часть постов платные).
 Кандидаты, которые не вошли: Zvi Mowshowitz (огромные еженедельные посты — дорого переводить), Stratechery и SemiAnalysis (почти всё платное), Every / Chain of Thought (частично платное).
 
 ## Страница (`site/index.html`)

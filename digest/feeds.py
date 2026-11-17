@@ -27,7 +27,8 @@ FEEDS = [
         "name": "Import AI",
         "author": "Джек Кларк",
         "about": "Сооснователь Anthropic еженедельно разбирает исследования и их последствия для мира",
-        "url": "https://importai.substack.com/feed",
+        # importai.substack.com/feed отдаёт серверам GitHub Actions 403; jack-clark.net — зеркало с полным текстом
+        "url": "https://jack-clark.net/feed/",
         "site": "https://importai.substack.com",
     },
     {
