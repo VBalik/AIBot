@@ -32,6 +32,10 @@ RU = {
                "и сам проверяет результат. Однако вместе с автономией растут и риски — модель способна уверенно ошибаться, "
                "а замечать это приходится человеку. Автор предлагает простое правило: доверять агенту ровно настолько, "
                "насколько легко проверить его работу.").split(". "),
+    "openai": ("Языковые модели заметно выросли в долгих задачах: агент часами пишет код "
+               "и сам себя проверяет. Но вместе с самостоятельностью растут и риски — модель умеет ошибаться уверенно, "
+               "и заметить это должен человек. Автор предлагает правило: доверять агенту ровно в той мере, "
+               "в какой легко проверить его работу.").split(". "),
     "haiku": ("Языковые модели стали лучше справляться с длинными задачами: агент долго пишет код "
               "и проверяет результат. Но с автономией растут и риски — модель может ошибаться уверенно, "
               "и это должен замечать человек. Автор советует доверять агенту настолько, "
@@ -106,7 +110,7 @@ def source_of(text):
 
 
 # ---------- имитация Gemini API (REST) ----------
-calls = {"g_score": 0, "g_abstract": 0, "g_translate": 0, "g_truncated": 0, "g_429": 0,
+calls = {"o_score": 0, "o_abstract": 0, "o_translate": 0, "o_truncated": 0, "g_score": 0, "g_abstract": 0, "g_translate": 0, "g_truncated": 0, "g_429": 0,
          "c_score": 0, "c_abstract": 0, "c_translate": 0, "c_truncated": 0}
 
 
@@ -146,6 +150,45 @@ def gemini_handler(req: httpx.Request):
         calls["g_truncated"] += 1
         return gemini_reply("обрыв", "MAX_TOKENS")
     return gemini_reply(fake_translate(src, "gemini"))
+
+
+# ---------- имитация OpenAI Responses API (REST) ----------
+def openai_reply(text, status="completed"):
+    body = {"id": "resp_1", "object": "response", "status": status, "output": [
+        {"type": "reasoning", "id": "rs_1", "summary": []},
+        {"type": "message", "id": "msg_1", "role": "assistant", "status": status,
+         "content": [{"type": "output_text", "text": text, "annotations": []}]}]}
+    if status == "incomplete":
+        body["incomplete_details"] = {"reason": "max_output_tokens"}
+    return httpx.Response(200, json=body)
+
+
+def openai_handler(req: httpx.Request):
+    assert req.url.path == "/v1/responses" and req.headers["authorization"] == "Bearer o-key"
+    body = json.loads(req.content)
+    assert body["reasoning"] == {"effort": "low"} and body["store"] is False
+    model, system, user = body["model"], body["instructions"], body["input"]
+    fmt = (body.get("text") or {}).get("format")
+    if fmt:
+        assert fmt["type"] == "json_schema" and fmt["strict"] is True
+        schema = fmt["schema"]
+        assert schema["additionalProperties"] is False and set(schema["required"]) == set(schema["properties"])
+        if "score" in schema["properties"]:
+            calls["o_score"] += 1
+            assert model == "gpt-6-luna" and "minimum" not in schema["properties"]["score"]
+            return openai_reply(json.dumps({"score": 3 if "Boring" in user else 8, "reason": "тест"}, ensure_ascii=False))
+        calls["o_abstract"] += 1
+        assert model == "gpt-6.1-sol" and system == build.ABSTRACT_SYSTEM
+        title = re.search(r"Заголовок: (.*)", user).group(1)
+        return openai_reply(json.dumps({"title_ru": TITLES_RU.get(title, title),
+                                        "abstract_ru": ". ".join(RU["openai"][:3]) + "."}, ensure_ascii=False))
+    calls["o_translate"] += 1
+    assert model == "gpt-6-astra" and system == build.TRANSLATOR_SYSTEM
+    src = source_of(user)
+    if len(src) > 4000:
+        calls["o_truncated"] += 1
+        return openai_reply("обрыв", "incomplete")
+    return openai_reply(fake_translate(src, "openai"))
 
 
 # ---------- имитация Claude API (SDK anthropic) ----------
@@ -199,7 +242,9 @@ def fetch(feed):
 
 def writers(cfg):
     def llm(provider, model=None):
-        if provider == "gemini":
+        if provider == "openai":
+            l = build.OpenAILLM(cfg, http=httpx.Client(transport=httpx.MockTransport(openai_handler)))
+        elif provider == "gemini":
             l = build.GeminiLLM(cfg, http=httpx.Client(transport=httpx.MockTransport(gemini_handler)))
         else:
             l = build.ClaudeLLM(cfg, client=build.anthropic.Anthropic(
@@ -222,12 +267,39 @@ def run_pass(cfg, out):
 def check_provider_logic():
     C = build.Config
     assert C(gemini_key="g", anthropic_key="a").main_provider() == "gemini"
-    assert C(gemini_key="g", anthropic_key="a").second_provider() == "claude"
-    assert C(gemini_key="g").second_provider() is None
-    assert C(anthropic_key="a").main_provider() == "claude" and C(anthropic_key="a").second_provider() is None
-    assert C(gemini_key="g", anthropic_key="a", provider="claude").second_provider() == "gemini"
-    assert C(gemini_key="g", anthropic_key="a", compare_provider="off").second_provider() is None
-    assert C(gemini_key="g", anthropic_key="a", compare_limit=0).second_provider() is None
+    assert C(gemini_key="g", anthropic_key="a").compare_providers() == ["claude"]
+    assert C(gemini_key="g").compare_providers() == []
+    assert C(anthropic_key="a").main_provider() == "claude" and C(anthropic_key="a").compare_providers() == []
+    assert C(gemini_key="g", anthropic_key="a", provider="claude").compare_providers() == ["gemini"]
+    assert C(gemini_key="g", anthropic_key="a", compare_provider="off").compare_providers() == []
+    assert C(gemini_key="g", anthropic_key="a", compare_limit=0).compare_providers() == []
+    # OpenAI первым при auto: его оплачивают кредиты подписки ChatGPT Pro
+    full = C(openai_key="o", gemini_key="g", anthropic_key="a")
+    assert full.main_provider() == "openai" and full.compare_providers() == ["gemini", "claude"]
+    assert C(openai_key="o", gemini_key="g", anthropic_key="a", compare_provider="claude").compare_providers() == ["claude"]
+    assert C(openai_key="o").variants() == []
+    assert C(openai_key="o", anthropic_key="a").variants() == [("claude", "claude", "claude-sonnet-5-5")]
+    assert build.to_openai_schema(build.SCORE_TOOL["input_schema"]) == {"type": "object", "properties": {
+        "score": {"type": "integer", "description": "1 = неинтересно, 10 = обязательно к прочтению"},
+        "reason": {"type": "string", "description": "Одно короткое предложение по-русски: почему такая оценка"}},
+        "required": ["score", "reason"], "additionalProperties": False}
+    # OpenAI: модель без reasoning.effort — повтор без параметра; закончились кредиты — понятная ошибка
+    seen = []
+    def no_reasoning(req):
+        b = json.loads(req.content)
+        seen.append("reasoning" in b)
+        if "reasoning" in b:
+            return httpx.Response(400, json={"error": {"message": "Unsupported parameter: 'reasoning.effort' is not supported with this model."}})
+        return openai_reply("готово")
+    o = build.OpenAILLM(C(openai_key="o-key"), http=httpx.Client(transport=httpx.MockTransport(no_reasoning)))
+    assert o.text("translate", "sys", "user") == "готово" and seen == [True, False]
+    broke = build.OpenAILLM(C(openai_key="o-key"), http=httpx.Client(transport=httpx.MockTransport(
+        lambda req: httpx.Response(429, json={"error": {"code": "insufficient_quota", "message": "You exceeded your current quota"}}))))
+    try:
+        broke.text("translate", "sys", "user")
+        raise AssertionError("нет ошибки о кредитах")
+    except RuntimeError as exc:
+        assert "закончились кредиты" in str(exc)
     # варианты для сравнения: другой движок и/или дешёвая модель того же движка
     assert C(anthropic_key="a").variants() == [("claude-haiku-5-5", "claude", "claude-haiku-5-5")]
     assert C(anthropic_key="a", claude_model_translate="claude-haiku-5-5").variants() == []
@@ -323,6 +395,25 @@ def main():
     assert sonnet["model"] == "claude-sonnet-5-5" and "Большие языковые модели" in sonnet["html"]
     assert haiku["model"] == "claude-haiku-5-5" and "Языковые модели стали лучше" in haiku["html"]
     print("B:", st_b)
+
+    # --- Сценарий C: OpenAI основной (Astra), Claude Sonnet для сравнения ---
+    out_c = Path(tempfile.mkdtemp()) / "data"
+    cfg_c = build.Config(openai_key="o-key", anthropic_key="a-key", password=PASSWORD, chunk_chars=9000,
+                         max_translations_per_run=1)
+    before = dict(calls)
+    st_c = run_pass(cfg_c, out_c)
+    feed_c = json.loads((out_c / "feed.json").read_text())
+    ia_c = next(it for it in feed_c["items"] if it["title_en"].startswith("Import AI 481"))
+    assert st_c["translated"] == 1 and st_c["compared"] == 1 and st_c["new"] == 5
+    assert ia_c["engine"] == "openai" and ia_c["model"] == "gpt-6-astra"
+    assert ia_c["alt"] == [{"id": "claude", "model": "claude-sonnet-5-5"}]
+    assert calls["o_score"] == 5 and calls["o_abstract"] == 4 and calls["o_truncated"] >= 1
+    assert calls["c_score"] == before["c_score"] and calls["g_score"] == before["g_score"]
+    vc = build.Vault(PASSWORD, feed_c["crypto"], 1000)
+    astra = vc.decrypt_json(json.loads((out_c / "full" / f"{ia_c['id']}.json").read_text()))
+    assert astra["engine"] == "openai" and "Языковые модели заметно выросли" in astra["html"]
+    assert "Large language" not in astra["html"]
+    print("C:", st_c)
     print("ВСЕ ПРОВЕРКИ СБОРЩИКА ПРОЙДЕНЫ →", OUT)
 
 

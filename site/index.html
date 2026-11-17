@@ -478,10 +478,12 @@ function closeReader() {
   if (lastOpener) lastOpener.focus({ preventScroll: true });
 }
 
-const ENGINE_LABEL = { gemini: "Gemini", claude: "Claude" };
-// «claude-sonnet-5-5» → «Claude Sonnet», «gemini-3.1-pro-preview» → «Gemini Pro»
+const ENGINE_LABEL = { openai: "OpenAI", gemini: "Gemini", claude: "Claude" };
+// «claude-sonnet-5-5» → «Claude Sonnet», «gemini-3.1-pro-preview» → «Gemini Pro», «gpt-6-astra» → «GPT-6 Astra»
 function modelLabel(model, fallback) {
   const m = String(model || "");
+  if (/^gpt-/.test(m)) return m.split("-").map((w, i) => (i === 0 ? "GPT" : w[0].toUpperCase() + w.slice(1)))
+    .join(" ").replace(/^GPT /, "GPT-");
   const c = m.match(/^claude-(opus|sonnet|haiku|fable)/);
   if (c) return "Claude " + c[1][0].toUpperCase() + c[1].slice(1);
   if (m.startsWith("gemini")) return /pro/.test(m) ? "Gemini Pro" : /flash-lite/.test(m) ? "Gemini Flash-Lite" : /flash/.test(m) ? "Gemini Flash" : "Gemini";

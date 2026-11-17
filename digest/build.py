@@ -7,7 +7,8 @@ AI Digest — сборщик данных для страницы.
   2. для интересных пишет русский заголовок и абстракт на 3–5 предложений;
   3. делает полный литературный перевод и шифрует его паролем DIGEST_PASSWORD.
 
-Модели: Gemini (по умолчанию, если задан GEMINI_API_KEY) или Claude (ANTHROPIC_API_KEY), переключатель PROVIDER.
+Движки: OpenAI (OPENAI_API_KEY), Gemini (GEMINI_API_KEY) или Claude (ANTHROPIC_API_KEY); при PROVIDER=auto
+берётся первый, для которого есть ключ, в этом порядке.
 Для сравнения первые COMPARE_LIMIT постов дополнительно переводят второй движок (если заданы оба ключа)
 и/или более дешёвая модель того же движка (COMPARE_MODEL, для Claude по умолчанию Haiku) —
 на странице появляется переключатель, чтобы сравнить качество.
@@ -71,13 +72,17 @@ def _env(name: str, default: str) -> str:
     return os.environ.get(name) or default
 
 
+PROVIDERS = ("openai", "gemini", "claude")  # порядок выбора при PROVIDER=auto: сначала движки с кредитами подписок
+
+
 @dataclass
 class Config:
     anthropic_key: str = ""
     gemini_key: str = ""
+    openai_key: str = ""
     password: str = ""
-    provider: str = "auto"           # gemini | claude | auto (= gemini, если есть его ключ)
-    compare_provider: str = "auto"   # второй переводчик для сравнения: claude | gemini | off | auto (= другой, если есть ключ)
+    provider: str = "auto"           # openai | gemini | claude | auto (= первый, у которого есть ключ)
+    compare_provider: str = "auto"   # другой движок для сравнения: openai | gemini | claude | off | auto (= все остальные с ключами)
     compare_limit: int = 3           # сколько постов перевести каждым вариантом для сравнения
     compare_model: str = "auto"      # ещё один переводчик того же движка: имя модели | off | auto (Claude → Haiku)
     # Claude (по умолчанию экономно: перевод Sonnet ≈ $4/мес, отбор и абстракты Haiku)
@@ -89,6 +94,11 @@ class Config:
     gemini_model_abstract: str = "gemini-3.1-pro-preview"
     gemini_model_translate: str = "gemini-3.1-pro-preview"
     gemini_thinking: str = "LOW"     # MINIMAL | LOW | MEDIUM | HIGH; пусто — по умолчанию модели
+    # OpenAI (оплачивается кредитами подписки ChatGPT Pro)
+    openai_model_score: str = "gpt-6-luna"
+    openai_model_abstract: str = "gpt-6.1-sol"
+    openai_model_translate: str = "gpt-6-astra"
+    openai_effort: str = "low"       # reasoning.effort: low | medium | high | xhigh | max; пусто — по умолчанию модели
     show_min_score: int = 6          # с этой оценки пост попадает на страницу (абстракт)
     translate_min_score: int = 6     # с этой оценки делается полный перевод
     max_translations_per_run: int = 4
@@ -105,6 +115,7 @@ class Config:
         return cls(
             anthropic_key=_env("ANTHROPIC_API_KEY", ""),
             gemini_key=_env("GEMINI_API_KEY", ""),
+            openai_key=_env("OPENAI_API_KEY", ""),
             password=_env("DIGEST_PASSWORD", ""),
             provider=e("PROVIDER", "provider").lower(),
             compare_provider=e("COMPARE_PROVIDER", "compare_provider").lower(),
@@ -117,6 +128,10 @@ class Config:
             gemini_model_abstract=e("GEMINI_MODEL_ABSTRACT", "gemini_model_abstract"),
             gemini_model_translate=e("GEMINI_MODEL_TRANSLATE", "gemini_model_translate"),
             gemini_thinking=e("GEMINI_THINKING_LEVEL", "gemini_thinking").upper(),
+            openai_model_score=e("OPENAI_MODEL_SCORE", "openai_model_score"),
+            openai_model_abstract=e("OPENAI_MODEL_ABSTRACT", "openai_model_abstract"),
+            openai_model_translate=e("OPENAI_MODEL_TRANSLATE", "openai_model_translate"),
+            openai_effort=e("OPENAI_REASONING_EFFORT", "openai_effort").lower(),
             show_min_score=int(e("SHOW_MIN_SCORE", "show_min_score")),
             translate_min_score=int(e("TRANSLATE_MIN_SCORE", "translate_min_score")),
             max_translations_per_run=int(e("MAX_TRANSLATIONS_PER_RUN", "max_translations_per_run")),
@@ -127,36 +142,32 @@ class Config:
         )
 
     def main_provider(self) -> str:
-        if self.provider == "auto":
-            return "gemini" if self.gemini_key else "claude"
-        return self.provider
+        if self.provider != "auto":
+            return self.provider
+        return next((p for p in PROVIDERS if self.has_key(p)), "claude")
 
-    def second_provider(self) -> str | None:
+    def compare_providers(self) -> list[str]:
+        """Другие движки, которыми переводить для сравнения."""
         main = self.main_provider()
         want = self.compare_provider
         if want in ("", "off", "none", "no", "0") or self.compare_limit <= 0:
-            return None
-        if want == "auto":
-            want = "claude" if main == "gemini" else "gemini"
-        if want == main or not self.has_key(want):
-            return None
-        return want
+            return []
+        candidates = PROVIDERS if want == "auto" else (want,)
+        return [p for p in candidates if p != main and self.has_key(p)]
 
     def has_key(self, provider: str) -> bool:
-        return bool(self.gemini_key if provider == "gemini" else self.anthropic_key)
+        return bool({"openai": self.openai_key, "gemini": self.gemini_key, "claude": self.anthropic_key}.get(provider))
 
     def translate_model(self, provider: str) -> str:
-        return self.gemini_model_translate if provider == "gemini" else self.claude_model_translate
+        return {"openai": self.openai_model_translate, "gemini": self.gemini_model_translate}.get(
+            provider, self.claude_model_translate)
 
     def variants(self) -> list[tuple[str, str, str]]:
         """Дополнительные переводы для сравнения: (вариант, движок, модель-переводчик)."""
         if self.compare_limit <= 0:
             return []
         main = self.main_provider()
-        out = []
-        other = self.second_provider()
-        if other:
-            out.append((other, other, self.translate_model(other)))
+        out = [(p, p, self.translate_model(p)) for p in self.compare_providers()]
         want = self.compare_model.strip()
         if want.lower() == "auto":
             want = "claude-haiku-5-5" if main == "claude" and "haiku" not in self.claude_model_translate else ""
@@ -487,8 +498,102 @@ class GeminiLLM:
         return text
 
 
+OPENAI_URL = "https://api.openai.com/v1/responses"
+
+
+def to_openai_schema(schema: dict) -> dict:
+    """JSON Schema для строгого structured output OpenAI: без min/max, все поля обязательны, без лишних полей."""
+    out: dict = {}
+    if "type" in schema:
+        out["type"] = schema["type"]
+    if "description" in schema:
+        out["description"] = schema["description"]
+    if "properties" in schema:
+        out["properties"] = {k: to_openai_schema(v) for k, v in schema["properties"].items()}
+        out["required"] = list(schema["properties"])
+        out["additionalProperties"] = False
+    if "items" in schema:
+        out["items"] = to_openai_schema(schema["items"])
+    return out
+
+
+class OpenAILLM:
+    """OpenAI Responses API через REST (без SDK)."""
+    name, label = "openai", "OpenAI"
+    RETRY_STATUSES = (429, 500, 502, 503, 504)
+
+    def __init__(self, cfg: Config, http: httpx.Client | None = None):
+        self.key = cfg.openai_key
+        self.effort = cfg.openai_effort.strip().lower()
+        self.models = {"score": cfg.openai_model_score, "abstract": cfg.openai_model_abstract,
+                       "translate": cfg.openai_model_translate}
+        self.http = http or httpx.Client(timeout=httpx.Timeout(900, connect=30))
+
+    def _respond(self, step: str, system: str, user: str, max_tokens: int, schema: dict | None = None,
+                 schema_name: str = "result"):
+        body: dict = {"model": self.models[step], "instructions": system, "input": user,
+                      "max_output_tokens": max_tokens, "store": False}
+        if self.effort:
+            body["reasoning"] = {"effort": self.effort}
+        if schema:
+            body["text"] = {"format": {"type": "json_schema", "name": schema_name, "schema": schema, "strict": True}}
+        for attempt in range(5):
+            r = self.http.post(OPENAI_URL, json=body, headers={"Authorization": f"Bearer {self.key}"})
+            if r.status_code == 400 and "reasoning" in body and "reasoning" in r.text.lower():
+                log.warning("OpenAI: модель %s не принимает reasoning.effort=%s, повторяю без него",
+                            self.models[step], self.effort)
+                body.pop("reasoning")
+                continue
+            if r.status_code == 429 and "insufficient_quota" in r.text:
+                raise RuntimeError("OpenAI: закончились кредиты API. Проверьте баланс на platform.openai.com "
+                                   "(Settings → Billing) или активацию кредитов ChatGPT Pro.")
+            if r.status_code in self.RETRY_STATUSES and attempt < 4:
+                wait = min(120, 10 * 2 ** attempt)
+                log.warning("OpenAI %s, повтор через %d с", r.status_code, wait)
+                time.sleep(wait)
+                continue
+            break
+        if r.status_code != 200:
+            try:
+                detail = r.json().get("error", {}).get("message", "")
+            except Exception:
+                detail = r.text[:300]
+            raise RuntimeError(f"OpenAI {r.status_code} ({self.models[step]}): {detail}")
+        data = r.json()
+        texts = []
+        for item in data.get("output") or []:
+            if item.get("type") != "message":
+                continue  # reasoning и прочие служебные элементы
+            for c in item.get("content") or []:
+                if c.get("type") == "refusal":
+                    raise RuntimeError(f"OpenAI отказался отвечать: {c.get('refusal', '')[:200]}")
+                if c.get("type") == "output_text":
+                    texts.append(c.get("text", ""))
+        cut = data.get("status") == "incomplete" and \
+            (data.get("incomplete_details") or {}).get("reason") == "max_output_tokens"
+        return "".join(texts), cut
+
+    def structured(self, step: str, system: str, tool: dict, user: str, max_tokens: int) -> dict:
+        # в лимит входят и токены размышлений, поэтому даём запас
+        text, cut = self._respond(step, system, user, max_tokens + 8192,
+                                  to_openai_schema(tool["input_schema"]), tool["name"])
+        if cut:
+            raise RuntimeError("OpenAI: ответ обрезан по длине")
+        return json.loads(text)
+
+    def text(self, step: str, system: str, user: str) -> str:
+        text, cut = self._respond(step, system, user, 32768)
+        if cut:
+            raise TruncatedOutput()
+        return text
+
+
 def make_llm(provider: str, cfg: Config, translate_model: str | None = None):
-    if provider == "gemini":
+    if provider == "openai":
+        if not cfg.openai_key:
+            raise SystemExit("Не задан OPENAI_API_KEY")
+        llm = OpenAILLM(cfg)
+    elif provider == "gemini":
         if not cfg.gemini_key:
             raise SystemExit("Не задан GEMINI_API_KEY")
         llm = GeminiLLM(cfg)
@@ -497,7 +602,7 @@ def make_llm(provider: str, cfg: Config, translate_model: str | None = None):
             raise SystemExit("Не задан ANTHROPIC_API_KEY")
         llm = ClaudeLLM(cfg)
     else:
-        raise SystemExit(f"Неизвестный PROVIDER: {provider} (нужно gemini или claude)")
+        raise SystemExit(f"Неизвестный PROVIDER: {provider} (нужно openai, gemini или claude)")
     if translate_model:
         llm.models["translate"] = translate_model
     return llm

@@ -46,6 +46,7 @@ jobs:
 
       - name: Собрать дайджест
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DIGEST_PASSWORD: ${{ secrets.DIGEST_PASSWORD }}
@@ -53,6 +54,10 @@ jobs:
           COMPARE_PROVIDER: ${{ vars.COMPARE_PROVIDER }}
           COMPARE_LIMIT: ${{ vars.COMPARE_LIMIT }}
           COMPARE_MODEL: ${{ vars.COMPARE_MODEL }}
+          OPENAI_MODEL_SCORE: ${{ vars.OPENAI_MODEL_SCORE }}
+          OPENAI_MODEL_ABSTRACT: ${{ vars.OPENAI_MODEL_ABSTRACT }}
+          OPENAI_MODEL_TRANSLATE: ${{ vars.OPENAI_MODEL_TRANSLATE }}
+          OPENAI_REASONING_EFFORT: ${{ vars.OPENAI_REASONING_EFFORT }}
           GEMINI_MODEL_SCORE: ${{ vars.GEMINI_MODEL_SCORE }}
           GEMINI_MODEL_ABSTRACT: ${{ vars.GEMINI_MODEL_ABSTRACT }}
           GEMINI_MODEL_TRANSLATE: ${{ vars.GEMINI_MODEL_TRANSLATE }}
