@@ -1,0 +1,33 @@
+name: Telegram check
+
+# Ручная проверка связи с Telegram Bot API с сервера GitHub Actions: моделей не вызывает и кредитов не тратит.
+# Показывает формат токена (без самого токена) и время ответа Telegram на чужой и на ваш токен.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Проверить токен и связь
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          t="$(printf '%s' "$TOKEN" | tr -d '\r')"
+          echo "Длина токена: ${#t}, строк: $(printf '%s' "$t" | wc -l | tr -d ' ') переводов строки"
+          if printf '%s' "$t" | grep -Eq '^[[:space:]]*[0-9]{6,}:[A-Za-z0-9_-]{30,}[[:space:]]*$'; then
+            echo "Формат токена правильный (число:строка)"
+          else
+            echo "::warning::Токен не похож на токен BotFather (ожидается вид 7123456789:AAH…): лишние слова, пробелы внутри или обрезан"
+          fi
+          t="$(printf '%s' "$t" | tr -d '[:space:]')"
+          probe() {
+            curl -sS -4 -m 25 -o /tmp/body -w "HTTP %{http_code}, соединение %{time_connect} с, ответ %{time_total} с\n" "$1" || echo "curl: ошибка $?"
+            head -c 300 /tmp/body 2>/dev/null | sed -E 's/[0-9]{6,}:[A-Za-z0-9_-]{20,}/[токен]/g'; echo
+          }
+          echo "--- api.telegram.org, корень"; probe "https://api.telegram.org/"
+          echo "--- getMe с заведомо неверным токеном (ожидается 401 или 404 за доли секунды)"; probe "https://api.telegram.org/bot123456:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/getMe"
+          echo "--- getMe с вашим токеном"; probe "https://api.telegram.org/bot${t}/getMe"
+          echo "--- getWebhookInfo с вашим токеном"; probe "https://api.telegram.org/bot${t}/getWebhookInfo"
