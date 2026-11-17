@@ -57,6 +57,8 @@ with sync_playwright() as p:
     # переключатель Gemini / Claude: у этого поста два перевода
     assert page.locator(".engines button").count() == 2
     assert page.get_attribute('.engines button[data-engine="gemini"]', "aria-pressed") == "true"
+    assert page.inner_text('.engines button[data-engine="gemini"]') == "Gemini Pro"
+    assert page.inner_text('.engines button[data-engine="claude"]') == "Claude Sonnet"
     page.click('.engines button[data-engine="claude"]')
     page.wait_for_function("document.querySelector('.prose') && document.querySelector('.prose').innerText.includes('Большие языковые модели')")
     assert page.get_attribute('.engines button[data-engine="claude"]', "aria-pressed") == "true"

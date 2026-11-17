@@ -52,6 +52,7 @@ jobs:
           PROVIDER: ${{ vars.PROVIDER }}
           COMPARE_PROVIDER: ${{ vars.COMPARE_PROVIDER }}
           COMPARE_LIMIT: ${{ vars.COMPARE_LIMIT }}
+          COMPARE_MODEL: ${{ vars.COMPARE_MODEL }}
           GEMINI_MODEL_SCORE: ${{ vars.GEMINI_MODEL_SCORE }}
           GEMINI_MODEL_ABSTRACT: ${{ vars.GEMINI_MODEL_ABSTRACT }}
           GEMINI_MODEL_TRANSLATE: ${{ vars.GEMINI_MODEL_TRANSLATE }}

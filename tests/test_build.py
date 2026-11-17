@@ -32,6 +32,10 @@ RU = {
                "и сам проверяет результат. Однако вместе с автономией растут и риски — модель способна уверенно ошибаться, "
                "а замечать это приходится человеку. Автор предлагает простое правило: доверять агенту ровно настолько, "
                "насколько легко проверить его работу.").split(". "),
+    "haiku": ("Языковые модели стали лучше справляться с длинными задачами: агент долго пишет код "
+              "и проверяет результат. Но с автономией растут и риски — модель может ошибаться уверенно, "
+              "и это должен замечать человек. Автор советует доверять агенту настолько, "
+              "насколько просто проверить его работу.").split(". "),
 }
 
 para = ("<p>Large language models are getting <strong>much better</strong> at <em>long tasks</em>. "
@@ -168,19 +172,20 @@ def claude_handler(req):
     content = body["messages"][0]["content"]
     if body.get("stream"):
         calls["c_translate"] += 1
-        assert body["model"] == "claude-opus-5-5" and body["system"] == build.TRANSLATOR_SYSTEM
+        assert body["model"] in ("claude-sonnet-5-5", "claude-haiku-5-5") and body["system"] == build.TRANSLATOR_SYSTEM
         src = source_of(content)
         if len(src) > 4000:
             calls["c_truncated"] += 1
             return httpx2.Response(200, text=sse("обрыв", "max_tokens"), headers={"content-type": "text/event-stream"})
-        return httpx2.Response(200, text=sse(fake_translate(src, "claude")), headers={"content-type": "text/event-stream"})
+        flavor = "haiku" if "haiku" in body["model"] else "claude"
+        return httpx2.Response(200, text=sse(fake_translate(src, flavor)), headers={"content-type": "text/event-stream"})
     name = body["tool_choice"]["name"]
     if name == "rate_post":
         calls["c_score"] += 1
         assert body["model"] == "claude-haiku-5-5"
         return tool_reply(body["model"], name, {"score": 3 if "Boring" in content else 8, "reason": "тест"})
     calls["c_abstract"] += 1
-    assert name == "save_abstract" and body["model"] == "claude-sonnet-5-5"
+    assert name == "save_abstract" and body["model"] == "claude-haiku-5-5"
     title = re.search(r"Заголовок: (.*)", content).group(1)
     return tool_reply(body["model"], name, {"title_ru": TITLES_RU.get(title, title), "abstract_ru": ". ".join(RU["claude"][:3]) + "."})
 
@@ -193,20 +198,25 @@ def fetch(feed):
 
 
 def writers(cfg):
-    gem = build.GeminiLLM(cfg, http=httpx.Client(transport=httpx.MockTransport(gemini_handler)))
-    cla = build.ClaudeLLM(cfg, client=build.anthropic.Anthropic(
-        api_key="x", http_client=httpx2.Client(transport=httpx2.MockTransport(claude_handler))))
-    llms = {"gemini": gem, "claude": cla}
-    main = build.Writer(cfg, llms[cfg.main_provider()])
-    second = cfg.second_provider()
-    return main, (build.Writer(cfg, llms[second]) if second else None)
+    def llm(provider, model=None):
+        if provider == "gemini":
+            l = build.GeminiLLM(cfg, http=httpx.Client(transport=httpx.MockTransport(gemini_handler)))
+        else:
+            l = build.ClaudeLLM(cfg, client=build.anthropic.Anthropic(
+                api_key="x", http_client=httpx2.Client(transport=httpx2.MockTransport(claude_handler))))
+        if model:
+            l.models["translate"] = model
+        return l
+    main = build.Writer(cfg, llm(cfg.main_provider()))
+    extras = [build.Writer(cfg, llm(p, m), variant=v) for v, p, m in cfg.variants()]
+    return main, extras
 
 
 def run_pass(cfg, out):
     data = build.DataDir(out)
     vault = build.Vault(PASSWORD, data.crypto, 1000)
-    main, second = writers(cfg)
-    return build.run(cfg, data, main, vault, fetch=fetch, second=second)
+    main, extras = writers(cfg)
+    return build.run(cfg, data, main, vault, fetch=fetch, extras=extras)
 
 
 def check_provider_logic():
@@ -218,6 +228,14 @@ def check_provider_logic():
     assert C(gemini_key="g", anthropic_key="a", provider="claude").second_provider() == "gemini"
     assert C(gemini_key="g", anthropic_key="a", compare_provider="off").second_provider() is None
     assert C(gemini_key="g", anthropic_key="a", compare_limit=0).second_provider() is None
+    # варианты для сравнения: другой движок и/или дешёвая модель того же движка
+    assert C(anthropic_key="a").variants() == [("claude-haiku-5-5", "claude", "claude-haiku-5-5")]
+    assert C(anthropic_key="a", claude_model_translate="claude-haiku-5-5").variants() == []
+    assert C(anthropic_key="a", compare_model="off").variants() == []
+    assert C(gemini_key="g").variants() == []
+    assert C(gemini_key="g", anthropic_key="a").variants() == [("claude", "claude", "claude-sonnet-5-5")]
+    assert C(gemini_key="g", anthropic_key="a", provider="claude").variants() == [
+        ("gemini", "gemini", "gemini-3.1-pro-preview"), ("claude-haiku-5-5", "claude", "claude-haiku-5-5")]
     # 429 с «limit: 0» (модель не входит в бесплатный уровень) — без повторов и с понятной ошибкой
     hits = []
     def free_tier(req):
@@ -258,11 +276,12 @@ def main():
     assert st2["new"] == 0 and st2["translated"] == 1 and st2["compared"] == 0
     assert calls["g_429"] == 1 and calls["g_score"] == 5 and calls["g_abstract"] == 4 and calls["g_truncated"] >= 1
     assert calls["c_score"] == 0 and calls["c_abstract"] == 0 and calls["c_translate"] >= 1 and calls["c_truncated"] >= 1
-    assert state["compare_done"] == 1
+    assert state["compare_done"] == {"claude": 1}
 
     ia = items["Import AI 481: AI sub-contractors & more"]
     ls = items["Building Visual Intelligence"]
-    assert ia["full"] == "ok" and ia["engine"] == "gemini" and ia["alt"] == ["claude"]
+    assert ia["full"] == "ok" and ia["engine"] == "gemini" and ia["model"] == "gemini-3.1-pro-preview"
+    assert ia["alt"] == [{"id": "claude", "model": "claude-sonnet-5-5"}]
     assert ls["full"] == "ok" and ls["engine"] == "gemini" and "alt" not in ls
     assert ia["title_ru"].startswith("Import AI 481: ИИ-субподрядчики")
     assert items["How big is the open model economy today?"]["full"] == "paywalled"
@@ -273,7 +292,7 @@ def main():
     main_doc = v.decrypt_json(json.loads((OUT / "full" / f"{ia['id']}.json").read_text()))
     alt_doc = v.decrypt_json(json.loads((OUT / "full" / f"{ia['id']}--claude.json").read_text()))
     assert main_doc["engine"] == "gemini" and main_doc["model"] == "gemini-3.1-pro-preview"
-    assert alt_doc["engine"] == "claude" and alt_doc["model"] == "claude-opus-5-5"
+    assert alt_doc["engine"] == "claude" and alt_doc["model"] == "claude-sonnet-5-5"
     assert "Крупные языковые модели" in main_doc["html"] and "Большие" not in main_doc["html"]
     assert "Большие языковые модели" in alt_doc["html"]
     assert "обдумаю" not in main_doc["html"], "в перевод попали «размышления» Gemini"
@@ -287,15 +306,22 @@ def main():
     except SystemExit:
         pass
 
-    # --- Сценарий B: только ключ Claude — всё делает Claude, сравнения нет ---
+    # --- Сценарий B: только ключ Claude — перевод Sonnet, для сравнения Haiku ---
     out_b = Path(tempfile.mkdtemp()) / "data"
     cfg_b = build.Config(anthropic_key="a-key", password=PASSWORD, chunk_chars=9000, max_translations_per_run=1)
     before = dict(calls)
     st_b = run_pass(cfg_b, out_b)
     feed_b = json.loads((out_b / "feed.json").read_text())
     ia_b = next(it for it in feed_b["items"] if it["title_en"].startswith("Import AI 481"))
-    assert st_b["translated"] == 1 and st_b["compared"] == 0 and ia_b["engine"] == "claude" and "alt" not in ia_b
+    assert st_b["translated"] == 1 and st_b["compared"] == 1
+    assert ia_b["engine"] == "claude" and ia_b["model"] == "claude-sonnet-5-5"
+    assert ia_b["alt"] == [{"id": "claude-haiku-5-5", "model": "claude-haiku-5-5"}]
     assert calls["c_score"] - before["c_score"] == 5 and calls["g_score"] == before["g_score"]
+    vb = build.Vault(PASSWORD, feed_b["crypto"], 1000)
+    sonnet = vb.decrypt_json(json.loads((out_b / "full" / f"{ia_b['id']}.json").read_text()))
+    haiku = vb.decrypt_json(json.loads((out_b / "full" / f"{ia_b['id']}--claude-haiku-5-5.json").read_text()))
+    assert sonnet["model"] == "claude-sonnet-5-5" and "Большие языковые модели" in sonnet["html"]
+    assert haiku["model"] == "claude-haiku-5-5" and "Языковые модели стали лучше" in haiku["html"]
     print("B:", st_b)
     print("ВСЕ ПРОВЕРКИ СБОРЩИКА ПРОЙДЕНЫ →", OUT)
 

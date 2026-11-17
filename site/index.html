@@ -479,6 +479,14 @@ function closeReader() {
 }
 
 const ENGINE_LABEL = { gemini: "Gemini", claude: "Claude" };
+// «claude-sonnet-5-5» → «Claude Sonnet», «gemini-3.1-pro-preview» → «Gemini Pro»
+function modelLabel(model, fallback) {
+  const m = String(model || "");
+  const c = m.match(/^claude-(opus|sonnet|haiku|fable)/);
+  if (c) return "Claude " + c[1][0].toUpperCase() + c[1].slice(1);
+  if (m.startsWith("gemini")) return /pro/.test(m) ? "Gemini Pro" : /flash-lite/.test(m) ? "Gemini Flash-Lite" : /flash/.test(m) ? "Gemini Flash" : "Gemini";
+  return ENGINE_LABEL[fallback] || fallback || "ИИ";
+}
 let fullSeq = 0;  // защищает от гонки, если перевод переключили, пока грузился прошлый
 
 async function renderFull(it, engine) {
@@ -497,13 +505,18 @@ async function renderFull(it, engine) {
   if (!cryptoKey) cryptoKey = await savedKey();
   if (!cryptoKey) return renderUnlock(it, box);
 
-  const engines = it.engine ? [it.engine, ...(it.alt || [])] : [];
-  engine = engine || it.engine;
-  const file = !engine || engine === it.engine ? `full/${it.id}.json` : `full/${it.id}--${engine}.json`;
-  const switcher = engines.length > 1
-    ? `<div class="engines" role="group" aria-label="Чей перевод показать">${engines.map((e) =>
-        `<button type="button" data-engine="${esc(e)}" aria-pressed="${e === engine}">${esc(ENGINE_LABEL[e] || e)}</button>`).join("")}</div>
-       <p class="engines-note">Этот текст переведён двумя моделями. Переключайтесь, чтобы сравнить.</p>`
+  // варианты перевода: основной + для сравнения (alt — список {id, model}; старый формат — строки)
+  const variants = it.engine
+    ? [{ id: it.engine, model: it.model, main: true }, ...(it.alt || []).map((a) => (typeof a === "string" ? { id: a } : a))]
+    : [];
+  const cur = variants.find((v) => v.id === engine) || variants[0];
+  engine = cur ? cur.id : undefined;
+  const file = !cur || cur.main ? `full/${it.id}.json` : `full/${it.id}--${cur.id}.json`;
+  const n = variants.length;
+  const switcher = n > 1
+    ? `<div class="engines" role="group" aria-label="Чей перевод показать">${variants.map((v) =>
+        `<button type="button" data-engine="${esc(v.id)}" aria-pressed="${v.id === engine}">${esc(modelLabel(v.model, v.id))}</button>`).join("")}</div>
+       <p class="engines-note">Этот текст переведён ${n === 2 ? "двумя моделями" : n + " моделями"}. Переключайтесь, чтобы сравнить.</p>`
     : "";
   box.innerHTML = switcher + `<p class="notice">Открываю перевод…</p>`;
   box.querySelectorAll("button[data-engine]").forEach((b) =>
@@ -517,8 +530,7 @@ async function renderFull(it, engine) {
     prose.className = "prose";
     prose.append(cleanFragment(data.html));
     box.querySelector(".notice").replaceWith(prose);
-    const label = ENGINE_LABEL[data.engine] || (String(data.model || "").startsWith("claude") ? "Claude" : "");
-    $("#engine-line").textContent = ` Перевод: ${label ? label + ", " : ""}${data.model || "ИИ"}.`;
+    $("#engine-line").textContent = ` Перевод: ${modelLabel(data.model, data.engine)}${data.model ? " (" + data.model + ")" : ""}.`;
   } catch (e) {
     if (seq !== fullSeq) return;
     const n = box.querySelector(".notice");

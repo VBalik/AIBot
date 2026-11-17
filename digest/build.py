@@ -8,13 +8,14 @@ AI Digest — сборщик данных для страницы.
   3. делает полный литературный перевод и шифрует его паролем DIGEST_PASSWORD.
 
 Модели: Gemini (по умолчанию, если задан GEMINI_API_KEY) или Claude (ANTHROPIC_API_KEY), переключатель PROVIDER.
-Если заданы оба ключа, первые COMPARE_LIMIT постов дополнительно переводит второй движок —
+Для сравнения первые COMPARE_LIMIT постов дополнительно переводят второй движок (если заданы оба ключа)
+и/или более дешёвая модель того же движка (COMPARE_MODEL, для Claude по умолчанию Haiku) —
 на странице появляется переключатель, чтобы сравнить качество.
 
 Результат — каталог данных (в GitHub он живёт в ветке `data`):
   feed.json        список постов с абстрактами + параметры шифрования
   full/<id>.json   полный перевод: gzip(JSON) → AES-256-GCM, ключ = PBKDF2-SHA256(пароль)
-  full/<id>--<движок>.json   второй перевод для сравнения (если есть)
+  full/<id>--<вариант>.json  перевод для сравнения (вариант = движок или модель)
   state.json       какие посты уже видели и с какой оценкой
 
 Запуск:
@@ -77,11 +78,12 @@ class Config:
     password: str = ""
     provider: str = "auto"           # gemini | claude | auto (= gemini, если есть его ключ)
     compare_provider: str = "auto"   # второй переводчик для сравнения: claude | gemini | off | auto (= другой, если есть ключ)
-    compare_limit: int = 3           # сколько постов перевести вторым движком
-    # Claude
+    compare_limit: int = 3           # сколько постов перевести каждым вариантом для сравнения
+    compare_model: str = "auto"      # ещё один переводчик того же движка: имя модели | off | auto (Claude → Haiku)
+    # Claude (по умолчанию экономно: перевод Sonnet ≈ $4/мес, отбор и абстракты Haiku)
     claude_model_score: str = "claude-haiku-5-5"
-    claude_model_abstract: str = "claude-sonnet-5-5"
-    claude_model_translate: str = "claude-opus-5-5"
+    claude_model_abstract: str = "claude-haiku-5-5"
+    claude_model_translate: str = "claude-sonnet-5-5"
     # Gemini
     gemini_model_score: str = "gemini-3.1-flash-lite"
     gemini_model_abstract: str = "gemini-3.1-pro-preview"
@@ -107,6 +109,7 @@ class Config:
             provider=e("PROVIDER", "provider").lower(),
             compare_provider=e("COMPARE_PROVIDER", "compare_provider").lower(),
             compare_limit=int(e("COMPARE_LIMIT", "compare_limit")),
+            compare_model=e("COMPARE_MODEL", "compare_model"),
             claude_model_score=e("CLAUDE_MODEL_SCORE", "claude_model_score"),
             claude_model_abstract=e("CLAUDE_MODEL_ABSTRACT", "claude_model_abstract"),
             claude_model_translate=e("CLAUDE_MODEL_TRANSLATE", "claude_model_translate"),
@@ -141,6 +144,25 @@ class Config:
 
     def has_key(self, provider: str) -> bool:
         return bool(self.gemini_key if provider == "gemini" else self.anthropic_key)
+
+    def translate_model(self, provider: str) -> str:
+        return self.gemini_model_translate if provider == "gemini" else self.claude_model_translate
+
+    def variants(self) -> list[tuple[str, str, str]]:
+        """Дополнительные переводы для сравнения: (вариант, движок, модель-переводчик)."""
+        if self.compare_limit <= 0:
+            return []
+        main = self.main_provider()
+        out = []
+        other = self.second_provider()
+        if other:
+            out.append((other, other, self.translate_model(other)))
+        want = self.compare_model.strip()
+        if want.lower() == "auto":
+            want = "claude-haiku-5-5" if main == "claude" and "haiku" not in self.claude_model_translate else ""
+        if want.lower() not in ("", "off", "none", "no", "0") and want != self.translate_model(main):
+            out.append((want, main, want))
+        return out
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
@@ -465,24 +487,29 @@ class GeminiLLM:
         return text
 
 
-def make_llm(provider: str, cfg: Config):
+def make_llm(provider: str, cfg: Config, translate_model: str | None = None):
     if provider == "gemini":
         if not cfg.gemini_key:
             raise SystemExit("Не задан GEMINI_API_KEY")
-        return GeminiLLM(cfg)
-    if provider == "claude":
+        llm = GeminiLLM(cfg)
+    elif provider == "claude":
         if not cfg.anthropic_key:
             raise SystemExit("Не задан ANTHROPIC_API_KEY")
-        return ClaudeLLM(cfg)
-    raise SystemExit(f"Неизвестный PROVIDER: {provider} (нужно gemini или claude)")
+        llm = ClaudeLLM(cfg)
+    else:
+        raise SystemExit(f"Неизвестный PROVIDER: {provider} (нужно gemini или claude)")
+    if translate_model:
+        llm.models["translate"] = translate_model
+    return llm
 
 
 class Writer:
     """Шаги дайджеста поверх любой модели: оценка, абстракт, полный перевод."""
 
-    def __init__(self, cfg: Config, llm):
+    def __init__(self, cfg: Config, llm, variant: str | None = None):
         self.cfg = cfg
         self.llm = llm
+        self.variant = variant or llm.name  # имя варианта перевода (для файла full/<id>--<variant>.json)
 
     def score(self, post: Post) -> tuple[int, str]:
         system = ("Ты отбираешь посты для персонального дайджеста лучших текстов об ИИ. Интересы читателя:\n"
@@ -535,7 +562,7 @@ class Writer:
             tr = self._translate_safe(ch, context, post, f"Фрагмент {i + 1} из {len(chunks)}")
             parts.append(tr)
             context = BeautifulSoup(tr, "html.parser").get_text(" ", strip=True)[-1500:]
-            log.info("    %s: фрагмент %d/%d готов", self.llm.label, i + 1, len(chunks))
+            log.info("    %s: фрагмент %d/%d готов", self.llm.models["translate"], i + 1, len(chunks))
         return str(sanitize_html("\n".join(parts))).strip()
 
 
@@ -615,6 +642,12 @@ class DataDir:
         self.crypto = feed.get("crypto")
         self.items: dict[str, dict] = {it["id"]: it for it in feed.get("items", [])}
 
+    def compare_done(self) -> dict:
+        done = self.state.get("compare_done")
+        if not isinstance(done, dict):
+            done = self.state["compare_done"] = {}
+        return done
+
     def seen(self, pid: str) -> bool:
         return pid in self.state["posts"]
 
@@ -629,8 +662,8 @@ class DataDir:
         ordered = sorted(self.items.values(), key=lambda it: it["published"], reverse=True)
         for it in ordered[keep:]:
             self.full_path(it["id"]).unlink(missing_ok=True)
-            for engine in it.get("alt", []):
-                self.full_path(it["id"], engine).unlink(missing_ok=True)
+            for alt in it.get("alt", []):
+                self.full_path(it["id"], alt["id"] if isinstance(alt, dict) else alt).unlink(missing_ok=True)
             del self.items[it["id"]]
         cutoff = _iso(_now() - timedelta(days=state_days))
         self.state["posts"] = {k: v for k, v in self.state["posts"].items()
@@ -665,7 +698,7 @@ def full_status_for(cfg: Config, post: Post, score: int) -> str:
 
 
 def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_feed,
-        second: Writer | None = None) -> dict:
+        extras: list[Writer] | None = None) -> dict:
     data.crypto = vault.meta
     cutoff = _now() - timedelta(days=cfg.lookback_days)
     live: dict[str, Post] = {}
@@ -723,7 +756,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
         if post is None:
             it["full"] = "unavailable"
             continue
-        log.info("Перевожу (%s): %s", writer.llm.label, post.title)
+        log.info("Перевожу (%s): %s", writer.llm.models["translate"], post.title)
         try:
             html_ru = writer.translate(post)
         except Exception as exc:
@@ -737,22 +770,27 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
         _save_translation(data, vault, it, writer, html_ru)
         it["full"] = "ok"
         it["engine"] = writer.llm.name
+        it["model"] = writer.llm.models["translate"]
         it.pop("attempts", None)
         stats["translated"] += 1
         data.save()
 
-        # 3. Второй перевод того же поста для сравнения (первые compare_limit постов)
-        if second is not None and data.state.get("compare_done", 0) < cfg.compare_limit:
-            log.info("Перевожу для сравнения (%s): %s", second.llm.label, post.title)
+        # 3. Тот же пост другими переводчиками — для сравнения (первые compare_limit постов каждого варианта)
+        done = data.compare_done()
+        for ex in extras or []:
+            if done.get(ex.variant, 0) >= cfg.compare_limit:
+                continue
+            log.info("Перевожу для сравнения (%s): %s", ex.llm.models["translate"], post.title)
             try:
-                alt_html = second.translate(post)
+                alt_html = ex.translate(post)
             except Exception as exc:
-                log.warning("Сравнительный перевод не удался: %s", exc)
+                log.warning("Сравнительный перевод (%s) не удался: %s", ex.variant, exc)
                 stats["errors"] += 1
                 continue
-            _save_translation(data, vault, it, second, alt_html, alt=True)
-            it["alt"] = sorted(set(it.get("alt", [])) | {second.llm.name})
-            data.state["compare_done"] = data.state.get("compare_done", 0) + 1
+            _save_translation(data, vault, it, ex, alt_html, variant=ex.variant)
+            it["alt"] = [a for a in it.get("alt", []) if isinstance(a, dict) and a["id"] != ex.variant] + \
+                        [{"id": ex.variant, "model": ex.llm.models["translate"]}]
+            done[ex.variant] = done.get(ex.variant, 0) + 1
             stats["compared"] += 1
             data.save()
 
@@ -761,10 +799,11 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
     return stats
 
 
-def _save_translation(data: DataDir, vault: Vault, it: dict, writer: Writer, html_ru: str, alt: bool = False) -> None:
+def _save_translation(data: DataDir, vault: Vault, it: dict, writer: Writer, html_ru: str,
+                      variant: str | None = None) -> None:
     payload = {"html": html_ru, "engine": writer.llm.name, "model": writer.llm.models["translate"],
                "translated_at": _iso(_now())}
-    path = data.full_path(it["id"], writer.llm.name if alt else None)
+    path = data.full_path(it["id"], variant)
     _write_json(path, vault.encrypt_json(payload), compact=True)
 
 
@@ -783,17 +822,16 @@ def main() -> None:
 
     main_name = cfg.main_provider()
     writer = Writer(cfg, make_llm(main_name, cfg))
-    second_name = cfg.second_provider()
-    second = Writer(cfg, make_llm(second_name, cfg)) if second_name else None
+    extras = [Writer(cfg, make_llm(provider, cfg, translate_model=model), variant=variant)
+              for variant, provider, model in cfg.variants()]
     m = writer.llm.models
     log.info("Движок: %s — отбор %s, абстракты %s, перевод %s", writer.llm.label, m["score"], m["abstract"], m["translate"])
-    if second:
-        log.info("Сравнение: %s (%s), осталось постов: %d", second.llm.label, second.llm.models["translate"],
-                 max(0, cfg.compare_limit))
+    for ex in extras:
+        log.info("Сравнение: %s (до %d постов)", ex.llm.models["translate"], cfg.compare_limit)
 
     data = DataDir(Path(args.data))
     vault = Vault(cfg.password, data.crypto, cfg.kdf_iterations)
-    stats = run(cfg, data, writer, vault, second=second)
+    stats = run(cfg, data, writer, vault, extras=extras)
     log.info("Готово: новых %(new)d, на страницу %(shown)d, переведено %(translated)d, "
              "для сравнения %(compared)d, ошибок %(errors)d", stats)
 
