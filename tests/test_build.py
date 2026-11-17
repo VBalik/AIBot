@@ -271,18 +271,21 @@ TG_ALLOWED = {"b", "strong", "i", "em", "u", "ins", "s", "strike", "del", "a", "
 class FakeTelegram:
     """Отвечает как api.telegram.org: getUpdates, getChat, sendMessage; запоминает отправленное."""
 
-    def __init__(self, chat_type="private", username=None, fail_send=0, bad_markup=0):
+    def __init__(self, chat_type="private", username=None, fail_send=0, bad_markup=0, fail_updates=0):
         self.updates = [{"update_id": 700, "message": {"text": "/start", "chat": {"id": 555, "type": "private"}}},
                         {"update_id": 701, "message": {"text": "hi", "chat": {"id": -100, "type": "group"}}}]
         self.chat = {"id": 555, "type": chat_type, **({"username": username} if username else {})}
         self.sent, self.offsets = [], []
-        self.fail_send, self.bad_markup = fail_send, bad_markup
+        self.fail_send, self.bad_markup, self.fail_updates = fail_send, bad_markup, fail_updates
 
     def handler(self, req: httpx.Request):
         method = req.url.path.rsplit("/", 1)[-1]
         assert req.url.path.startswith("/bot123456:TEST-token-for-tests-only-0123456789/"), req.url
         body = json.loads(req.content)
         if method == "getUpdates":
+            if self.fail_updates:  # так ответил настоящий Telegram в первом прогоне
+                self.fail_updates -= 1
+                return httpx.Response(502, json={"ok": False, "error_code": 502, "description": "Bad Gateway"})
             off = body.get("offset", 0)
             self.offsets.append(off)
             return httpx.Response(200, json={"ok": True, "result": [u for u in self.updates if u["update_id"] >= off]})
@@ -328,9 +331,9 @@ def check_telegram(src_out):
 
     # 1) chat_id ещё не задан: бот отвечает на /start в личке и подсказывает chat_id, статей не шлёт
     out = fresh_copy()
-    tg = FakeTelegram()
+    tg = FakeTelegram(fail_updates=2)  # пара «Bad Gateway» — повтор, а не ошибка
     st = run_pass(build.Config(**base), out, tg=tg.api())
-    assert st["telegram"] == 0 and len(tg.sent) == 1, tg.sent
+    assert st["telegram"] == 0 and len(tg.sent) == 1 and st["errors"] == 1, (tg.sent, st)
     assert tg.sent[0]["chat_id"] == "555" and "<code>555</code>" in tg.sent[0]["text"]
     assert "TELEGRAM_CHAT_ID" in tg.sent[0]["text"] and tg.offsets[-1] == 702  # прочтение подтверждено
     state = json.loads((out / "state.json").read_text())
@@ -393,7 +396,7 @@ def check_telegram(src_out):
         st = run_pass(build.Config(**base, telegram_chat_id="555"), out, tg=tg.api())
         assert st["telegram"] == 0 and st["errors"] >= 1 and st["api_errors"] == 0, st
     state = json.loads((out / "state.json").read_text())
-    assert any("Telegram" in e and "Bad Gateway" in e for e in state["last_run"]["errors"])
+    assert any("Telegram sendMessage: Bad Gateway (после 5 попыток)" in e for e in state["last_run"]["errors"]), state["last_run"]
     feed = json.loads((out / "feed.json").read_text())
     assert next(it for it in sorted(feed["items"], key=lambda it: it["published"], reverse=True)
                 if it["full"] != "pending")["tg"] == "error"

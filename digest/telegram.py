@@ -202,24 +202,36 @@ def build_messages(item: dict, source: dict, html_ru: str | None, site_url: str)
 
 class TelegramAPI:
     def __init__(self, token: str, http: httpx.Client | None = None):
-        self.base = f"https://api.telegram.org/bot{token}"
+        self.base = f"https://api.telegram.org/bot{token.strip()}"  # при копировании с телефона цепляются пробелы
         self.http = http or httpx.Client(timeout=30)
 
     def call(self, method: str, payload: dict) -> dict | list:
-        for _ in range(5):
-            r = self.http.post(f"{self.base}/{method}", json=payload)
+        last = ""
+        for attempt in range(5):
+            try:
+                r = self.http.post(f"{self.base}/{method}", json=payload)
+            except httpx.TransportError as exc:  # обрыв соединения, таймаут
+                last = f"нет связи ({type(exc).__name__})"
+                time.sleep(5 * (attempt + 1))
+                continue
             try:
                 data = r.json()
             except ValueError:
-                raise RuntimeError(f"Telegram {method}: HTTP {r.status_code}")
+                data = {"description": f"HTTP {r.status_code}"}
             if data.get("ok"):
                 return data["result"]
+            last = data.get("description") or f"HTTP {r.status_code}"
             retry = (data.get("parameters") or {}).get("retry_after")
             if r.status_code == 429 and retry:
                 time.sleep(min(int(retry), 60) + 1)
                 continue
-            raise RuntimeError(f"Telegram {method}: {data.get('description', r.status_code)}")
-        raise RuntimeError(f"Telegram {method}: слишком много повторов")
+            if r.status_code >= 500:  # «Bad Gateway» и подобное у Telegram обычно проходит за секунды
+                time.sleep(5 * (attempt + 1))
+                continue
+            if r.status_code == 401:
+                last += " — токен бота неверный: проверьте секрет TELEGRAM_BOT_TOKEN"
+            raise RuntimeError(f"Telegram {method}: {last}")
+        raise RuntimeError(f"Telegram {method}: {last} (после 5 попыток)")
 
     def send(self, chat_id: str, text: str) -> dict:
         return self.call("sendMessage", {"chat_id": chat_id, "text": text, "parse_mode": "HTML",
@@ -285,14 +297,14 @@ def mirror(items: list[dict], sources: dict, load_full, state: dict, *, api: Tel
     try:
         answer_start(api, state, chat_id)
     except Exception as exc:
-        problem(f"Telegram getUpdates: {exc}")
+        problem(str(exc))
     if not chat_id:
         log.info("Telegram: TELEGRAM_CHAT_ID не задан — напишите боту /start, он подскажет chat_id")
         return 0
     try:
         public = api.is_public(chat_id)
     except Exception as exc:
-        problem(f"Telegram getChat: {exc}")
+        problem(str(exc))
         return 0
     ready = [it for it in items if not it.get("tg") and it.get("full") != "pending"]
     ready.sort(key=lambda it: it["published"], reverse=True)  # сначала самые свежие
