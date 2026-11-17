@@ -1,6 +1,7 @@
 name: Update digest
 
-# Каждый час: читает ленты, пишет абстракты, переводит, публикует данные в ветку `data`.
+# Каждый час: читает ленты, пишет абстракты, переводит, публикует данные в ветку `data`
+# и (если задан TELEGRAM_BOT_TOKEN) отправляет готовые статьи в Telegram.
 # Ветка `data` перезаписывается одним коммитом (без истории), чтобы репозиторий не разрастался.
 # Netlify собирает только main, поэтому обновления данных не тратят кредиты Netlify.
 
@@ -50,6 +51,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DIGEST_PASSWORD: ${{ secrets.DIGEST_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           PROVIDER: ${{ vars.PROVIDER }}
           COMPARE_PROVIDER: ${{ vars.COMPARE_PROVIDER }}
           COMPARE_LIMIT: ${{ vars.COMPARE_LIMIT }}
@@ -70,6 +73,8 @@ jobs:
           MAX_TRANSLATIONS_PER_RUN: ${{ inputs.max_translations || vars.MAX_TRANSLATIONS_PER_RUN }}
           MAX_TRANSLATE_CHARS: ${{ vars.MAX_TRANSLATE_CHARS }}
           INTERESTS: ${{ vars.INTERESTS }}
+          TELEGRAM_MAX_POSTS_PER_RUN: ${{ vars.TELEGRAM_MAX_POSTS_PER_RUN }}
+          SITE_URL: ${{ vars.SITE_URL }}
         run: python digest/build.py --data data
 
       - name: Опубликовать данные в ветку data

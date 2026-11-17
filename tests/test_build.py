@@ -257,11 +257,150 @@ def writers(cfg):
     return main, extras
 
 
-def run_pass(cfg, out):
+def run_pass(cfg, out, tg=None):
     data = build.DataDir(out)
     vault = build.Vault(PASSWORD, data.crypto, 1000)
     main, extras = writers(cfg)
-    return build.run(cfg, data, main, vault, fetch=fetch, extras=extras)
+    return build.run(cfg, data, main, vault, fetch=fetch, extras=extras, tg=tg)
+
+
+# ---------- Telegram Bot API (имитация) ----------
+TG_ALLOWED = {"b", "strong", "i", "em", "u", "ins", "s", "strike", "del", "a", "code", "pre", "blockquote"}
+
+
+class FakeTelegram:
+    """Отвечает как api.telegram.org: getUpdates, getChat, sendMessage; запоминает отправленное."""
+
+    def __init__(self, chat_type="private", username=None, fail_send=0, bad_markup=0):
+        self.updates = [{"update_id": 700, "message": {"text": "/start", "chat": {"id": 555, "type": "private"}}},
+                        {"update_id": 701, "message": {"text": "hi", "chat": {"id": -100, "type": "group"}}}]
+        self.chat = {"id": 555, "type": chat_type, **({"username": username} if username else {})}
+        self.sent, self.offsets = [], []
+        self.fail_send, self.bad_markup = fail_send, bad_markup
+
+    def handler(self, req: httpx.Request):
+        method = req.url.path.rsplit("/", 1)[-1]
+        assert req.url.path.startswith("/bot123456:TEST-token-for-tests-only-0123456789/"), req.url
+        body = json.loads(req.content)
+        if method == "getUpdates":
+            off = body.get("offset", 0)
+            self.offsets.append(off)
+            return httpx.Response(200, json={"ok": True, "result": [u for u in self.updates if u["update_id"] >= off]})
+        if method == "getChat":
+            return httpx.Response(200, json={"ok": True, "result": self.chat})
+        if method == "sendMessage":
+            if self.fail_send:
+                self.fail_send -= 1
+                return httpx.Response(502, json={"ok": False, "description": "Bad Gateway"})
+            if self.bad_markup and body.get("parse_mode") == "HTML":
+                self.bad_markup -= 1
+                return httpx.Response(400, json={"ok": False, "description":
+                    "Bad Request: can't parse entities: unsupported start tag \"x\" at byte offset 3"})
+            text = body["text"]
+            assert len(text) <= build.telegram.TG_LIMIT, len(text)
+            if body.get("parse_mode") == "HTML":  # только поддерживаемые Telegram теги, все закрыты
+                tags = re.findall(r"<(/?)([a-z]+)[^>]*>", text)
+                assert {t for _, t in tags} <= TG_ALLOWED, {t for _, t in tags} - TG_ALLOWED
+                stack = []
+                for close, t in tags:
+                    if close:
+                        assert stack and stack.pop() == t, (t, text[:300])
+                    else:
+                        stack.append(t)
+                assert not stack, stack
+            self.sent.append(body)
+            return httpx.Response(200, json={"ok": True, "result": {"message_id": len(self.sent)}})
+        raise AssertionError(method)
+
+    def api(self):
+        return build.telegram.TelegramAPI("123456:TEST-token-for-tests-only-0123456789",
+                                          http=httpx.Client(transport=httpx.MockTransport(self.handler)))
+
+
+def check_telegram(src_out):
+    """Зеркало в Telegram: подсказка chat_id, полные переводы в личку, только абстракты в публичный канал."""
+    def fresh_copy():
+        out = Path(tempfile.mkdtemp()) / "data"
+        shutil.copytree(src_out, out)
+        return out
+    base = dict(openai_key="o-key", password=PASSWORD, chunk_chars=9000, max_translations_per_run=0,
+                telegram_token="123456:TEST-token-for-tests-only-0123456789")
+
+    # 1) chat_id ещё не задан: бот отвечает на /start в личке и подсказывает chat_id, статей не шлёт
+    out = fresh_copy()
+    tg = FakeTelegram()
+    st = run_pass(build.Config(**base), out, tg=tg.api())
+    assert st["telegram"] == 0 and len(tg.sent) == 1, tg.sent
+    assert tg.sent[0]["chat_id"] == "555" and "<code>555</code>" in tg.sent[0]["text"]
+    assert "TELEGRAM_CHAT_ID" in tg.sent[0]["text"] and tg.offsets[-1] == 702  # прочтение подтверждено
+    state = json.loads((out / "state.json").read_text())
+    assert state["telegram"] == {"update_offset": 702}
+    tg.sent.clear()
+    run_pass(build.Config(**base), out, tg=tg.api())
+    assert tg.sent == [], "повторно ответил на тот же /start"
+
+    # 2) личный чат: по 2 статьи за прогон, сначала свежие; переведённая — целиком, остальные — абстракт
+    out = fresh_copy()
+    tg = FakeTelegram()
+    cfg = build.Config(**base, telegram_chat_id="555")
+    st = run_pass(cfg, out, tg=tg.api())
+    feed = json.loads((out / "feed.json").read_text())
+    ready = sorted((it for it in feed["items"] if it["full"] != "pending"), key=lambda it: it["published"], reverse=True)
+    assert st["telegram"] == 2 and st["api_errors"] == 0, st
+    assert [it.get("tg") for it in ready[:2]] == [("full" if it["full"] == "ok" else "abstract") for it in ready[:2]]
+    assert all(not it.get("tg") for it in ready[2:])
+    texts = [m["text"] for m in tg.sent[1:]]  # первое — ответ на /start
+    assert tg.sent[0]["text"].startswith("✅")
+    ia = next(it for it in feed["items"] if it["full"] == "ok")
+    ia_msgs = [t for t in texts if ia["title_ru"][:30] in t or "Языковые модели заметно выросли" in t]
+    whole = "\n".join(texts)
+    assert ia["abstract"][:40] in whole and "Языковые модели заметно выросли" in whole
+    assert "def f(x):\n    return x &lt; 2" in whole  # код из перевода дошёл без искажений
+    assert "🖼 иллюстрация" in whole and "<pre>" in whole and "• " in whole
+    assert f"aidigestbot.netlify.app/#/p/{ia['id']}" in whole and ia["url"] in whole
+    assert len(ia_msgs) >= 1 and len(texts) >= 3, len(texts)
+    n_before = len(tg.sent)
+    st2 = run_pass(cfg, out, tg=tg.api())
+    feed = json.loads((out / "feed.json").read_text())
+    assert st2["telegram"] == min(2, len(ready) - 2)
+    assert all(it.get("tg") for it in feed["items"] if it["full"] != "pending")
+    sent_ids = [m["text"] for m in tg.sent[n_before:]]
+    assert not any(ia["title_ru"] in t for t in sent_ids), "статья ушла второй раз"
+    assert "555" not in (out / "state.json").read_text().replace('"update_offset": 702', "")
+
+    # 3) публичный канал: только абстракты и ссылки, полные переводы туда не уходят
+    out = fresh_copy()
+    tg = FakeTelegram(chat_type="channel", username="ai_digest_public")
+    st = run_pass(build.Config(**base, telegram_chat_id="@ai_digest_public", telegram_max_posts=10), out, tg=tg.api())
+    feed = json.loads((out / "feed.json").read_text())
+    assert st["telegram"] == len(ready) and all(it.get("tg") in (None, "abstract") for it in feed["items"])
+    whole = "\n".join(m["text"] for m in tg.sent)
+    assert "def f(x)" not in whole and "🖼" not in whole and ia["abstract"][:40] in whole  # переводов нет
+
+    # 4) Telegram не принял разметку — то же сообщение уходит простым текстом
+    out = fresh_copy()
+    tg = FakeTelegram(bad_markup=1)
+    tg.updates = []
+    st = run_pass(build.Config(**base, telegram_chat_id="555", telegram_max_posts=1), out, tg=tg.api())
+    assert st["telegram"] == 1 and st["errors"] == 1, st  # единственная ошибка — недоступная лента
+    assert "parse_mode" not in tg.sent[0] and "<b>" not in tg.sent[0]["text"] and "parse_mode" in tg.sent[1]
+
+    # 5) Telegram недоступен: ошибка видна в last_run, но это не ошибка модели; три неудачи — статья пропускается
+    out = fresh_copy()
+    tg = FakeTelegram(fail_send=100)
+    tg.updates = []
+    for i in range(3):
+        st = run_pass(build.Config(**base, telegram_chat_id="555"), out, tg=tg.api())
+        assert st["telegram"] == 0 and st["errors"] >= 1 and st["api_errors"] == 0, st
+    state = json.loads((out / "state.json").read_text())
+    assert any("Telegram" in e and "Bad Gateway" in e for e in state["last_run"]["errors"])
+    feed = json.loads((out / "feed.json").read_text())
+    assert next(it for it in sorted(feed["items"], key=lambda it: it["published"], reverse=True)
+                if it["full"] != "pending")["tg"] == "error"
+
+    # токен бота не должен попасть в публичный state.json
+    assert "TEST-token" not in build.redact("POST https://api.telegram.org/bot123456:TEST-token-for-tests-only-0123456789/sendMessage")
+    print("Telegram: проверки пройдены")
 
 
 def check_provider_logic():
@@ -440,6 +579,7 @@ def main():
     assert astra["engine"] == "openai" and "Языковые модели заметно выросли" in astra["html"]
     assert "Large language" not in astra["html"]
     print("C:", st_c)
+    check_telegram(out_c)
     print("ВСЕ ПРОВЕРКИ СБОРЩИКА ПРОЙДЕНЫ →", OUT)
 
 

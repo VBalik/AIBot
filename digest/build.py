@@ -51,6 +51,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from feeds import FEEDS  # noqa: E402
+import telegram  # noqa: E402
 
 log = logging.getLogger("ai-digest")
 
@@ -108,6 +109,11 @@ class Config:
     chunk_chars: int = 9000
     kdf_iterations: int = 310000
     interests: str = DEFAULT_INTERESTS
+    # Telegram-зеркало: в личный чат или закрытый канал — полные переводы, в публичный — только абстракты
+    telegram_token: str = ""
+    telegram_chat_id: str = ""
+    telegram_max_posts: int = 2      # сколько статей отправлять за прогон (пока отлаживаем — немного)
+    site_url: str = "https://aidigestbot.netlify.app"
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -139,6 +145,10 @@ class Config:
             lookback_days=int(e("LOOKBACK_DAYS", "lookback_days")),
             keep_items=int(e("KEEP_ITEMS", "keep_items")),
             interests=_env("INTERESTS", DEFAULT_INTERESTS).replace("\\n", "\n"),
+            telegram_token=_env("TELEGRAM_BOT_TOKEN", ""),
+            telegram_chat_id=_env("TELEGRAM_CHAT_ID", "").strip(),
+            telegram_max_posts=int(e("TELEGRAM_MAX_POSTS_PER_RUN", "telegram_max_posts")),
+            site_url=e("SITE_URL", "site_url"),
         )
 
     def main_provider(self) -> str:
@@ -804,11 +814,11 @@ def full_status_for(cfg: Config, post: Post, score: int) -> str:
 
 
 def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_feed,
-        extras: list[Writer] | None = None) -> dict:
+        extras: list[Writer] | None = None, tg: "telegram.TelegramAPI | None" = None) -> dict:
     data.crypto = vault.meta
     cutoff = _now() - timedelta(days=cfg.lookback_days)
     live: dict[str, Post] = {}
-    stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "errors": 0, "api_errors": 0}
+    stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "telegram": 0, "errors": 0, "api_errors": 0}
     problems: list[str] = []
 
     def problem(text: str, api: bool = True) -> None:
@@ -919,6 +929,17 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             stats["compared"] += 1
             data.save()
 
+    # 4. Зеркало в Telegram
+    if tg is not None:
+        def load_full(it: dict) -> str:
+            return vault.decrypt_json(_load_json(data.full_path(it["id"]), None))["html"]
+
+        tg_state = data.state.setdefault("telegram", {})  # только смещение getUpdates; chat_id сюда не пишем
+        stats["telegram"] = telegram.mirror(
+            list(data.items.values()), {f["id"]: f for f in FEEDS}, load_full, tg_state,
+            api=tg, chat_id=cfg.telegram_chat_id, site_url=cfg.site_url, max_posts=cfg.telegram_max_posts,
+            problem=lambda text: problem(text, api=False), save=data.save)
+
     data.trim(cfg.keep_items)
     # итог прогона лежит в ветке data — по нему видно, что пошло не так, без доступа к журналу Actions
     data.state["last_run"] = {"at": _iso(_now()), "engine": writer.llm.name, "stats": stats,
@@ -927,7 +948,8 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
     return stats
 
 
-SECRET_RE = re.compile(r"(sk-[A-Za-z0-9_\-*]{6,}|AIza[0-9A-Za-z_\-]{20,}|sk-ant-[A-Za-z0-9_\-*]{6,})")
+SECRET_RE = re.compile(r"(sk-[A-Za-z0-9_\-*]{6,}|AIza[0-9A-Za-z_\-]{20,}|sk-ant-[A-Za-z0-9_\-*]{6,}"
+                       r"|\d{6,}:[A-Za-z0-9_\-]{30,})")  # последнее — токен Telegram-бота
 
 
 def redact(text: str) -> str:
@@ -967,11 +989,12 @@ def main() -> None:
 
     data = DataDir(Path(args.data))
     vault = Vault(cfg.password, data.crypto, cfg.kdf_iterations)
-    stats = run(cfg, data, writer, vault, extras=extras)
+    tg = telegram.TelegramAPI(cfg.telegram_token) if cfg.telegram_token else None
+    stats = run(cfg, data, writer, vault, extras=extras, tg=tg)
     for msg in data.state["last_run"]["errors"][:5]:
         print(f"::warning::{msg}")  # видно прямо на странице прогона в GitHub Actions
     log.info("Готово: новых %(new)d, на страницу %(shown)d, переведено %(translated)d, "
-             "для сравнения %(compared)d, ошибок %(errors)d", stats)
+             "для сравнения %(compared)d, в Telegram %(telegram)d, ошибок %(errors)d", stats)
     if stats["api_errors"] and not (stats["shown"] or stats["translated"]):
         # ни один запрос к модели не прошёл — пусть прогон будет красным, а не «успешным» вхолостую
         print(f"::error::Модель не ответила ни разу. Первая ошибка: {data.state['last_run']['errors'][0] if data.state['last_run']['errors'] else '—'}")
