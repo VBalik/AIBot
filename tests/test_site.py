@@ -51,7 +51,19 @@ with sync_playwright() as p:
     page.wait_for_selector(".prose")
     page.evaluate("document.getElementById('reader').scrollTop = 0")
     prose = page.inner_text(".prose")
-    assert "Большие языковые модели" in prose and "def f(x):" in prose
+    assert "Крупные языковые модели" in prose and "def f(x):" in prose
+    assert "Gemini" in page.inner_text("#engine-line")
+
+    # переключатель Gemini / Claude: у этого поста два перевода
+    assert page.locator(".engines button").count() == 2
+    assert page.get_attribute('.engines button[data-engine="gemini"]', "aria-pressed") == "true"
+    page.click('.engines button[data-engine="claude"]')
+    page.wait_for_function("document.querySelector('.prose') && document.querySelector('.prose').innerText.includes('Большие языковые модели')")
+    assert page.get_attribute('.engines button[data-engine="claude"]', "aria-pressed") == "true"
+    assert "Claude" in page.inner_text("#engine-line")
+    page.screenshot(path=str(OUT / "3b-reader-claude.png"))
+    page.click('.engines button[data-engine="gemini"]')
+    page.wait_for_function("document.querySelector('.prose') && document.querySelector('.prose').innerText.includes('Крупные')")
     assert page.locator(".prose img").count() == 1 and page.locator(".prose blockquote").count() == 1
     assert page.locator(".prose a[target=_blank]").count() >= 1
     page.screenshot(path=str(OUT / "3-reader.png"))
@@ -74,6 +86,7 @@ with sync_playwright() as p:
     deep = page.get_attribute('.entry a:has-text("Black Forest Labs")', "href")
     page.goto(URL + deep)
     page.wait_for_selector(".prose")
+    assert page.locator(".engines").count() == 0
     page.click("#back")
     page.wait_for_selector("#reader", state="hidden")
 

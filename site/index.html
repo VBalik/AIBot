@@ -190,6 +190,16 @@ footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 
 .doc-end { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: .875rem; color: var(--ink-2); }
 .doc-end a { color: var(--accent); }
 
+.engines { display: inline-flex; gap: .25rem; padding: .25rem; margin: 0 0 .5rem; background: var(--surface); border-radius: .5rem; }
+.engines button {
+  all: unset; cursor: pointer; font: 500 .875rem/1 var(--sans); color: var(--ink-2);
+  padding: .5rem .875rem; border-radius: .375rem;
+}
+.engines button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+@media (prefers-color-scheme: dark) { .engines button[aria-pressed="true"] { color: #0E2A2C; } }
+.engines button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.engines-note { font-size: .8125rem; color: var(--ink-2); margin: 0 0 1.75rem; }
+
 @media (min-width: 40rem) {
   .masthead { padding-top: 4rem; }
   .masthead h1 { font-size: 2.75rem; }
@@ -216,7 +226,7 @@ footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 
   <footer class="colophon" id="colophon" hidden>
     <h2>Источники</h2>
     <ul class="sources" id="sources"></ul>
-    <p>Абстракты и переводы сделаны Claude. Тексты принадлежат авторам, у каждого есть ссылка на оригинал.</p>
+    <p>Абстракты и переводы сделаны ИИ, модель указана в конце каждого перевода. Тексты принадлежат авторам, у каждого есть ссылка на оригинал.</p>
     <p id="forget-wrap" hidden><button class="linkbtn" id="forget" type="button">Забыть пароль на этом устройстве</button></p>
   </footer>
 </main>
@@ -450,7 +460,7 @@ function openReader(id, push) {
     <p class="lead">${esc(it.abstract)}</p>
     ${it.audio ? `<audio controls preload="none" src="${esc(it.audio)}"></audio>` : ""}
     <div id="full"></div>
-    <p class="doc-end">Текст: <a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(s ? s.author : "автор")}, ${esc(s ? s.name : "")}</a>. Абстракт и перевод: Claude.</p>`;
+    <p class="doc-end">Текст: <a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(s ? s.author : "автор")}, ${esc(s ? s.name : "")}</a>.<span id="engine-line"></span></p>`;
   if (push) history.pushState({ id }, "", "#/p/" + id);
   document.body.classList.add("reading");
   reader.hidden = false;
@@ -468,7 +478,11 @@ function closeReader() {
   if (lastOpener) lastOpener.focus({ preventScroll: true });
 }
 
-async function renderFull(it) {
+const ENGINE_LABEL = { gemini: "Gemini", claude: "Claude" };
+let fullSeq = 0;  // защищает от гонки, если перевод переключили, пока грузился прошлый
+
+async function renderFull(it, engine) {
+  const seq = ++fullSeq;
   const box = $("#full");
   const orig = `<a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">Читать оригинал</a>`;
   const notices = {
@@ -482,18 +496,33 @@ async function renderFull(it) {
   if (it.full !== "ok") { box.innerHTML = `<p class="notice">${notices[it.full] || orig}</p>`; return; }
   if (!cryptoKey) cryptoKey = await savedKey();
   if (!cryptoKey) return renderUnlock(it, box);
-  box.innerHTML = `<p class="notice">Открываю перевод…</p>`;
+
+  const engines = it.engine ? [it.engine, ...(it.alt || [])] : [];
+  engine = engine || it.engine;
+  const file = !engine || engine === it.engine ? `full/${it.id}.json` : `full/${it.id}--${engine}.json`;
+  const switcher = engines.length > 1
+    ? `<div class="engines" role="group" aria-label="Чей перевод показать">${engines.map((e) =>
+        `<button type="button" data-engine="${esc(e)}" aria-pressed="${e === engine}">${esc(ENGINE_LABEL[e] || e)}</button>`).join("")}</div>
+       <p class="engines-note">Этот текст переведён двумя моделями. Переключайтесь, чтобы сравнить.</p>`
+    : "";
+  box.innerHTML = switcher + `<p class="notice">Открываю перевод…</p>`;
+  box.querySelectorAll("button[data-engine]").forEach((b) =>
+    b.addEventListener("click", () => { if (b.dataset.engine !== engine) renderFull(it, b.dataset.engine); }));
   try {
-    const r = await fetch(DATA_BASE + "full/" + it.id + ".json");
+    const r = await fetch(DATA_BASE + file);
     if (!r.ok) throw new Error("HTTP " + r.status);
     const data = JSON.parse(await gunzip(await decryptRaw(cryptoKey, await r.json())));
-    if (ITEMS.get(it.id) !== it || reader.hidden) return;
+    if (seq !== fullSeq || reader.hidden) return;
     const prose = document.createElement("div");
     prose.className = "prose";
     prose.append(cleanFragment(data.html));
-    box.replaceChildren(prose);
+    box.querySelector(".notice").replaceWith(prose);
+    const label = ENGINE_LABEL[data.engine] || (String(data.model || "").startsWith("claude") ? "Claude" : "");
+    $("#engine-line").textContent = ` Перевод: ${label ? label + ", " : ""}${data.model || "ИИ"}.`;
   } catch (e) {
-    box.innerHTML = `<p class="notice">Не удалось открыть перевод. Проверьте соединение и откройте текст ещё раз, или ${orig.replace("Читать", "прочитайте")}.</p>`;
+    if (seq !== fullSeq) return;
+    const n = box.querySelector(".notice");
+    if (n) n.innerHTML = `Не удалось открыть перевод. Проверьте соединение и откройте текст ещё раз, или ${orig.replace("Читать", "прочитайте")}.`;
   }
 }
 

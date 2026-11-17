@@ -1,14 +1,15 @@
 """Офлайн-проверка сборщика: ленты -> оценка -> абстракт -> перевод -> шифрование -> feed.json.
 
 Запуск: python tests/test_build.py [каталог_для_данных]
-Claude API имитируется на уровне HTTP, сеть не нужна. Готовые данные можно открыть страницей:
-  python -m http.server -d tests/out 8765  →  http://localhost:8765/site/index.html?data=/data/
+Gemini и Claude имитируются на уровне HTTP, сеть не нужна. Готовые данные можно открыть страницей:
+  python -m http.server 8765  →  http://localhost:8765/site/index.html?data=/tests/out/data/
 """
-import json, re, shutil, sys
+import json, re, shutil, sys, tempfile
 from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime
 from pathlib import Path
 
+import httpx   # транспорт для Gemini (REST)
 import httpx2  # транспорт, который использует SDK anthropic
 from bs4 import BeautifulSoup, NavigableString
 
@@ -19,11 +20,19 @@ import build  # noqa: E402
 OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "tests" / "out" / "data"
 PASSWORD = "тест-пароль"
 now = datetime.now(timezone.utc)
+build.time.sleep = lambda s: None  # не ждать при повторах после 429
 
-RU = ("Большие языковые модели заметно продвинулись в долгих задачах: агент теперь часами работает над кодом "
-      "и сам проверяет результат. Но вместе с автономией растут и риски — модель может уверенно ошибаться, "
-      "и замечать это приходится человеку. Автор предлагает простое правило: доверять агенту ровно настолько, "
-      "насколько легко проверить его работу.").split(". ")
+# «Переводы» двух движков отличаются, чтобы проверить переключатель на странице
+RU = {
+    "gemini": ("Крупные языковые модели заметно продвинулись в долгих задачах: агент часами работает над кодом "
+               "и сам проверяет результат. Но вместе с автономией растут и риски — модель может уверенно ошибаться, "
+               "и замечать это приходится человеку. Автор предлагает правило: доверять агенту ровно настолько, "
+               "насколько легко проверить его работу.").split(". "),
+    "claude": ("Большие языковые модели заметно продвинулись в долгих задачах: агент теперь часами работает над кодом "
+               "и сам проверяет результат. Однако вместе с автономией растут и риски — модель способна уверенно ошибаться, "
+               "а замечать это приходится человеку. Автор предлагает простое правило: доверять агенту ровно настолько, "
+               "насколько легко проверить его работу.").split(". "),
+}
 
 para = ("<p>Large language models are getting <strong>much better</strong> at <em>long tasks</em>. "
         "See <a href=\"https://example.com/paper\">the paper</a> &amp; the <code>eval_harness</code> code.</p>")
@@ -64,19 +73,22 @@ FEEDS_XML = {
                           ("ic-boring", "Boring housekeeping note", 2, "<p>meh</p>")]),
     "dwarkesh": rss([("dw-1", "Paul Christiano — interview", 1.5, huge)]),
 }
+TITLES_RU = {
+    "Import AI 481: AI sub-contractors & more": "Import AI 481: ИИ-субподрядчики, мокрая лаборатория для ИИ и хитрости при обучении",
+    "Building Visual Intelligence": "Как строить визуальный интеллект: разговор с основателями Black Forest Labs",
+    "How big is the open model economy today?": "Насколько велика экономика открытых моделей",
+    "Paul Christiano — interview": "Пол Кристиано: до ИИ, способного свергнуть правительство, может оставаться год",
+}
 
-# ---------- имитация Anthropic API ----------
-calls = {"score": 0, "abstract": 0, "translate": 0, "truncated": 0}
 
-
-def fake_translate(src: str) -> str:
+def fake_translate(src: str, engine: str) -> str:
     s = BeautifulSoup(src, "html.parser")
     i = 0
     for t in list(s.find_all(string=True)):
         if t.parent.name in ("code", "pre") or not t.strip():
             continue
         words = len(str(t).split())
-        piece = RU[i % len(RU)]
+        piece = RU[engine][i % len(RU[engine])]
         i += 1
         t.replace_with(NavigableString((" " if str(t).startswith(" ") else "") + " ".join(piece.split()[:max(2, words + 1)])
                                        + (" " if str(t).endswith(" ") else "")))
@@ -85,6 +97,54 @@ def fake_translate(src: str) -> str:
     return "```html\n" + str(s) + "\n```"
 
 
+def source_of(text):
+    return re.search(r"<source>\n(.*)\n</source>", text, re.S).group(1)
+
+
+# ---------- имитация Gemini API (REST) ----------
+calls = {"g_score": 0, "g_abstract": 0, "g_translate": 0, "g_truncated": 0, "g_429": 0,
+         "c_score": 0, "c_abstract": 0, "c_translate": 0, "c_truncated": 0}
+
+
+def gemini_reply(text, finish="STOP"):
+    return httpx.Response(200, json={"candidates": [{"content": {"role": "model", "parts": [
+        {"text": "Сначала обдумаю задачу…", "thought": True}, {"text": text}]}, "finishReason": finish}],
+        "usageMetadata": {"promptTokenCount": 1, "candidatesTokenCount": 1, "thoughtsTokenCount": 5}})
+
+
+def gemini_handler(req: httpx.Request):
+    assert req.headers["x-goog-api-key"] == "g-key"
+    model = re.search(r"/v1beta/models/([^:]+):generateContent$", req.url.path).group(1)
+    body = json.loads(req.content)
+    gen = body["generationConfig"]
+    assert gen["thinkingConfig"] == {"thinkingLevel": "LOW"}
+    user = body["contents"][0]["parts"][0]["text"]
+    system = body["systemInstruction"]["parts"][0]["text"]
+    if calls["g_429"] == 0:  # первый запрос — перегрузка, клиент должен повторить
+        calls["g_429"] += 1
+        return httpx.Response(429, json={"error": {"code": 429, "message": "Resource exhausted"}})
+    if "responseSchema" in gen:
+        schema = gen["responseSchema"]
+        assert gen["responseMimeType"] == "application/json" and schema["type"] == "OBJECT"
+        if "score" in schema["properties"]:
+            calls["g_score"] += 1
+            assert model == "gemini-3.1-flash-lite" and schema["properties"]["score"]["type"] == "INTEGER"
+            return gemini_reply(json.dumps({"score": 3 if "Boring" in user else 8, "reason": "тест"}, ensure_ascii=False))
+        calls["g_abstract"] += 1
+        assert model == "gemini-3.1-pro-preview" and system == build.ABSTRACT_SYSTEM
+        title = re.search(r"Заголовок: (.*)", user).group(1)
+        return gemini_reply("```json\n" + json.dumps({"title_ru": TITLES_RU.get(title, title),
+                                                      "abstract_ru": ". ".join(RU["gemini"][:3]) + "."}, ensure_ascii=False) + "\n```")
+    calls["g_translate"] += 1
+    assert model == "gemini-3.1-pro-preview" and system == build.TRANSLATOR_SYSTEM
+    src = source_of(user)
+    if len(src) > 4000:
+        calls["g_truncated"] += 1
+        return gemini_reply("обрыв", "MAX_TOKENS")
+    return gemini_reply(fake_translate(src, "gemini"))
+
+
+# ---------- имитация Claude API (SDK anthropic) ----------
 def sse(text, stop="end_turn"):
     ev = [("message_start", {"type": "message_start", "message": {"id": "m", "type": "message", "role": "assistant",
            "model": "claude-opus-5-5", "content": [], "stop_reason": None, "stop_sequence": None,
@@ -103,93 +163,128 @@ def tool_reply(model, name, data):
         "stop_reason": "tool_use", "stop_sequence": None, "usage": {"input_tokens": 1, "output_tokens": 1}})
 
 
-def handler(req):
+def claude_handler(req):
     body = json.loads(req.content)
     content = body["messages"][0]["content"]
     if body.get("stream"):
-        calls["translate"] += 1
+        calls["c_translate"] += 1
         assert body["model"] == "claude-opus-5-5" and body["system"] == build.TRANSLATOR_SYSTEM
-        src = re.search(r"<source>\n(.*)\n</source>", content, re.S).group(1)
+        src = source_of(content)
         if len(src) > 4000:
-            calls["truncated"] += 1
+            calls["c_truncated"] += 1
             return httpx2.Response(200, text=sse("обрыв", "max_tokens"), headers={"content-type": "text/event-stream"})
-        return httpx2.Response(200, text=sse(fake_translate(src)), headers={"content-type": "text/event-stream"})
+        return httpx2.Response(200, text=sse(fake_translate(src, "claude")), headers={"content-type": "text/event-stream"})
     name = body["tool_choice"]["name"]
     if name == "rate_post":
-        calls["score"] += 1
+        calls["c_score"] += 1
         assert body["model"] == "claude-haiku-5-5"
         return tool_reply(body["model"], name, {"score": 3 if "Boring" in content else 8, "reason": "тест"})
-    calls["abstract"] += 1
+    calls["c_abstract"] += 1
     assert name == "save_abstract" and body["model"] == "claude-sonnet-5-5"
     title = re.search(r"Заголовок: (.*)", content).group(1)
-    return tool_reply(body["model"], name, {
-        "title_ru": {"Import AI 481: AI sub-contractors & more": "Import AI 481: ИИ-субподрядчики, мокрая лаборатория для ИИ и хитрости при обучении",
-                     "Building Visual Intelligence": "Как строить визуальный интеллект: разговор с основателями Black Forest Labs",
-                     "How big is the open model economy today?": "Насколько велика экономика открытых моделей",
-                     "Paul Christiano — interview": "Пол Кристиано: до ИИ, способного свергнуть правительство, может оставаться год"}.get(title, title),
-        "abstract_ru": ". ".join(RU[:3]) + "."})
+    return tool_reply(body["model"], name, {"title_ru": TITLES_RU.get(title, title), "abstract_ru": ". ".join(RU["claude"][:3]) + "."})
+
+
+# ---------- сборка ----------
+def fetch(feed):
+    if feed["id"] not in FEEDS_XML:
+        raise httpx.ConnectError("нет сети")  # недоступная лента не должна ронять сборку
+    return build.parse_feed(feed, FEEDS_XML[feed["id"]])
+
+
+def writers(cfg):
+    gem = build.GeminiLLM(cfg, http=httpx.Client(transport=httpx.MockTransport(gemini_handler)))
+    cla = build.ClaudeLLM(cfg, client=build.anthropic.Anthropic(
+        api_key="x", http_client=httpx2.Client(transport=httpx2.MockTransport(claude_handler))))
+    llms = {"gemini": gem, "claude": cla}
+    main = build.Writer(cfg, llms[cfg.main_provider()])
+    second = cfg.second_provider()
+    return main, (build.Writer(cfg, llms[second]) if second else None)
+
+
+def run_pass(cfg, out):
+    data = build.DataDir(out)
+    vault = build.Vault(PASSWORD, data.crypto, 1000)
+    main, second = writers(cfg)
+    return build.run(cfg, data, main, vault, fetch=fetch, second=second)
+
+
+def check_provider_logic():
+    C = build.Config
+    assert C(gemini_key="g", anthropic_key="a").main_provider() == "gemini"
+    assert C(gemini_key="g", anthropic_key="a").second_provider() == "claude"
+    assert C(gemini_key="g").second_provider() is None
+    assert C(anthropic_key="a").main_provider() == "claude" and C(anthropic_key="a").second_provider() is None
+    assert C(gemini_key="g", anthropic_key="a", provider="claude").second_provider() == "gemini"
+    assert C(gemini_key="g", anthropic_key="a", compare_provider="off").second_provider() is None
+    assert C(gemini_key="g", anthropic_key="a", compare_limit=0).second_provider() is None
+    sch = build.to_gemini_schema(build.SCORE_TOOL["input_schema"])
+    assert sch == {"type": "OBJECT", "properties": {
+        "score": {"type": "INTEGER", "description": "1 = неинтересно, 10 = обязательно к прочтению"},
+        "reason": {"type": "STRING", "description": "Одно короткое предложение по-русски: почему такая оценка"}},
+        "required": ["score", "reason"]}, sch
 
 
 def main():
-    if OUT.exists():
-        shutil.rmtree(OUT)
+    check_provider_logic()
     by_id = {f["id"]: f for f in build.FEEDS}
     build.FEEDS[:] = [by_id[k] for k in ("importai", "latentspace", "interconnects", "dwarkesh", "willison")]
 
-    def fetch(feed):
-        if feed["id"] not in FEEDS_XML:
-            raise httpx2.ConnectError("нет сети")  # недоступная лента не должна ронять сборку
-        return build.parse_feed(feed, FEEDS_XML[feed["id"]])
-
-    cfg = build.Config(anthropic_key="x", password=PASSWORD, chunk_chars=9000, max_translations_per_run=1)
-    client = build.anthropic.Anthropic(api_key="x", http_client=httpx2.Client(transport=httpx2.MockTransport(handler)))
-
-    # проход 1: всё оценено, переведён только 1 пост (лимит)
-    data = build.DataDir(OUT)
-    vault = build.Vault(PASSWORD, data.crypto, 1000)
-    st1 = build.run(cfg, data, build.Claude(cfg, client), vault, fetch=fetch)
-    # проход 2: новые посты не появились, переводится следующий по очереди
-    data = build.DataDir(OUT)
-    vault = build.Vault(PASSWORD, data.crypto, 1000)
-    st2 = build.run(cfg, data, build.Claude(cfg, client), vault, fetch=fetch)
-    print("проход 1:", st1, "\nпроход 2:", st2, "\nвызовы API:", calls)
+    # --- Сценарий A: Gemini основной, Claude переводит 1 пост для сравнения ---
+    if OUT.exists():
+        shutil.rmtree(OUT)
+    cfg = build.Config(gemini_key="g-key", anthropic_key="a-key", password=PASSWORD, compare_limit=1,
+                       chunk_chars=9000, max_translations_per_run=1)
+    st1 = run_pass(cfg, OUT)
+    st2 = run_pass(cfg, OUT)
+    print("A проход 1:", st1, "\nA проход 2:", st2, "\nвызовы:", calls)
 
     feed = json.loads((OUT / "feed.json").read_text())
-    state = json.loads((OUT / "state.json").read_text())["posts"]
+    state = json.loads((OUT / "state.json").read_text())
     items = {it["title_en"]: it for it in feed["items"]}
-    print({k: v["full"] for k, v in items.items()})
+    assert st1["new"] == 5 and st1["translated"] == 1 and st1["compared"] == 1 and st1["errors"] == 1
+    assert st2["new"] == 0 and st2["translated"] == 1 and st2["compared"] == 0
+    assert calls["g_429"] == 1 and calls["g_score"] == 5 and calls["g_abstract"] == 4 and calls["g_truncated"] >= 1
+    assert calls["c_score"] == 0 and calls["c_abstract"] == 0 and calls["c_translate"] >= 1 and calls["c_truncated"] >= 1
+    assert state["compare_done"] == 1
 
-    assert st1["errors"] == 1 and st1["new"] == 5 and st1["translated"] == 1 and st2["translated"] == 1 and st2["new"] == 0
-    assert calls["score"] == 5 and calls["abstract"] == 4 and calls["truncated"] >= 1
-    assert "[AINews] Daily recap" not in items and not any("AINews" in v["title"] for v in state.values())
-    assert items["Import AI 481: AI sub-contractors & more"]["full"] == "ok"
-    assert items["Building Visual Intelligence"]["full"] == "ok"
+    ia = items["Import AI 481: AI sub-contractors & more"]
+    ls = items["Building Visual Intelligence"]
+    assert ia["full"] == "ok" and ia["engine"] == "gemini" and ia["alt"] == ["claude"]
+    assert ls["full"] == "ok" and ls["engine"] == "gemini" and "alt" not in ls
+    assert ia["title_ru"].startswith("Import AI 481: ИИ-субподрядчики")
     assert items["How big is the open model economy today?"]["full"] == "paywalled"
     assert items["Paul Christiano — interview"]["full"] == "too_long"
-    assert "Boring housekeeping note" not in items
-    assert sorted(v["status"] for v in state.values()) == ["old", "shown", "shown", "shown", "shown", "skipped"]
-    assert [it["published"] for it in feed["items"]] == sorted((it["published"] for it in feed["items"]), reverse=True)
-    assert [s["symbol"] for s in feed["sources"]] == ["Ia", "Ls", "Ic", "Dw", "Sw"]
+    assert "[AINews] Daily recap" not in items and "Boring housekeeping note" not in items
 
-    # шифрование: неверный пароль отвергается, верный — расшифровывает
+    v = build.Vault(PASSWORD, feed["crypto"], 1000)
+    main_doc = v.decrypt_json(json.loads((OUT / "full" / f"{ia['id']}.json").read_text()))
+    alt_doc = v.decrypt_json(json.loads((OUT / "full" / f"{ia['id']}--claude.json").read_text()))
+    assert main_doc["engine"] == "gemini" and main_doc["model"] == "gemini-3.1-pro-preview"
+    assert alt_doc["engine"] == "claude" and alt_doc["model"] == "claude-opus-5-5"
+    assert "Крупные языковые модели" in main_doc["html"] and "Большие" not in main_doc["html"]
+    assert "Большие языковые модели" in alt_doc["html"]
+    assert "обдумаю" not in main_doc["html"], "в перевод попали «размышления» Gemini"
+    h = main_doc["html"]
+    assert "Subscribe" not in h and "Share" not in h and "javascript:" not in h and "data:image" not in h
+    assert 'def f(x):\n    return x &lt; 2 and "ok"' in h and "<blockquote>" in h and "<figcaption>" in h
+    assert "Large language" not in h, "остался непереведённый текст"
     try:
         build.Vault("не тот", feed["crypto"], 1000)
         raise AssertionError("неверный пароль принят")
     except SystemExit:
         pass
-    v = build.Vault(PASSWORD, feed["crypto"], 1000)
-    it = items["Import AI 481: AI sub-contractors & more"]
-    blob = json.loads((OUT / "full" / f"{it['id']}.json").read_text())
-    doc = v.decrypt_json(blob)
-    h = doc["html"]
-    assert "Subscribe" not in h and "Share" not in h and "javascript:" not in h and "data:image" not in h
-    assert 'def f(x):\n    return x &lt; 2 and "ok"' in h
-    assert '<img alt="График результатов" src="https://substackcdn.com/image/fetch/chart.png"/>' in h
-    assert "<blockquote>" in h and "<figcaption>" in h and "Большие языковые модели" in h
-    assert "Large language" not in h, "остался непереведённый текст"
-    raw = (OUT / "full" / f"{it['id']}.json").read_text()
-    assert "Большие" not in raw and "html" not in raw  # на диске только шифротекст
-    print("размер зашифрованного перевода:", len(raw), "байт")
+
+    # --- Сценарий B: только ключ Claude — всё делает Claude, сравнения нет ---
+    out_b = Path(tempfile.mkdtemp()) / "data"
+    cfg_b = build.Config(anthropic_key="a-key", password=PASSWORD, chunk_chars=9000, max_translations_per_run=1)
+    before = dict(calls)
+    st_b = run_pass(cfg_b, out_b)
+    feed_b = json.loads((out_b / "feed.json").read_text())
+    ia_b = next(it for it in feed_b["items"] if it["title_en"].startswith("Import AI 481"))
+    assert st_b["translated"] == 1 and st_b["compared"] == 0 and ia_b["engine"] == "claude" and "alt" not in ia_b
+    assert calls["c_score"] - before["c_score"] == 5 and calls["g_score"] == before["g_score"]
+    print("B:", st_b)
     print("ВСЕ ПРОВЕРКИ СБОРЩИКА ПРОЙДЕНЫ →", OUT)
 
 

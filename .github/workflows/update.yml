@@ -46,15 +46,23 @@ jobs:
 
       - name: Собрать дайджест
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DIGEST_PASSWORD: ${{ secrets.DIGEST_PASSWORD }}
+          PROVIDER: ${{ vars.PROVIDER }}
+          COMPARE_PROVIDER: ${{ vars.COMPARE_PROVIDER }}
+          COMPARE_LIMIT: ${{ vars.COMPARE_LIMIT }}
+          GEMINI_MODEL_SCORE: ${{ vars.GEMINI_MODEL_SCORE }}
+          GEMINI_MODEL_ABSTRACT: ${{ vars.GEMINI_MODEL_ABSTRACT }}
+          GEMINI_MODEL_TRANSLATE: ${{ vars.GEMINI_MODEL_TRANSLATE }}
+          GEMINI_THINKING_LEVEL: ${{ vars.GEMINI_THINKING_LEVEL }}
+          CLAUDE_MODEL_SCORE: ${{ vars.CLAUDE_MODEL_SCORE }}
+          CLAUDE_MODEL_ABSTRACT: ${{ vars.CLAUDE_MODEL_ABSTRACT }}
+          CLAUDE_MODEL_TRANSLATE: ${{ vars.CLAUDE_MODEL_TRANSLATE }}
           SHOW_MIN_SCORE: ${{ vars.SHOW_MIN_SCORE }}
           TRANSLATE_MIN_SCORE: ${{ vars.TRANSLATE_MIN_SCORE }}
           MAX_TRANSLATIONS_PER_RUN: ${{ inputs.max_translations || vars.MAX_TRANSLATIONS_PER_RUN }}
           MAX_TRANSLATE_CHARS: ${{ vars.MAX_TRANSLATE_CHARS }}
-          MODEL_TRANSLATE: ${{ vars.MODEL_TRANSLATE }}
-          MODEL_ABSTRACT: ${{ vars.MODEL_ABSTRACT }}
-          MODEL_SCORE: ${{ vars.MODEL_SCORE }}
           INTERESTS: ${{ vars.INTERESTS }}
         run: python digest/build.py --data data
 

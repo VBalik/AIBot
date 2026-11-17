@@ -3,13 +3,18 @@
 AI Digest — сборщик данных для страницы.
 
 Читает RSS-ленты из digest/feeds.py и для каждого нового поста:
-  1. оценивает интересность (Claude Haiku, 1–10);
-  2. для интересных пишет русский заголовок и абстракт на 3–5 предложений (Claude Sonnet);
-  3. делает полный литературный перевод (Claude Opus) и шифрует его паролем DIGEST_PASSWORD.
+  1. оценивает интересность (1–10);
+  2. для интересных пишет русский заголовок и абстракт на 3–5 предложений;
+  3. делает полный литературный перевод и шифрует его паролем DIGEST_PASSWORD.
+
+Модели: Gemini (по умолчанию, если задан GEMINI_API_KEY) или Claude (ANTHROPIC_API_KEY), переключатель PROVIDER.
+Если заданы оба ключа, первые COMPARE_LIMIT постов дополнительно переводит второй движок —
+на странице появляется переключатель, чтобы сравнить качество.
 
 Результат — каталог данных (в GitHub он живёт в ветке `data`):
   feed.json        список постов с абстрактами + параметры шифрования
   full/<id>.json   полный перевод: gzip(JSON) → AES-256-GCM, ключ = PBKDF2-SHA256(пароль)
+  full/<id>--<движок>.json   второй перевод для сравнения (если есть)
   state.json       какие посты уже видели и с какой оценкой
 
 Запуск:
@@ -29,6 +34,7 @@ import logging
 import os
 import re
 import sys
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -67,10 +73,20 @@ def _env(name: str, default: str) -> str:
 @dataclass
 class Config:
     anthropic_key: str = ""
+    gemini_key: str = ""
     password: str = ""
-    model_score: str = "claude-haiku-5-5"
-    model_abstract: str = "claude-sonnet-5-5"
-    model_translate: str = "claude-opus-5-5"
+    provider: str = "auto"           # gemini | claude | auto (= gemini, если есть его ключ)
+    compare_provider: str = "auto"   # второй переводчик для сравнения: claude | gemini | off | auto (= другой, если есть ключ)
+    compare_limit: int = 3           # сколько постов перевести вторым движком
+    # Claude
+    claude_model_score: str = "claude-haiku-5-5"
+    claude_model_abstract: str = "claude-sonnet-5-5"
+    claude_model_translate: str = "claude-opus-5-5"
+    # Gemini
+    gemini_model_score: str = "gemini-3.1-flash-lite"
+    gemini_model_abstract: str = "gemini-3.1-pro-preview"
+    gemini_model_translate: str = "gemini-3.1-pro-preview"
+    gemini_thinking: str = "LOW"     # MINIMAL | LOW | MEDIUM | HIGH; пусто — по умолчанию модели
     show_min_score: int = 6          # с этой оценки пост попадает на страницу (абстракт)
     translate_min_score: int = 6     # с этой оценки делается полный перевод
     max_translations_per_run: int = 4
@@ -83,21 +99,48 @@ class Config:
 
     @classmethod
     def from_env(cls) -> "Config":
+        e = lambda name, attr: _env(name, str(getattr(cls, attr)))
         return cls(
             anthropic_key=_env("ANTHROPIC_API_KEY", ""),
+            gemini_key=_env("GEMINI_API_KEY", ""),
             password=_env("DIGEST_PASSWORD", ""),
-            model_score=_env("MODEL_SCORE", cls.model_score),
-            model_abstract=_env("MODEL_ABSTRACT", cls.model_abstract),
-            model_translate=_env("MODEL_TRANSLATE", cls.model_translate),
-            show_min_score=int(_env("SHOW_MIN_SCORE", str(cls.show_min_score))),
-            translate_min_score=int(_env("TRANSLATE_MIN_SCORE", str(cls.translate_min_score))),
-            max_translations_per_run=int(_env("MAX_TRANSLATIONS_PER_RUN", str(cls.max_translations_per_run))),
-            max_translate_chars=int(_env("MAX_TRANSLATE_CHARS", str(cls.max_translate_chars))),
-            lookback_days=int(_env("LOOKBACK_DAYS", str(cls.lookback_days))),
-            keep_items=int(_env("KEEP_ITEMS", str(cls.keep_items))),
+            provider=e("PROVIDER", "provider").lower(),
+            compare_provider=e("COMPARE_PROVIDER", "compare_provider").lower(),
+            compare_limit=int(e("COMPARE_LIMIT", "compare_limit")),
+            claude_model_score=e("CLAUDE_MODEL_SCORE", "claude_model_score"),
+            claude_model_abstract=e("CLAUDE_MODEL_ABSTRACT", "claude_model_abstract"),
+            claude_model_translate=e("CLAUDE_MODEL_TRANSLATE", "claude_model_translate"),
+            gemini_model_score=e("GEMINI_MODEL_SCORE", "gemini_model_score"),
+            gemini_model_abstract=e("GEMINI_MODEL_ABSTRACT", "gemini_model_abstract"),
+            gemini_model_translate=e("GEMINI_MODEL_TRANSLATE", "gemini_model_translate"),
+            gemini_thinking=e("GEMINI_THINKING_LEVEL", "gemini_thinking").upper(),
+            show_min_score=int(e("SHOW_MIN_SCORE", "show_min_score")),
+            translate_min_score=int(e("TRANSLATE_MIN_SCORE", "translate_min_score")),
+            max_translations_per_run=int(e("MAX_TRANSLATIONS_PER_RUN", "max_translations_per_run")),
+            max_translate_chars=int(e("MAX_TRANSLATE_CHARS", "max_translate_chars")),
+            lookback_days=int(e("LOOKBACK_DAYS", "lookback_days")),
+            keep_items=int(e("KEEP_ITEMS", "keep_items")),
             interests=_env("INTERESTS", DEFAULT_INTERESTS).replace("\\n", "\n"),
         )
 
+    def main_provider(self) -> str:
+        if self.provider == "auto":
+            return "gemini" if self.gemini_key else "claude"
+        return self.provider
+
+    def second_provider(self) -> str | None:
+        main = self.main_provider()
+        want = self.compare_provider
+        if want in ("", "off", "none", "no", "0") or self.compare_limit <= 0:
+            return None
+        if want == "auto":
+            want = "claude" if main == "gemini" else "gemini"
+        if want == main or not self.has_key(want):
+            return None
+        return want
+
+    def has_key(self, provider: str) -> bool:
+        return bool(self.gemini_key if provider == "gemini" else self.anthropic_key)
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
@@ -302,24 +345,139 @@ embeddings, RAG; benchmark — «бенчмарк». Будь последова
 
 
 class TruncatedOutput(Exception):
-    pass
+    """Ответ модели упёрся в лимит длины — фрагмент нужно разделить."""
 
 
-class Claude:
+class ClaudeLLM:
+    name, label = "claude", "Claude"
+
     def __init__(self, cfg: Config, client: anthropic.Anthropic | None = None):
-        self.cfg = cfg
+        self.models = {"score": cfg.claude_model_score, "abstract": cfg.claude_model_abstract,
+                       "translate": cfg.claude_model_translate}
         self.client = client or anthropic.Anthropic(api_key=cfg.anthropic_key or None)
 
-    def _call_tool(self, model: str, system: str, tool: dict, user: str, max_tokens: int) -> dict:
+    def structured(self, step: str, system: str, tool: dict, user: str, max_tokens: int) -> dict:
         resp = self.client.messages.create(
-            model=model, max_tokens=max_tokens, system=system,
+            model=self.models[step], max_tokens=max_tokens, system=system,
             tools=[tool], tool_choice={"type": "tool", "name": tool["name"]},
             messages=[{"role": "user", "content": user}],
         )
         for block in resp.content:
             if block.type == "tool_use":
                 return block.input
-        raise RuntimeError(f"Модель не вернула результат ({resp.stop_reason})")
+        raise RuntimeError(f"Claude не вернул результат ({resp.stop_reason})")
+
+    def text(self, step: str, system: str, user: str) -> str:
+        with self.client.messages.stream(
+            model=self.models[step], max_tokens=16000, system=system,
+            messages=[{"role": "user", "content": user}],
+        ) as stream:
+            msg = stream.get_final_message()
+        if msg.stop_reason == "max_tokens":
+            raise TruncatedOutput()
+        return "".join(b.text for b in msg.content if b.type == "text")
+
+
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+
+
+def to_gemini_schema(schema: dict) -> dict:
+    """JSON Schema из описания инструмента → подмножество OpenAPI, которое понимает responseSchema Gemini."""
+    out: dict = {}
+    if "type" in schema:
+        out["type"] = str(schema["type"]).upper()
+    if "description" in schema:
+        out["description"] = schema["description"]
+    if "properties" in schema:
+        out["properties"] = {k: to_gemini_schema(v) for k, v in schema["properties"].items()}
+    if "required" in schema:
+        out["required"] = list(schema["required"])
+    if "items" in schema:
+        out["items"] = to_gemini_schema(schema["items"])
+    return out
+
+
+class GeminiLLM:
+    """Gemini API через REST (без SDK): ключ в заголовке x-goog-api-key."""
+    name, label = "gemini", "Gemini"
+    RETRY_STATUSES = (429, 500, 502, 503, 504)
+
+    def __init__(self, cfg: Config, http: httpx.Client | None = None):
+        self.key = cfg.gemini_key
+        self.thinking = cfg.gemini_thinking.strip().upper()
+        self.models = {"score": cfg.gemini_model_score, "abstract": cfg.gemini_model_abstract,
+                       "translate": cfg.gemini_model_translate}
+        self.http = http or httpx.Client(timeout=httpx.Timeout(900, connect=30))
+
+    def _generate(self, step: str, system: str, user: str, max_tokens: int, schema: dict | None = None):
+        gen: dict = {"maxOutputTokens": max_tokens}
+        if self.thinking:
+            gen["thinkingConfig"] = {"thinkingLevel": self.thinking}
+        if schema:
+            gen["responseMimeType"] = "application/json"
+            gen["responseSchema"] = schema
+        body = {
+            "systemInstruction": {"parts": [{"text": system}]},
+            "contents": [{"role": "user", "parts": [{"text": user}]}],
+            "generationConfig": gen,
+        }
+        url = GEMINI_URL.format(model=self.models[step])
+        for attempt in range(5):
+            r = self.http.post(url, json=body, headers={"x-goog-api-key": self.key})
+            if r.status_code in self.RETRY_STATUSES and attempt < 4:
+                wait = min(120, 10 * 2 ** attempt)
+                log.warning("Gemini %s, повтор через %d с", r.status_code, wait)
+                time.sleep(wait)
+                continue
+            break
+        if r.status_code != 200:
+            try:
+                detail = r.json().get("error", {}).get("message", "")
+            except Exception:
+                detail = r.text[:300]
+            raise RuntimeError(f"Gemini {r.status_code} ({self.models[step]}): {detail}")
+        data = r.json()
+        candidates = data.get("candidates") or []
+        if not candidates:
+            raise RuntimeError(f"Gemini не вернул ответ: {data.get('promptFeedback')}")
+        cand = candidates[0]
+        parts = (cand.get("content") or {}).get("parts") or []
+        text = "".join(p.get("text", "") for p in parts if not p.get("thought"))
+        return text, cand.get("finishReason", "")
+
+    def structured(self, step: str, system: str, tool: dict, user: str, max_tokens: int) -> dict:
+        # в лимит Gemini входят и «размышления», поэтому даём запас
+        text, reason = self._generate(step, system, user, max_tokens + 8192, to_gemini_schema(tool["input_schema"]))
+        if reason == "MAX_TOKENS":
+            raise RuntimeError("Gemini: ответ обрезан по длине")
+        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
+        return json.loads(text)
+
+    def text(self, step: str, system: str, user: str) -> str:
+        text, reason = self._generate(step, system, user, 32768)
+        if reason == "MAX_TOKENS":
+            raise TruncatedOutput()
+        return text
+
+
+def make_llm(provider: str, cfg: Config):
+    if provider == "gemini":
+        if not cfg.gemini_key:
+            raise SystemExit("Не задан GEMINI_API_KEY")
+        return GeminiLLM(cfg)
+    if provider == "claude":
+        if not cfg.anthropic_key:
+            raise SystemExit("Не задан ANTHROPIC_API_KEY")
+        return ClaudeLLM(cfg)
+    raise SystemExit(f"Неизвестный PROVIDER: {provider} (нужно gemini или claude)")
+
+
+class Writer:
+    """Шаги дайджеста поверх любой модели: оценка, абстракт, полный перевод."""
+
+    def __init__(self, cfg: Config, llm):
+        self.cfg = cfg
+        self.llm = llm
 
     def score(self, post: Post) -> tuple[int, str]:
         system = ("Ты отбираешь посты для персонального дайджеста лучших текстов об ИИ. Интересы читателя:\n"
@@ -328,14 +486,14 @@ class Claude:
         user = (f"Источник: {post.feed['name']} ({post.feed['author']})\nЗаголовок: {post.title}\n"
                 f"{'(Это только начало платного поста.)' if post.paywalled else ''}\n\n"
                 f"Текст (начало):\n{post.text[:12000]}")
-        out = self._call_tool(self.cfg.model_score, system, SCORE_TOOL, user, 300)
+        out = self.llm.structured("score", system, SCORE_TOOL, user, 300)
         return max(1, min(10, int(out["score"]))), str(out.get("reason", "")).strip()
 
     def abstract(self, post: Post) -> dict:
         user = (f"Источник: {post.feed['name']} ({post.feed['author']})\nЗаголовок: {post.title}\n"
                 f"{'(Это только бесплатное начало платного поста.)' if post.paywalled else ''}\n\n"
                 f"Текст:\n{post.text[:100000]}")
-        out = self._call_tool(self.cfg.model_abstract, ABSTRACT_SYSTEM, ABSTRACT_TOOL, user, 1200)
+        out = self.llm.structured("abstract", ABSTRACT_SYSTEM, ABSTRACT_TOOL, user, 1200)
         return {"title_ru": out["title_ru"].strip(), "abstract_ru": out["abstract_ru"].strip()}
 
     # --- полный перевод -------------------------------------------------
@@ -345,14 +503,7 @@ class Claude:
             user += ("\nКонец перевода предыдущего фрагмента — только для единообразия терминов и стиля, "
                      f"не переводи и не повторяй его:\n<context>\n{context}\n</context>\n")
         user += f"\nПереведи HTML-фрагмент:\n<source>\n{chunk}\n</source>"
-        with self.client.messages.stream(
-            model=self.cfg.model_translate, max_tokens=16000, system=TRANSLATOR_SYSTEM,
-            messages=[{"role": "user", "content": user}],
-        ) as stream:
-            msg = stream.get_final_message()
-        if msg.stop_reason == "max_tokens":
-            raise TruncatedOutput()
-        text = "".join(b.text for b in msg.content if b.type == "text").strip()
+        text = self.llm.text("translate", TRANSLATOR_SYSTEM, user).strip()
         text = re.sub(r"^```(?:html)?\s*|\s*```$", "", text)
         text = re.sub(r"^\s*<(?:source|translation)>\s*|\s*</(?:source|translation)>\s*$", "", text)
         return text
@@ -379,7 +530,7 @@ class Claude:
             tr = self._translate_safe(ch, context, post, f"Фрагмент {i + 1} из {len(chunks)}")
             parts.append(tr)
             context = BeautifulSoup(tr, "html.parser").get_text(" ", strip=True)[-1500:]
-            log.info("    фрагмент %d/%d готов", i + 1, len(chunks))
+            log.info("    %s: фрагмент %d/%d готов", self.llm.label, i + 1, len(chunks))
         return str(sanitize_html("\n".join(parts))).strip()
 
 
@@ -466,13 +617,15 @@ class DataDir:
         self.state["posts"][post.id] = {"status": status, "score": score, "reason": reason,
                                         "title": post.title, "published": _iso(post.published)}
 
-    def full_path(self, pid: str) -> Path:
-        return self.root / "full" / f"{pid}.json"
+    def full_path(self, pid: str, engine: str | None = None) -> Path:
+        return self.root / "full" / (f"{pid}--{engine}.json" if engine else f"{pid}.json")
 
     def trim(self, keep: int, state_days: int = 120) -> None:
         ordered = sorted(self.items.values(), key=lambda it: it["published"], reverse=True)
         for it in ordered[keep:]:
             self.full_path(it["id"]).unlink(missing_ok=True)
+            for engine in it.get("alt", []):
+                self.full_path(it["id"], engine).unlink(missing_ok=True)
             del self.items[it["id"]]
         cutoff = _iso(_now() - timedelta(days=state_days))
         self.state["posts"] = {k: v for k, v in self.state["posts"].items()
@@ -506,11 +659,12 @@ def full_status_for(cfg: Config, post: Post, score: int) -> str:
     return "pending"
 
 
-def run(cfg: Config, data: DataDir, claude: Claude, vault: Vault, fetch=fetch_feed) -> dict:
+def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_feed,
+        second: Writer | None = None) -> dict:
     data.crypto = vault.meta
     cutoff = _now() - timedelta(days=cfg.lookback_days)
     live: dict[str, Post] = {}
-    stats = {"new": 0, "shown": 0, "translated": 0, "errors": 0}
+    stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "errors": 0}
 
     # 1. Новые посты: оценка и абстракт
     for feed in FEEDS:
@@ -529,8 +683,8 @@ def run(cfg: Config, data: DataDir, claude: Claude, vault: Vault, fetch=fetch_fe
                 continue
             stats["new"] += 1
             try:
-                score, reason = claude.score(post)
-                abstract = claude.abstract(post) if score >= cfg.show_min_score else None
+                score, reason = writer.score(post)
+                abstract = writer.abstract(post) if score >= cfg.show_min_score else None
             except Exception as exc:
                 log.error("Не удалось обработать «%s»: %s", post.title, exc)
                 stats["errors"] += 1
@@ -564,9 +718,9 @@ def run(cfg: Config, data: DataDir, claude: Claude, vault: Vault, fetch=fetch_fe
         if post is None:
             it["full"] = "unavailable"
             continue
-        log.info("Перевожу: %s", post.title)
+        log.info("Перевожу (%s): %s", writer.llm.label, post.title)
         try:
-            html_ru = claude.translate(post)
+            html_ru = writer.translate(post)
         except Exception as exc:
             log.error("Перевод «%s» не удался: %s", post.title, exc)
             stats["errors"] += 1
@@ -575,16 +729,38 @@ def run(cfg: Config, data: DataDir, claude: Claude, vault: Vault, fetch=fetch_fe
                 it["full"] = "error"
             data.save()
             continue
-        blob = vault.encrypt_json({"html": html_ru, "model": cfg.model_translate, "translated_at": _iso(_now())})
-        _write_json(data.full_path(it["id"]), blob, compact=True)
+        _save_translation(data, vault, it, writer, html_ru)
         it["full"] = "ok"
+        it["engine"] = writer.llm.name
         it.pop("attempts", None)
         stats["translated"] += 1
         data.save()
 
+        # 3. Второй перевод того же поста для сравнения (первые compare_limit постов)
+        if second is not None and data.state.get("compare_done", 0) < cfg.compare_limit:
+            log.info("Перевожу для сравнения (%s): %s", second.llm.label, post.title)
+            try:
+                alt_html = second.translate(post)
+            except Exception as exc:
+                log.warning("Сравнительный перевод не удался: %s", exc)
+                stats["errors"] += 1
+                continue
+            _save_translation(data, vault, it, second, alt_html, alt=True)
+            it["alt"] = sorted(set(it.get("alt", [])) | {second.llm.name})
+            data.state["compare_done"] = data.state.get("compare_done", 0) + 1
+            stats["compared"] += 1
+            data.save()
+
     data.trim(cfg.keep_items)
     data.save()
     return stats
+
+
+def _save_translation(data: DataDir, vault: Vault, it: dict, writer: Writer, html_ru: str, alt: bool = False) -> None:
+    payload = {"html": html_ru, "engine": writer.llm.name, "model": writer.llm.models["translate"],
+               "translated_at": _iso(_now())}
+    path = data.full_path(it["id"], writer.llm.name if alt else None)
+    _write_json(path, vault.encrypt_json(payload), compact=True)
 
 
 def main() -> None:
@@ -599,13 +775,22 @@ def main() -> None:
     cfg = Config.from_env()
     if args.max_translations is not None:
         cfg.max_translations_per_run = args.max_translations
-    if not cfg.anthropic_key:
-        sys.exit("Не задан ANTHROPIC_API_KEY")
+
+    main_name = cfg.main_provider()
+    writer = Writer(cfg, make_llm(main_name, cfg))
+    second_name = cfg.second_provider()
+    second = Writer(cfg, make_llm(second_name, cfg)) if second_name else None
+    m = writer.llm.models
+    log.info("Движок: %s — отбор %s, абстракты %s, перевод %s", writer.llm.label, m["score"], m["abstract"], m["translate"])
+    if second:
+        log.info("Сравнение: %s (%s), осталось постов: %d", second.llm.label, second.llm.models["translate"],
+                 max(0, cfg.compare_limit))
 
     data = DataDir(Path(args.data))
     vault = Vault(cfg.password, data.crypto, cfg.kdf_iterations)
-    stats = run(cfg, data, Claude(cfg), vault)
-    log.info("Готово: новых %(new)d, на страницу %(shown)d, переведено %(translated)d, ошибок %(errors)d", stats)
+    stats = run(cfg, data, writer, vault, second=second)
+    log.info("Готово: новых %(new)d, на страницу %(shown)d, переведено %(translated)d, "
+             "для сравнения %(compared)d, ошибок %(errors)d", stats)
 
 
 if __name__ == "__main__":
