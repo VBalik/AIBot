@@ -45,7 +45,7 @@ Netlify — site/index.html (публикуется только при изме
    - `DIGEST_PASSWORD` — придуманный вами пароль для полных переводов. Лучше длинный, например из четырёх случайных слов;
    - `ANTHROPIC_API_KEY` — по желанию, ключ Claude.
 5. **Первый запуск.** github.com/VBalik/AIBot/actions/workflows/update.yml → **Run workflow**. Через несколько минут появится ветка `data`. Дальше сборщик запускается сам каждый час.
-6. **Netlify.** На app.netlify.com откройте **Add new project** → **Import an existing project** → **GitHub** → репозиторий `AIBot` → **Deploy**. Настройки подтянутся из `netlify.toml`. Если репозитория нет в списке, откройте Netlify доступ к нему на github.com/settings/installations.
+6. **Netlify.** На app.netlify.com откройте **Add new project** → **Import an existing project** → **GitHub** → репозиторий `AIBot` → **Deploy**. Настройки подтянутся из `netlify.toml`. Если репозитория нет в списке, откройте Netlify доступ к нему на github.com/settings/installations. Сменить адрес `*.netlify.app` можно в **Project configuration** → **General** → **Project details** → **Project information** → **Manage project name and cover image**.
 7. На iPhone откройте адрес страницы в Safari → **Share** → **Add to Home Screen**.
 
 ## Настройки

@@ -807,7 +807,13 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
     data.crypto = vault.meta
     cutoff = _now() - timedelta(days=cfg.lookback_days)
     live: dict[str, Post] = {}
-    stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "errors": 0}
+    stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "errors": 0, "api_errors": 0}
+    problems: list[str] = []
+
+    def problem(text: str, api: bool = True) -> None:
+        stats["errors"] += 1
+        stats["api_errors"] += int(api)
+        problems.append(redact(text))
 
     # 1. Новые посты: оценка и абстракт
     for feed in FEEDS:
@@ -815,7 +821,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             posts = fetch(feed)
         except Exception as exc:
             log.warning("Лента %s недоступна: %s", feed["name"], exc)
-            stats["errors"] += 1
+            problem(f"Лента {feed['name']}: {exc}", api=False)
             continue
         for post in posts:
             live[post.id] = post
@@ -830,7 +836,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
                 abstract = writer.abstract(post) if score >= cfg.show_min_score else None
             except Exception as exc:
                 log.error("Не удалось обработать «%s»: %s", post.title, exc)
-                stats["errors"] += 1
+                problem(f"Оценка/абстракт «{post.title}»: {exc}")
                 continue  # повторим в следующий раз
             if abstract:
                 data.items[post.id] = {
@@ -866,7 +872,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             html_ru = writer.translate(post)
         except Exception as exc:
             log.error("Перевод «%s» не удался: %s", post.title, exc)
-            stats["errors"] += 1
+            problem(f"Перевод «{post.title}»: {exc}")
             it["attempts"] = it.get("attempts", 0) + 1
             if it["attempts"] >= 3:
                 it["full"] = "error"
@@ -890,7 +896,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
                 alt_html = ex.translate(post)
             except Exception as exc:
                 log.warning("Сравнительный перевод (%s) не удался: %s", ex.variant, exc)
-                stats["errors"] += 1
+                problem(f"Сравнительный перевод ({ex.variant}) «{post.title}»: {exc}")
                 continue
             _save_translation(data, vault, it, ex, alt_html, variant=ex.variant)
             it["alt"] = [a for a in it.get("alt", []) if isinstance(a, dict) and a["id"] != ex.variant] + \
@@ -900,8 +906,19 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             data.save()
 
     data.trim(cfg.keep_items)
+    # итог прогона лежит в ветке data — по нему видно, что пошло не так, без доступа к журналу Actions
+    data.state["last_run"] = {"at": _iso(_now()), "engine": writer.llm.name, "stats": stats,
+                              "errors": problems[:15]}
     data.save()
     return stats
+
+
+SECRET_RE = re.compile(r"(sk-[A-Za-z0-9_\-*]{6,}|AIza[0-9A-Za-z_\-]{20,}|sk-ant-[A-Za-z0-9_\-*]{6,})")
+
+
+def redact(text: str) -> str:
+    """Убирает из текста ошибки всё, похожее на ключ API, и обрезает до разумной длины."""
+    return SECRET_RE.sub("[ключ скрыт]", str(text))[:400]
 
 
 def _save_translation(data: DataDir, vault: Vault, it: dict, writer: Writer, html_ru: str,
@@ -937,8 +954,14 @@ def main() -> None:
     data = DataDir(Path(args.data))
     vault = Vault(cfg.password, data.crypto, cfg.kdf_iterations)
     stats = run(cfg, data, writer, vault, extras=extras)
+    for msg in data.state["last_run"]["errors"][:5]:
+        print(f"::warning::{msg}")  # видно прямо на странице прогона в GitHub Actions
     log.info("Готово: новых %(new)d, на страницу %(shown)d, переведено %(translated)d, "
              "для сравнения %(compared)d, ошибок %(errors)d", stats)
+    if stats["api_errors"] and not (stats["shown"] or stats["translated"]):
+        # ни один запрос к модели не прошёл — пусть прогон будет красным, а не «успешным» вхолостую
+        print(f"::error::Модель не ответила ни разу. Первая ошибка: {data.state['last_run']['errors'][0] if data.state['last_run']['errors'] else '—'}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

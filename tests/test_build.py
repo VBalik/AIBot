@@ -349,6 +349,11 @@ def main():
     assert calls["g_429"] == 1 and calls["g_score"] == 5 and calls["g_abstract"] == 4 and calls["g_truncated"] >= 1
     assert calls["c_score"] == 0 and calls["c_abstract"] == 0 and calls["c_translate"] >= 1 and calls["c_truncated"] >= 1
     assert state["compare_done"] == {"claude": 1}
+    lr = state["last_run"]
+    assert lr["engine"] == "gemini" and lr["stats"]["translated"] == 1 and lr["stats"]["api_errors"] == 0
+    assert any("Simon Willison" in e for e in lr["errors"])
+    assert build.redact("Incorrect API key provided: sk-proj-abc123****wxyz.") == "Incorrect API key provided: [ключ скрыт]."
+    assert "AIza" not in build.redact("key=AIzaSyA1234567890abcdefghijk bad")
 
     ia = items["Import AI 481: AI sub-contractors & more"]
     ls = items["Building Visual Intelligence"]
