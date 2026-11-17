@@ -4,6 +4,10 @@
 [build]
   publish = "site"
   command = ""
+  # Каждый production-деплой стоит 15 кредитов Netlify. Пересобираем сайт только при изменениях в site/:
+  # правки сборщика, тестов и документации деплой не запускают (git diff --quiet = 0 → сборка пропускается).
+  # Если нужно задеплоить вручную: в Netlify Deploys → Trigger deploy.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- site/"
 
 [[headers]]
   for = "/*"
