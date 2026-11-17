@@ -1,0 +1,75 @@
+name: Update digest
+
+# Каждый час: читает ленты, пишет абстракты, переводит, публикует данные в ветку `data`.
+# Ветка `data` перезаписывается одним коммитом (без истории), чтобы репозиторий не разрастался.
+# Netlify собирает только main, поэтому обновления данных не тратят кредиты Netlify.
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      max_translations:
+        description: "Сколько полных переводов за запуск"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: digest
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Получить текущие данные
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git fetch --depth=1 origin data
+            git worktree add --detach data FETCH_HEAD
+          else
+            mkdir -p data
+          fi
+
+      - name: Собрать дайджест
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DIGEST_PASSWORD: ${{ secrets.DIGEST_PASSWORD }}
+          SHOW_MIN_SCORE: ${{ vars.SHOW_MIN_SCORE }}
+          TRANSLATE_MIN_SCORE: ${{ vars.TRANSLATE_MIN_SCORE }}
+          MAX_TRANSLATIONS_PER_RUN: ${{ inputs.max_translations || vars.MAX_TRANSLATIONS_PER_RUN }}
+          MAX_TRANSLATE_CHARS: ${{ vars.MAX_TRANSLATE_CHARS }}
+          MODEL_TRANSLATE: ${{ vars.MODEL_TRANSLATE }}
+          MODEL_ABSTRACT: ${{ vars.MODEL_ABSTRACT }}
+          MODEL_SCORE: ${{ vars.MODEL_SCORE }}
+          INTERESTS: ${{ vars.INTERESTS }}
+        run: python digest/build.py --data data
+
+      - name: Опубликовать данные в ветку data
+        if: always()
+        run: |
+          cd data
+          [ -f feed.json ] || { echo "Данных нет — публиковать нечего"; exit 0; }
+          [ -e .git ] || git init -q
+          git config user.name "ai-digest-bot"
+          git config user.email "ai-digest-bot@users.noreply.github.com"
+          git add -A
+          if git rev-parse -q --verify HEAD >/dev/null && git diff --cached --quiet; then
+            echo "Изменений нет"; exit 0
+          fi
+          git checkout -q --orphan snapshot
+          git commit -qm "data $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/data

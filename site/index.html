@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F1F4F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14212A" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Дайджест ИИ">
+<title>Дайджест ИИ</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&display=swap">
+<style>
+:root {
+  --paper: #F1F4F3;
+  --surface: #FFFFFF;
+  --ink: #17242C;
+  --ink-2: #4F5E66;
+  --rule: #D3DBDC;
+  --accent: #0F6B68;
+  --tile-s: 42%; --tile-bg-l: 88%; --tile-fg-l: 24%; --tile-bd-l: 74%;
+  --serif: "Literata", "Iowan Old Style", Georgia, serif;
+  --sans: "Golos Text", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  --measure: 36rem;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #14212A; --surface: #1A2B35; --ink: #E3EAEB; --ink-2: #9DAEB4;
+    --rule: #2B3C46; --accent: #62C4BD;
+    --tile-s: 34%; --tile-bg-l: 23%; --tile-fg-l: 84%; --tile-bd-l: 34%;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 1rem/1.5 var(--sans);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+body.reading { overflow: hidden; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+
+/* ---------- шапка ---------- */
+.masthead { padding: 2.75rem 0 1.25rem; }
+.masthead h1 {
+  font: 650 2.125rem/1.1 var(--serif); font-variation-settings: "opsz" 72;
+  letter-spacing: -0.015em; margin: 0 0 .5rem;
+}
+.masthead p { margin: 0; color: var(--ink-2); font-size: .9375rem; max-width: 30rem; }
+.masthead .updated { margin-top: .75rem; font-size: .8125rem; }
+
+/* ---------- плитки ---------- */
+.tile {
+  --h: 200;
+  position: relative; display: inline-grid; place-items: center; flex: none;
+  width: 3.5rem; height: 3.5rem; border-radius: .375rem;
+  background: hsl(var(--h) var(--tile-s) var(--tile-bg-l));
+  color: hsl(var(--h) 55% var(--tile-fg-l));
+  border: 1px solid hsl(var(--h) var(--tile-s) var(--tile-bd-l));
+  font: 600 1.375rem/1 var(--serif); font-variation-settings: "opsz" 72; letter-spacing: -.01em;
+}
+.tile .n { position: absolute; top: .25rem; right: .3125rem; font: 500 .625rem/1 var(--sans); opacity: .8; }
+.tile.sm { width: 2.25rem; height: 2.25rem; font-size: .9375rem; border-radius: .3125rem; }
+.tile.all { --h: 176; font: 600 .9375rem/1 var(--sans); }
+
+.filters { margin: 0 -1.25rem; padding: .25rem 1.25rem .5rem; display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.filters::-webkit-scrollbar { display: none; }
+.filters button { all: unset; cursor: pointer; scroll-snap-align: start; border-radius: .375rem; }
+.filters button .tile { transition: transform .15s ease, box-shadow .15s ease; }
+.filters button[aria-pressed="true"] .tile { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px hsl(var(--h) 45% 45%); }
+.filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.source-note { min-height: 2.75rem; margin: .5rem 0 1.5rem; font-size: .875rem; color: var(--ink-2); }
+.source-note b { color: var(--ink); font-weight: 600; }
+
+/* ---------- лента ---------- */
+.entries { list-style: none; margin: 0; padding: 0 0 3rem; }
+.entry + .entry { margin-top: 2.25rem; }
+.entry a { display: grid; grid-template-columns: 2.25rem 1fr; gap: 1rem; text-decoration: none; border-radius: .5rem; }
+.entry a:active .entry-title { color: var(--accent); }
+.entry-title {
+  font: 600 1.25rem/1.3 var(--serif); font-variation-settings: "opsz" 28;
+  margin: 0 0 .375rem; letter-spacing: -.005em; text-wrap: pretty;
+}
+.entry.is-new .entry-title::before {
+  content: ""; display: inline-block; width: .5rem; height: .5rem; border-radius: 50%;
+  background: var(--accent); margin: 0 .5rem .15rem 0; vertical-align: middle;
+}
+.entry-meta { margin: 0 0 .625rem; font-size: .8125rem; color: var(--ink-2); }
+.entry-abstract { margin: 0; font: 400 1.0625rem/1.6 var(--serif); font-variation-settings: "opsz" 14; color: var(--ink); text-wrap: pretty; }
+.entry-state { margin: .625rem 0 0; font-size: .8125rem; font-weight: 500; color: var(--ink-2); }
+.entry-state.ok { color: var(--accent); }
+
+.empty { padding: 3rem 0; color: var(--ink-2); font: 400 1.0625rem/1.6 var(--serif); max-width: var(--measure); }
+
+footer.colophon { border-top: 1px solid var(--rule); padding: 2rem 0 3rem; font-size: .875rem; color: var(--ink-2); }
+footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 0 0 1rem; }
+.sources { list-style: none; padding: 0; margin: 0 0 1.75rem; display: grid; gap: .875rem; }
+.sources li { display: grid; grid-template-columns: 2.25rem 1fr; gap: .875rem; align-items: start; }
+.sources a { color: var(--ink); font-weight: 500; text-decoration: none; }
+.sources a:hover { text-decoration: underline; }
+.linkbtn { all: unset; cursor: pointer; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- читалка ---------- */
+.reader {
+  position: fixed; inset: 0; z-index: 10; background: var(--paper);
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  animation: slide-in .24s cubic-bezier(.2,.7,.2,1);
+}
+.reader[hidden] { display: none; }
+@keyframes slide-in { from { transform: translateX(14%); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .reader { animation: none; } .filters button .tile { transition: none; } }
+
+.reader-bar {
+  position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center;
+  padding: .625rem 1.25rem; background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rule);
+}
+.reader-bar button, .reader-bar a {
+  all: unset; cursor: pointer; font: 500 .9375rem/1 var(--sans); color: var(--accent); padding: .5rem 0;
+}
+.reader-bar button::before { content: "‹"; font-size: 1.5rem; line-height: 0; vertical-align: -.12em; margin-right: .35rem; }
+.reader-bar :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.doc { max-width: var(--measure); margin: 0 auto; padding: 1.75rem 1.25rem 5rem; }
+.doc-source { display: flex; align-items: center; gap: .75rem; font-size: .875rem; color: var(--ink-2); margin-bottom: 1.25rem; }
+.doc-source b { color: var(--ink); font-weight: 600; display: block; }
+.doc h1.doc-title {
+  font: 650 1.875rem/1.18 var(--serif); font-variation-settings: "opsz" 60;
+  letter-spacing: -.012em; margin: 0 0 .75rem; text-wrap: balance;
+}
+.doc-meta { font-size: .8125rem; color: var(--ink-2); margin: 0 0 1.5rem; }
+.doc-meta i { font-family: var(--serif); }
+.lead {
+  font: 400 1.1875rem/1.6 var(--serif); font-variation-settings: "opsz" 20; color: var(--ink-2);
+  margin: 0 0 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule);
+}
+.doc audio { width: 100%; margin: 0 0 2rem; }
+
+.prose { font: 400 1.125rem/1.7 var(--serif); font-variation-settings: "opsz" 16; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
+.prose > * { margin: 0 0 1.1em; }
+.prose h1, .prose h2, .prose h3, .prose h4 { font-family: var(--serif); line-height: 1.3; letter-spacing: -.005em; margin: 1.8em 0 .6em; hyphens: manual; }
+.prose h1, .prose h2 { font-size: 1.375rem; font-weight: 650; }
+.prose h3 { font-size: 1.1875rem; font-weight: 650; }
+.prose h4, .prose h5, .prose h6 { font-size: 1.0625rem; font-weight: 650; }
+.prose a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose li { margin: .35em 0; }
+.prose li > p { margin: 0 0 .5em; }
+.prose blockquote { margin: 1.5em 0; padding: 0 0 0 1.1em; border-left: 3px solid hsl(var(--h, 176) 40% 60%); color: var(--ink-2); }
+.prose blockquote > *:last-child { margin-bottom: 0; }
+.prose img { display: block; max-width: 100%; height: auto; border-radius: .375rem; margin: 1.5em auto .5em; background: var(--surface); }
+.prose figure { margin: 1.5em 0; }
+.prose figcaption { font: 400 .875rem/1.5 var(--sans); color: var(--ink-2); text-align: center; }
+.prose code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .85em; background: var(--surface); border-radius: .25rem; padding: .1em .3em; hyphens: none; }
+.prose pre { background: var(--surface); border: 1px solid var(--rule); border-radius: .5rem; padding: .9rem 1rem; overflow-x: auto; font-size: .875rem; line-height: 1.5; hyphens: none; }
+.prose pre code { background: none; padding: 0; font-size: inherit; }
+.prose table { border-collapse: collapse; font: 400 .9375rem/1.4 var(--sans); display: block; overflow-x: auto; }
+.prose td, .prose th { border-bottom: 1px solid var(--rule); padding: .4em .75em .4em 0; text-align: left; vertical-align: top; }
+.prose hr { border: 0; text-align: center; margin: 2em 0; }
+.prose hr::after { content: "⁂"; color: var(--ink-2); }
+
+.notice { font: 400 1rem/1.6 var(--sans); color: var(--ink-2); background: var(--surface); border-radius: .5rem; padding: 1rem 1.125rem; margin: 0 0 1.5rem; }
+.notice a { color: var(--accent); }
+.unlock { background: var(--surface); border-radius: .5rem; padding: 1.25rem 1.125rem; }
+.unlock p { margin: 0 0 1rem; font-size: .9375rem; color: var(--ink-2); }
+.unlock label { display: block; font-size: .8125rem; font-weight: 500; margin-bottom: .375rem; }
+.unlock .row { display: flex; gap: .5rem; }
+.unlock input {
+  flex: 1; min-width: 0; font: 400 1rem/1.4 var(--sans); color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: .375rem; padding: .625rem .75rem;
+}
+.unlock input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.unlock button {
+  font: 600 .9375rem/1 var(--sans); color: #fff; background: var(--accent); border: 0; border-radius: .375rem;
+  padding: 0 1rem; cursor: pointer;
+}
+@media (prefers-color-scheme: dark) { .unlock button { color: #0E2A2C; } }
+.unlock button[disabled] { opacity: .6; }
+.unlock .err { color: #B3412F; margin: .75rem 0 0; font-size: .875rem; }
+@media (prefers-color-scheme: dark) { .unlock .err { color: #F08A75; } }
+.doc-end { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: .875rem; color: var(--ink-2); }
+.doc-end a { color: var(--accent); }
+
+@media (min-width: 40rem) {
+  .masthead { padding-top: 4rem; }
+  .masthead h1 { font-size: 2.75rem; }
+  .doc h1.doc-title { font-size: 2.25rem; }
+  .prose { font-size: 1.1875rem; }
+}
+</style>
+</head>
+<body>
+<main class="wrap" id="main">
+  <header class="masthead">
+    <h1>Дайджест ИИ</h1>
+    <p>Лучшие англоязычные тексты об искусственном интеллекте: короткий абстракт и полный перевод на русский.</p>
+    <p class="updated" id="updated"></p>
+  </header>
+
+  <nav aria-label="Источники">
+    <div class="filters" id="filters"></div>
+    <p class="source-note" id="source-note" aria-live="polite"></p>
+  </nav>
+
+  <ol class="entries" id="entries" aria-label="Тексты"></ol>
+
+  <footer class="colophon" id="colophon" hidden>
+    <h2>Источники</h2>
+    <ul class="sources" id="sources"></ul>
+    <p>Абстракты и переводы сделаны Claude. Тексты принадлежат авторам, у каждого есть ссылка на оригинал.</p>
+    <p id="forget-wrap" hidden><button class="linkbtn" id="forget" type="button">Забыть пароль на этом устройстве</button></p>
+  </footer>
+</main>
+
+<div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="doc-title" hidden>
+  <div class="reader-bar">
+    <button type="button" id="back">Назад</button>
+    <a id="orig" href="#" target="_blank" rel="noopener noreferrer">Оригинал</a>
+  </div>
+  <article class="doc" id="doc"></article>
+</div>
+
+<script>
+"use strict";
+const params = new URLSearchParams(location.search);
+const DATA_BASE = params.get("data") || "https://raw.githubusercontent.com/VBalik/AIBot/data/";
+const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
+
+const $ = (s, r = document) => r.querySelector(s);
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+let FEED = null, ITEMS = new Map(), SOURCES = new Map(), cryptoKey = null, lastOpener = null;
+let filter = store.get("aid.filter") || "all";
+const lastVisit = Number(store.get("aid.lastVisit") || 0);
+
+/* ---------- форматирование ---------- */
+const plural = (n, one, few, many) => {
+  const m10 = n % 10, m100 = n % 100;
+  return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
+};
+function fmtDate(iso, withTime = false) {
+  const d = new Date(iso), now = new Date();
+  const opts = { day: "numeric", month: "long" };
+  if (d.getFullYear() !== now.getFullYear()) opts.year = "numeric";
+  let s = new Intl.DateTimeFormat("ru-RU", opts).format(d);
+  if (withTime) s += " в " + new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit" }).format(d);
+  return s;
+}
+function readingTime(words) {
+  const m = Math.max(1, Math.round((words || 0) / 200));
+  return `${m} ${plural(m, "минута", "минуты", "минут")} чтения`;
+}
+function tile(src, cls = "", count = null) {
+  const h = src ? src.hue : 176;
+  const n = count == null ? "" : `<span class="n" aria-hidden="true">${count}</span>`;
+  return `<span class="tile ${cls}" style="--h:${h}" aria-hidden="true">${esc(src ? src.symbol : "Все")}${n}</span>`;
+}
+const STATE_TEXT = {
+  ok: "Полный перевод",
+  pending: "Перевод готовится",
+  paywalled: "Только абстракт: текст для подписчиков автора",
+  too_long: "Только абстракт: очень длинный текст",
+  below: "Только абстракт",
+  unavailable: "Только абстракт",
+  error: "Только абстракт",
+};
+
+/* ---------- загрузка и лента ---------- */
+async function load() {
+  try {
+    const r = await fetch(DATA_BASE + "feed.json?v=" + Math.floor(Date.now() / 60000), { cache: "no-store" });
+    if (r.status === 404) return showEmpty("Пока пусто. Первые тексты появятся после ближайшего запуска сборщика — он работает каждый час.");
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    FEED = await r.json();
+  } catch (e) {
+    return showEmpty("Не удалось загрузить ленту. Проверьте соединение и обновите страницу.");
+  }
+  FEED.sources.forEach((s, i) => SOURCES.set(s.id, { ...s, hue: HUES[i % HUES.length] }));
+  FEED.items.forEach((it) => ITEMS.set(it.id, it));
+  if (filter !== "all" && !SOURCES.has(filter)) filter = "all";
+  if (FEED.updated_at) $("#updated").textContent = "Обновлено " + fmtDate(FEED.updated_at, true);
+  renderFilters();
+  renderEntries();
+  renderColophon();
+  store.set("aid.lastVisit", String(Date.now()));
+  const m = location.hash.match(/^#\/p\/([\w-]+)$/);
+  if (m && ITEMS.has(m[1])) openReader(m[1], false);
+}
+
+function showEmpty(text) {
+  $("#entries").innerHTML = `<li class="empty">${esc(text)}</li>`;
+}
+
+function renderFilters() {
+  const counts = {};
+  FEED.items.forEach((it) => (counts[it.source] = (counts[it.source] || 0) + 1));
+  const btn = (id, src, count, label) =>
+    `<button type="button" data-f="${id}" aria-pressed="${filter === id}" aria-label="${esc(label)}">${tile(src, id === "all" ? "all" : "", count)}</button>`;
+  let html = btn("all", null, FEED.items.length, "Все источники");
+  for (const s of SOURCES.values()) html += btn(s.id, s, counts[s.id] || 0, s.name);
+  const box = $("#filters");
+  box.innerHTML = html;
+  box.onclick = (e) => {
+    const b = e.target.closest("button[data-f]");
+    if (!b) return;
+    filter = b.dataset.f;
+    store.set("aid.filter", filter);
+    box.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    renderEntries();
+  };
+}
+
+function renderNote() {
+  const note = $("#source-note");
+  if (filter === "all") {
+    note.innerHTML = `<b>Все источники</b>, ${SOURCES.size} ${plural(SOURCES.size, "блог", "блога", "блогов")}. Нажмите на плитку, чтобы оставить один.`;
+  } else {
+    const s = SOURCES.get(filter);
+    note.innerHTML = `<b>${esc(s.name)}</b>, ${esc(s.author)}. ${esc(s.about)}.`;
+  }
+}
+
+function renderEntries() {
+  renderNote();
+  const list = FEED.items.filter((it) => filter === "all" || it.source === filter);
+  if (!list.length) return showEmpty(filter === "all"
+    ? "Пока пусто. Первые тексты появятся после ближайшего запуска сборщика — он работает каждый час."
+    : "Из этого блога пока нет отобранных текстов. Новые появятся здесь, как только автор опубликует что-то стоящее.");
+  $("#entries").innerHTML = list.map((it) => {
+    const s = SOURCES.get(it.source);
+    const isNew = lastVisit && Date.parse(it.added) > lastVisit;
+    return `<li class="entry${isNew ? " is-new" : ""}">
+      <a href="#/p/${esc(it.id)}" data-id="${esc(it.id)}">
+        ${tile(s, "sm")}
+        <div>
+          <h2 class="entry-title">${isNew ? '<span class="sr">Новое: </span>' : ""}${esc(it.title_ru)}</h2>
+          <p class="entry-meta">${esc(s ? s.name : it.source)}, ${fmtDate(it.published)}, ${readingTime(it.words_en)}</p>
+          <p class="entry-abstract">${esc(it.abstract)}</p>
+          <p class="entry-state${it.full === "ok" ? " ok" : ""}">${STATE_TEXT[it.full] || ""}</p>
+        </div>
+      </a></li>`;
+  }).join("");
+}
+
+$("#entries").addEventListener("click", (e) => {
+  const a = e.target.closest("a[data-id]");
+  if (!a || e.metaKey || e.ctrlKey) return;
+  e.preventDefault();
+  lastOpener = a;
+  openReader(a.dataset.id, true);
+});
+
+function renderColophon() {
+  $("#sources").innerHTML = [...SOURCES.values()].map((s) =>
+    `<li>${tile(s, "sm")}<div><a href="${esc(s.site)}" target="_blank" rel="noopener noreferrer">${esc(s.name)}</a>, ${esc(s.author)}<br>${esc(s.about)}</div></li>`
+  ).join("");
+  $("#colophon").hidden = false;
+  $("#forget-wrap").hidden = !store.get(keyName());
+}
+
+/* ---------- шифрование ---------- */
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const keyName = () => "aid.key." + (FEED && FEED.crypto ? FEED.crypto.salt : "");
+
+async function decryptRaw(key, blob) {
+  return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(blob.iv) }, key, b64(blob.ct)));
+}
+async function gunzip(bytes) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return await new Response(stream).text();
+}
+async function checkKey(key) {
+  return new TextDecoder().decode(await decryptRaw(key, FEED.crypto.check)) === "ai-digest-ok";
+}
+async function savedKey() {
+  const raw = store.get(keyName());
+  if (!raw) return null;
+  try {
+    const key = await crypto.subtle.importKey("raw", b64(raw), "AES-GCM", false, ["decrypt"]);
+    if (await checkKey(key)) return key;
+  } catch {}
+  store.del(keyName());
+  return null;
+}
+async function unlock(password) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: b64(FEED.crypto.salt), iterations: FEED.crypto.iterations, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
+  let ok = false;
+  try { ok = await checkKey(key); } catch {}
+  if (!ok) return false;
+  const raw = new Uint8Array(await crypto.subtle.exportKey("raw", key));
+  store.set(keyName(), btoa(String.fromCharCode(...raw)));
+  cryptoKey = key;
+  $("#forget-wrap").hidden = false;
+  return true;
+}
+
+/* ---------- очистка HTML перевода (страховка поверх очистки в сборщике) ---------- */
+const ALLOWED = new Set("P H1 H2 H3 H4 H5 H6 UL OL LI PRE BLOCKQUOTE TABLE THEAD TBODY TR TD TH HR FIGURE FIGCAPTION A B STRONG I EM CODE BR IMG SUP SUB S DEL U".split(" "));
+const DROP = new Set("SCRIPT STYLE IFRAME OBJECT EMBED FORM INPUT BUTTON SVG MATH TEMPLATE LINK META".split(" "));
+function cleanFragment(html) {
+  const doc = new DOMParser().parseFromString(`<body>${html}</body>`, "text/html");
+  const all = [...doc.body.querySelectorAll("*")].reverse();
+  for (const el of all) {
+    if (DROP.has(el.tagName)) { el.remove(); continue; }
+    if (!ALLOWED.has(el.tagName)) { el.replaceWith(...el.childNodes); continue; }
+    for (const attr of [...el.attributes]) {
+      const ok = (el.tagName === "A" && attr.name === "href" && /^https?:\/\//i.test(attr.value)) ||
+                 (el.tagName === "IMG" && attr.name === "src" && /^https:\/\//i.test(attr.value)) ||
+                 (el.tagName === "IMG" && attr.name === "alt");
+      if (!ok) el.removeAttribute(attr.name);
+    }
+    if (el.tagName === "A" && el.hasAttribute("href")) { el.target = "_blank"; el.rel = "noopener noreferrer"; }
+    if (el.tagName === "IMG") { el.loading = "lazy"; el.decoding = "async"; el.referrerPolicy = "no-referrer"; }
+  }
+  const frag = document.createDocumentFragment();
+  frag.append(...doc.body.childNodes);
+  return frag;
+}
+
+/* ---------- читалка ---------- */
+const reader = $("#reader"), docEl = $("#doc");
+
+function openReader(id, push) {
+  const it = ITEMS.get(id);
+  if (!it) return;
+  const s = SOURCES.get(it.source);
+  reader.style.setProperty("--h", s ? s.hue : 176);
+  $("#orig").href = it.url;
+  docEl.innerHTML = `
+    <div class="doc-source">${tile(s)}<div><b>${esc(s ? s.name : it.source)}</b>${esc(s ? s.author : "")}</div></div>
+    <h1 class="doc-title" id="doc-title">${esc(it.title_ru)}</h1>
+    <p class="doc-meta">${fmtDate(it.published)}, ${readingTime(it.words_en)}<br>Оригинал: <i>${esc(it.title_en)}</i></p>
+    <p class="lead">${esc(it.abstract)}</p>
+    ${it.audio ? `<audio controls preload="none" src="${esc(it.audio)}"></audio>` : ""}
+    <div id="full"></div>
+    <p class="doc-end">Текст: <a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(s ? s.author : "автор")}, ${esc(s ? s.name : "")}</a>. Абстракт и перевод: Claude.</p>`;
+  if (push) history.pushState({ id }, "", "#/p/" + id);
+  document.body.classList.add("reading");
+  reader.hidden = false;
+  reader.scrollTop = 0;
+  $("#back").focus({ preventScroll: true });
+  document.title = it.title_ru + " — Дайджест ИИ";
+  renderFull(it);
+}
+
+function closeReader() {
+  if (reader.hidden) return;
+  reader.hidden = true;
+  document.body.classList.remove("reading");
+  document.title = "Дайджест ИИ";
+  if (lastOpener) lastOpener.focus({ preventScroll: true });
+}
+
+async function renderFull(it) {
+  const box = $("#full");
+  const orig = `<a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">Читать оригинал</a>`;
+  const notices = {
+    pending: `Полный перевод готовится и появится здесь в течение пары часов. Пока можно ${orig.replace("Читать", "прочитать")}.`,
+    paywalled: `Полный текст доступен только подписчикам автора, поэтому здесь абстракт. ${orig}.`,
+    too_long: `Текст очень длинный — около ${readingTime(it.words_en).replace(" чтения", "")} чтения, поэтому здесь только абстракт. ${orig}.`,
+    below: `Этот текст отобран в дайджест, но полный перевод для него не делался. ${orig}.`,
+    unavailable: `Текст пропал из ленты автора до перевода. ${orig}.`,
+    error: `Перевести этот текст не получилось. ${orig}.`,
+  };
+  if (it.full !== "ok") { box.innerHTML = `<p class="notice">${notices[it.full] || orig}</p>`; return; }
+  if (!cryptoKey) cryptoKey = await savedKey();
+  if (!cryptoKey) return renderUnlock(it, box);
+  box.innerHTML = `<p class="notice">Открываю перевод…</p>`;
+  try {
+    const r = await fetch(DATA_BASE + "full/" + it.id + ".json");
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = JSON.parse(await gunzip(await decryptRaw(cryptoKey, await r.json())));
+    if (ITEMS.get(it.id) !== it || reader.hidden) return;
+    const prose = document.createElement("div");
+    prose.className = "prose";
+    prose.append(cleanFragment(data.html));
+    box.replaceChildren(prose);
+  } catch (e) {
+    box.innerHTML = `<p class="notice">Не удалось открыть перевод. Проверьте соединение и откройте текст ещё раз, или ${orig.replace("Читать", "прочитайте")}.</p>`;
+  }
+}
+
+function renderUnlock(it, box) {
+  box.innerHTML = `
+    <form class="unlock" id="unlock">
+      <p>Полные переводы открываются паролем. Введите его один раз — на этом устройстве он запомнится.</p>
+      <label for="pw">Пароль</label>
+      <div class="row">
+        <input id="pw" type="password" autocomplete="current-password" required>
+        <button type="submit">Открыть</button>
+      </div>
+      <p class="err" id="pw-err" role="alert" hidden>Пароль не подошёл. Проверьте раскладку и попробуйте ещё раз.</p>
+    </form>`;
+  const form = $("#unlock"), btn = form.querySelector("button"), err = $("#pw-err");
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    btn.disabled = true; err.hidden = true;
+    const ok = await unlock($("#pw").value);
+    btn.disabled = false;
+    if (ok) renderFull(it); else { err.hidden = false; $("#pw").select(); }
+  };
+}
+
+$("#back").addEventListener("click", () => {
+  if (history.state && history.state.id) history.back();
+  else { history.replaceState(null, "", location.pathname + location.search); closeReader(); }
+});
+window.addEventListener("popstate", () => {
+  const m = location.hash.match(/^#\/p\/([\w-]+)$/);
+  if (m && ITEMS.has(m[1])) openReader(m[1], false); else closeReader();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !reader.hidden) $("#back").click(); });
+$("#forget").addEventListener("click", () => {
+  store.del(keyName()); cryptoKey = null; $("#forget-wrap").hidden = true;
+});
+
+load();
+</script>
+</body>
+</html>
