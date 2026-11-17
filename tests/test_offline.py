@@ -56,6 +56,7 @@ with sync_playwright() as p:
     assert any("chart.png" in u for u in cached.get("images", [])), cached.get("images")
     assert any(u.endswith("/feed.json") for u in cached.get("data", [])), cached.get("data")
     assert sum("/full/" in u for u in cached.get("data", [])) == 3, cached.get("data")  # 2 статьи + 1 перевод для сравнения
+    assert any(u.endswith("/fonts/onest-cyrillic.woff2") for u in cached.get("fonts", [])), cached.get("fonts")
 
     # 3. Без сети: страница, лента, переводы и иллюстрации — из кэша
     ctx.set_offline(True)
@@ -64,6 +65,8 @@ with sync_playwright() as p:
     page.wait_for_selector(".entry", timeout=15000)
     assert page.locator(".entry").count() == 4
     assert "Нет сети" in page.inner_text("#offline-status")
+    page.wait_for_function("""[...document.fonts].some(f => f.family.replace(/"/g, '') === 'Onest' && f.status === 'loaded')""",
+                           timeout=10000)  # шрифт тоже из кэша
     page.screenshot(path=str(OUT / "7-offline-list.png"))
     # статью Black Forest Labs в этой сессии не открывали — она должна была сохраниться в фоне
     page.click('.entry a:has-text("Black Forest Labs")')

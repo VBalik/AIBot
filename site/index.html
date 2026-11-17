@@ -13,10 +13,18 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&display=swap">
+<link rel="preload" href="fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+/* Onest (OFL, github.com/simpals/onest): современный гротеск, нарисованный с кириллицей наравне с латиницей.
+   Шрифт лежит рядом со страницей: не зависит от Google Fonts и работает без сети. */
+@font-face { font-family: "Onest"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/onest-cyrillic.woff2) format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+@font-face { font-family: "Onest"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/onest-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Onest"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/onest-latin-ext.woff2) format("woff2");
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
 :root {
   --paper: #F1F4F3;
   --surface: #FFFFFF;
@@ -25,8 +33,7 @@
   --rule: #D3DBDC;
   --accent: #0F6B68;
   --tile-s: 42%; --tile-bg-l: 88%; --tile-fg-l: 24%; --tile-bd-l: 74%;
-  --serif: "Literata", "Iowan Old Style", Georgia, serif;
-  --sans: "Golos Text", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  --sans: "Onest", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
   --measure: 36rem;
   color-scheme: light dark;
 }
@@ -54,8 +61,8 @@ a { color: inherit; }
 /* ---------- шапка ---------- */
 .masthead { padding: 2.75rem 0 1.25rem; }
 .masthead h1 {
-  font: 650 2.125rem/1.1 var(--serif); font-variation-settings: "opsz" 72;
-  letter-spacing: -0.015em; margin: 0 0 .5rem;
+  font: 750 2.25rem/1.05 var(--sans);
+  letter-spacing: -0.03em; margin: 0 0 .5rem;
 }
 .masthead p { margin: 0; color: var(--ink-2); font-size: .9375rem; max-width: 30rem; }
 .masthead .updated { margin-top: .75rem; font-size: .8125rem; }
@@ -70,7 +77,7 @@ a { color: inherit; }
   background: hsl(var(--h) var(--tile-s) var(--tile-bg-l));
   color: hsl(var(--h) 55% var(--tile-fg-l));
   border: 1px solid hsl(var(--h) var(--tile-s) var(--tile-bd-l));
-  font: 600 1.375rem/1 var(--serif); font-variation-settings: "opsz" 72; letter-spacing: -.01em;
+  font: 650 1.375rem/1 var(--sans); letter-spacing: -.02em;
 }
 .tile .n { position: absolute; top: .25rem; right: .3125rem; font: 500 .625rem/1 var(--sans); opacity: .8; }
 .tile.sm { width: 2.25rem; height: 2.25rem; font-size: .9375rem; border-radius: .3125rem; }
@@ -91,7 +98,7 @@ a { color: inherit; }
 .entry a { display: grid; grid-template-columns: 2.25rem 1fr; gap: 1rem; text-decoration: none; border-radius: .5rem; }
 .entry a:active .entry-title { color: var(--accent); }
 .entry-title {
-  font: 600 1.25rem/1.3 var(--serif); font-variation-settings: "opsz" 28;
+  font: 650 1.1875rem/1.3 var(--sans); letter-spacing: -.01em;
   margin: 0 0 .375rem; letter-spacing: -.005em; text-wrap: pretty;
 }
 .entry.is-new .entry-title::before {
@@ -99,11 +106,11 @@ a { color: inherit; }
   background: var(--accent); margin: 0 .5rem .15rem 0; vertical-align: middle;
 }
 .entry-meta { margin: 0 0 .625rem; font-size: .8125rem; color: var(--ink-2); }
-.entry-abstract { margin: 0; font: 400 1.0625rem/1.6 var(--serif); font-variation-settings: "opsz" 14; color: var(--ink); text-wrap: pretty; }
+.entry-abstract { margin: 0; font: 400 1.0625rem/1.6 var(--sans); color: var(--ink); text-wrap: pretty; }
 .entry-state { margin: .625rem 0 0; font-size: .8125rem; font-weight: 500; color: var(--ink-2); }
 .entry-state.ok { color: var(--accent); }
 
-.empty { padding: 3rem 0; color: var(--ink-2); font: 400 1.0625rem/1.6 var(--serif); max-width: var(--measure); }
+.empty { padding: 3rem 0; color: var(--ink-2); font: 400 1.0625rem/1.6 var(--sans); max-width: var(--measure); }
 
 footer.colophon { border-top: 1px solid var(--rule); padding: 2rem 0 3rem; font-size: .875rem; color: var(--ink-2); }
 footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 0 0 1rem; }
@@ -139,21 +146,20 @@ footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 
 .doc-source { display: flex; align-items: center; gap: .75rem; font-size: .875rem; color: var(--ink-2); margin-bottom: 1.25rem; }
 .doc-source b { color: var(--ink); font-weight: 600; display: block; }
 .doc h1.doc-title {
-  font: 650 1.875rem/1.18 var(--serif); font-variation-settings: "opsz" 60;
+  font: 700 1.875rem/1.15 var(--sans); letter-spacing: -.025em;
   letter-spacing: -.012em; margin: 0 0 .75rem; text-wrap: balance;
 }
 .doc-meta { font-size: .8125rem; color: var(--ink-2); margin: 0 0 1.5rem; }
-.doc-meta i { font-family: var(--serif); }
 .lead {
-  font: 400 1.1875rem/1.6 var(--serif); font-variation-settings: "opsz" 20; color: var(--ink-2);
+  font: 400 1.1875rem/1.55 var(--sans); color: var(--ink-2);
   margin: 0 0 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule);
 }
 .doc audio { width: 100%; margin: 0 0 2rem; }
 
-.prose { font: 400 1.125rem/1.7 var(--serif); font-variation-settings: "opsz" 16; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
+.prose { font: 400 1.125rem/1.65 var(--sans); hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
 .prose > * { margin: 0 0 1.1em; }
-.prose h1, .prose h2, .prose h3, .prose h4 { font-family: var(--serif); line-height: 1.3; letter-spacing: -.005em; margin: 1.8em 0 .6em; hyphens: manual; }
-.prose h1, .prose h2 { font-size: 1.375rem; font-weight: 650; }
+.prose h1, .prose h2, .prose h3, .prose h4 { line-height: 1.25; letter-spacing: -.015em; margin: 1.8em 0 .6em; hyphens: manual; }
+.prose h1, .prose h2 { font-size: 1.375rem; font-weight: 700; }
 .prose h3 { font-size: 1.1875rem; font-weight: 650; }
 .prose h4, .prose h5, .prose h6 { font-size: 1.0625rem; font-weight: 650; }
 .prose a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
@@ -207,7 +213,7 @@ footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 
 
 @media (min-width: 40rem) {
   .masthead { padding-top: 4rem; }
-  .masthead h1 { font-size: 2.75rem; }
+  .masthead h1 { font-size: 2.875rem; }
   .doc h1.doc-title { font-size: 2.25rem; }
   .prose { font-size: 1.1875rem; }
 }

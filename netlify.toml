@@ -26,3 +26,9 @@
   for = "/manifest.webmanifest"
   [headers.values]
     Content-Type = "application/manifest+json"
+
+# Шрифт не меняется: пусть браузер держит его год и не перепроверяет
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

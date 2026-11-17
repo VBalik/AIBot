@@ -12,9 +12,15 @@ from playwright.sync_api import sync_playwright  # noqa: E402
 PNG = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAGElEQVR4nGNk+M+AFTDhEh8VAAJEAQGzAA2DAAFB2AB6Fb7lyAAAAABJRU5ErkJggg==")
 
 
+GOOGLE_FONT_HITS = []
+FONT_LOADED = """[...document.fonts].some(f => f.family.replace(/"/g, '') === 'Onest' && f.status === 'loaded')"""
+
+
 def stub_external(ctx):
-    """В песочнице нет интернета: шрифты Google и картинки с CDN подменяются заглушками."""
-    ctx.route("https://fonts.googleapis.com/**", lambda r: r.fulfill(status=200, content_type="text/css", body=""))
+    """В песочнице нет интернета: картинки с CDN подменяются заглушками.
+    Шрифт Onest лежит рядом со страницей; к Google Fonts страница ходить не должна."""
+    ctx.route("https://fonts.googleapis.com/**", lambda r: (GOOGLE_FONT_HITS.append(r.request.url), r.abort()))
+    ctx.route("https://fonts.gstatic.com/**", lambda r: (GOOGLE_FONT_HITS.append(r.request.url), r.abort()))
     ctx.route("https://substackcdn.com/**", lambda r: r.fulfill(status=200, content_type="image/png", body=PNG))
     return ctx
 
@@ -39,6 +45,10 @@ with sync_playwright() as p:
     page.goto(URL)
     page.wait_for_selector(".entry")
     assert page.locator(".entry").count() == 4
+    page.wait_for_function(FONT_LOADED, timeout=10000)  # свой шрифт загрузился и используется
+    for sel in (".masthead h1", ".entry-abstract", ".entry-title"):
+        fam = page.evaluate(f"getComputedStyle(document.querySelector({sel!r})).fontFamily")
+        assert fam.replace('"', "").startswith("Onest"), (sel, fam)
     page.screenshot(path=str(OUT / "1-list.png"))
 
     # фильтр по источнику
@@ -119,4 +129,5 @@ with sync_playwright() as p:
 
 srv.shutdown()
 assert not errors, errors
+assert not GOOGLE_FONT_HITS, GOOGLE_FONT_HITS
 print("ВСЕ ПРОВЕРКИ СТРАНИЦЫ ПРОЙДЕНЫ, скриншоты в", OUT)

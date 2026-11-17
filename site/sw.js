@@ -3,13 +3,13 @@
  * Кэши:
  *   shell-*  — сама страница, иконки, манифест (обновляется при каждой версии)
  *   data     — feed.json (сначала сеть, без сети — сохранённая копия) и переводы full/*.json (зашифрованы)
- *   fonts    — шрифты Google
+ *   fonts    — шрифт Onest (лежит рядом со страницей, файлы неизменны)
  *   images   — иллюстрации из переводов (в том числе непрозрачные ответы чужих CDN)
  *
  * Страница присылает сообщение {type: "cache-images", urls: [...]}: SW докачивает иллюстрации в фоне,
  * чтобы они были доступны офлайн, даже если статью ещё не открывали.
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL = `shell-${VERSION}`;
 const DATA = "data";
 const FONTS = "fonts";
@@ -19,9 +19,13 @@ const SHELL_FILES = [
   "./", "index.html", "favicon.svg", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png",
 ];
+const FONT_FILES = ["fonts/onest-cyrillic.woff2", "fonts/onest-latin.woff2"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)).then(() => self.skipWaiting()));
+  event.waitUntil(Promise.all([
+    caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)),
+    caches.open(FONTS).then((c) => c.addAll(FONT_FILES)),
+  ]).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -36,7 +40,7 @@ self.addEventListener("activate", (event) => {
 const noQuery = (url) => { const u = new URL(url); u.search = ""; return u.toString(); };
 const isFeed = (url) => /\/feed\.json$/.test(url.pathname);
 const isFull = (url) => /\/full\/[^/]+\.json$/.test(url.pathname);
-const isFont = (url) => url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com";
+const isFont = (url) => url.origin === self.location.origin && /\/fonts\/[^/]+\.woff2$/.test(url.pathname);
 
 async function networkFirst(request, cacheName, key, timeoutMs) {
   const cache = await caches.open(cacheName);
@@ -67,16 +71,6 @@ async function cacheFirst(request, cacheName, key) {
   return resp;
 }
 
-async function staleWhileRevalidate(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  const cached = await cache.match(request);
-  const update = fetch(request).then((resp) => {
-    if (resp.ok || resp.type === "opaque") cache.put(request, resp.clone());
-    return resp;
-  }).catch(() => cached);
-  return cached || update;
-}
-
 let trimming = false;
 async function trimImages() {
   if (trimming) return;
@@ -100,7 +94,7 @@ self.addEventListener("fetch", (event) => {
   } else if (isFull(url)) {
     event.respondWith(cacheFirst(req, DATA, noQuery(req.url)));
   } else if (isFont(url)) {
-    event.respondWith(staleWhileRevalidate(req, FONTS));
+    event.respondWith(cacheFirst(req, FONTS, noQuery(req.url)));
   } else if (url.origin === self.location.origin) {
     // страница: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия
     const key = req.mode === "navigate" ? new URL("index.html", self.registration.scope).toString() : noQuery(req.url);
