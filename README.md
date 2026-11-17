@@ -29,6 +29,7 @@ Netlify — site/index.html (публикуется только при изме
 - **Netlify без расхода кредитов.** На бесплатном тарифе каждый production-деплой стоит 15 из 300 месячных кредитов. Поэтому Netlify отдаёт только саму страницу, а данные обновляются в ветке `data` на GitHub и деплоев не вызывают.
 - **Полные переводы зашифрованы** (AES-256-GCM, ключ из пароля). Абстракты видны всем, у кого есть адрес. Полный перевод открывается только после ввода пароля, и на устройстве пароль запоминается.
 - **Без перевода остаются платные посты и очень длинные тексты.** У них только абстракт и ссылка на оригинал.
+- **Чтение без сети** на iPhone, iPad и компьютере. Пока устройство в сети, страница сама сохраняет ленту, все готовые переводы (в зашифрованном виде) и иллюстрации из них. Без сети она открывается из сохранённой копии, а расшифровка работает, потому что ключ уже сохранён на устройстве. Сколько сохранено, видно под заголовком. Каждое устройство хранит свою копию, и пароль нужно ввести один раз на каждом. Иллюстрации сохраняются после первого ввода пароля.
 
 ## Установка (можно с телефона, в браузере)
 
@@ -46,7 +47,8 @@ Netlify — site/index.html (публикуется только при изме
    - `ANTHROPIC_API_KEY` — по желанию, ключ Claude.
 5. **Первый запуск.** github.com/VBalik/AIBot/actions/workflows/update.yml → **Run workflow**. Через несколько минут появится ветка `data`. Дальше сборщик запускается сам каждый час.
 6. **Netlify.** На app.netlify.com откройте **Add new project** → **Import an existing project** → **GitHub** → репозиторий `AIBot` → **Deploy**. Настройки подтянутся из `netlify.toml`. Если репозитория нет в списке, откройте Netlify доступ к нему на github.com/settings/installations. Сменить адрес `*.netlify.app` можно в **Project configuration** → **General** → **Project details** → **Project information** → **Manage project name and cover image**.
-7. На iPhone откройте адрес страницы в Safari → **Share** → **Add to Home Screen**.
+   Новые проекты Netlify закрытые: открыть их можно только после входа в Netlify, и внизу видна панель **Private / Share / Pre-launch tools / Make public**. Чтобы страница открывалась на любом устройстве без входа и панель исчезла, нажмите в ней **Make public**. Полные переводы при этом остаются под паролем, а заголовок `X-Robots-Tag: noindex` не даёт поисковикам индексировать страницу. Значок «Powered by Netlify», который появится у публичного проекта, отключается в **Project configuration** → **General** → **Powered by Netlify badge**.
+7. На iPhone и iPad откройте адрес страницы в Safari → **Share** → **Add to Home Screen**. С иконки на экране «Домой» страница открывается как приложение, и сохранённая копия хранится надёжнее, чем во вкладке Safari.
 
 ## Настройки
 
@@ -75,5 +77,6 @@ Netlify — site/index.html (публикуется только при изме
 ```bash
 pip install -r requirements.txt playwright && playwright install chromium
 python tests/test_build.py    # сборщик с имитацией OpenAI, Gemini и Claude API → tests/out/data
-python tests/test_site.py     # страница в браузере → скриншоты в tests/out
+python tests/test_site.py     # страница в браузере (телефон, тёмная тема, iPad) → скриншоты в tests/out
+python tests/test_offline.py  # офлайн-режим: service worker, сохранённые переводы и иллюстрации
 ```
