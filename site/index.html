@@ -34,7 +34,8 @@
   --rule: #D3DBDC;
   --accent: #0F6B68;
   --on-accent: #FFFFFF;
-  --down: #B3412F;
+  --up: #2E8B4F;
+  --down: #C2412F;
   --tile-s: 42%; --tile-bg-l: 88%; --tile-fg-l: 24%; --tile-bd-l: 74%;
   --sans: "Onest", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
   --measure: 36rem;
@@ -44,7 +45,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --paper: #14212A; --surface: #1A2B35; --ink: #E3EAEB; --ink-2: #9DAEB4;
-    --rule: #2B3C46; --accent: #62C4BD; --on-accent: #0E2A2C; --down: #F08A75;
+    --rule: #2B3C46; --accent: #62C4BD; --on-accent: #0E2A2C; --up: #6FCF8C; --down: #F08A75;
     --tile-s: 34%; --tile-bg-l: 23%; --tile-fg-l: 84%; --tile-bd-l: 34%;
   }
 }
@@ -153,6 +154,7 @@ button { font: inherit; color: inherit; }
 
 /* ---------- лента ---------- */
 .entries { list-style: none; margin: 0; padding: 0; }
+.entry { position: relative; }
 .entry + .entry { margin-top: 2rem; }
 .entry > a { display: grid; grid-template-columns: 2.25rem 1fr; gap: 1rem; text-decoration: none; border-radius: .5rem; }
 .entry > a:active .entry-title { color: var(--accent); }
@@ -164,22 +166,29 @@ button { font: inherit; color: inherit; }
 .entry.is-read .entry-title { color: var(--ink-2); }
 .entry-meta { margin: 0 0 .5rem; font-size: .8125rem; color: var(--ink-2); }
 .entry-abstract { margin: 0; font: 400 1.0625rem/1.55 var(--sans); color: var(--ink); text-wrap: pretty; }
-.entry-state { margin: .5rem 0 0; font-size: .8125rem; font-weight: 500; color: var(--ink-2); }
+/* строка состояния делит строку с пальцами: они справа, по её середине (см. .entry > .rate) */
+.entry-state { margin: .5rem 0 0; padding-right: 4.5rem; font-size: .8125rem; line-height: 1.5rem; font-weight: 500; color: var(--ink-2); }
 .entry-state.ok { color: var(--accent); }
 .empty { padding: 2rem 0; color: var(--ink-2); font: 400 1.0625rem/1.6 var(--sans); }
 
 /* оценки */
-/* пальцы рядом, по левому краю текста: рамка кнопки шире значка на .375rem с каждой стороны — на столько и сдвиг */
-.rate { display: flex; justify-content: flex-start; align-items: center; gap: 0; margin: .25rem 0 0 2.875rem; }
+/* пальцы рядом; в ленте — справа на одной линии со строкой «Полный перевод» / «Перевод готовится»:
+   середина кнопок (2.75rem) совпадает с серединой последней строки (1.5rem), значок — с правым краем текста
+   (рамка кнопки шире значка на .375rem с каждой стороны) */
+.rate { display: flex; justify-content: flex-start; align-items: center; gap: 0; }
+.entry > .rate { position: absolute; right: -.375rem; bottom: -.625rem; }
 .rate button {
   all: unset; cursor: pointer; display: inline-grid; place-items: center;
   width: 2.25rem; height: 2.75rem; border-radius: .5rem; color: var(--ink-2);
 }
 /* у обоих пальцев рукав в центре рамки — рукава стоят на одной горизонтали */
 .rate svg { width: 1.5rem; height: 1.625rem; }
-.rate .up[aria-pressed="true"] { color: var(--accent); }
+/* нажатый палец: вверх — зеленоватый, вниз — красноватый (контур цветом, заливка тем же цветом, светлее) */
+.rate .up[aria-pressed="true"] { color: var(--up); }
 .rate .down[aria-pressed="true"] { color: var(--down); }
-.rate button[aria-pressed="true"] svg path { fill: currentColor; fill-opacity: .18; stroke-width: 2; }
+.rate button[aria-pressed="true"] svg path { fill: currentColor; fill-opacity: .22; stroke-width: 2; }
+.theme-quiet .rate .up[aria-pressed="true"] { color: #86D99E; }
+.theme-quiet .rate .down[aria-pressed="true"] { color: #F59A87; }
 .rate button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- читалка ---------- */
@@ -284,7 +293,6 @@ button { font: inherit; color: inherit; }
 .doc-rate p { margin: 0 0 .75rem; font-weight: 600; color: var(--r-ink); }
 .doc-rate .rate { margin: 0 0 0 -.3125rem; }
 .doc-rate .rate button { width: 2.5rem; height: 3.25rem; color: var(--r-ink-2); }
-.doc-rate .rate .up[aria-pressed="true"] { color: var(--r-accent); }
 .doc-rate .rate svg { width: 1.875rem; height: 2.03rem; }
 
 .engines { display: inline-flex; gap: .25rem; padding: .25rem; margin: 0 0 .5rem; background: var(--r-surface); border-radius: .5rem; }
@@ -513,7 +521,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-18.6";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "2026-11-18.7";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -559,8 +567,8 @@ const kindOf = (it) => (SOURCES.get(it.source) || {}).kind || "analysis";
 const STATE_TEXT = {
   ok: "Полный перевод",
   pending: "Перевод готовится",
-  paywalled: "Только абстракт: текст для подписчиков автора",
-  too_long: "Только абстракт: очень длинный текст",
+  paywalled: "Абстракт: текст платный",
+  too_long: "Абстракт: текст очень длинный",
   below: "Только абстракт",
   unavailable: "Только абстракт",
   error: "Только абстракт",

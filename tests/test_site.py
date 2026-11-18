@@ -159,9 +159,14 @@ with sync_playwright() as p:
     assert page.get_attribute(f"{up} svg", "viewBox") == "0 3 24 26" and page.get_attribute(f"{down} svg", "viewBox") == "0 -5 24 26"
     su, sd = page.locator(f"{up} svg").bounding_box(), page.locator(f"{down} svg").bounding_box()
     assert abs(su["y"] - sd["y"]) < 0.5 and abs(su["height"] - sd["height"]) < 0.5, (su, sd)
-    # рядом и по левому краю текста абстракта
+    # рядом, справа, на одной линии со строкой состояния («Полный перевод» / «Перевод готовится»)
     ab = page.locator(f'.entry[data-id="{ia}"] .entry-abstract').bounding_box()
-    assert abs(sd["x"] - ab["x"]) < 1.5 and su["x"] - (sd["x"] + sd["width"]) < 14, (sd, su, ab)
+    st = page.locator(f'.entry[data-id="{ia}"] .entry-state').bounding_box()
+    assert abs((su["x"] + su["width"]) - (ab["x"] + ab["width"])) < 1.5, (su, ab)
+    assert su["x"] - (sd["x"] + sd["width"]) < 14, (sd, su)
+    assert abs((su["y"] + su["height"] / 2) - (st["y"] + st["height"] / 2)) < 2, (su, st)
+    state_text = page.evaluate(f"(() => {{ const r = document.createRange(); r.selectNodeContents(document.querySelector('.entry[data-id=\"{ia}\"] .entry-state')); return r.getBoundingClientRect().right; }})()")
+    assert state_text < sd["x"], (state_text, sd)  # текст состояния не заходит под пальцы
     page.click(up)
     assert page.get_attribute(up, "aria-pressed") == "true"
     fb = page.evaluate("JSON.parse(localStorage.getItem('aid.fb'))")
