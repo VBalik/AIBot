@@ -45,6 +45,15 @@ def check(feed: dict) -> dict:
         paywalled=sum(p.paywalled for p in posts),
     )
     row["latest"] = row["latest"].strftime("%Y-%m-%d") if row["latest"] else "—"
+    if posts and row["median"] < 1500:  # выдержка — получится ли взять полный текст со страницы статьи
+        got = []
+        for p in posts[:3]:
+            try:
+                full = build.fetch_article(p.url)
+                got.append(len(build.BeautifulSoup(full, "html.parser").get_text()) if full else 0)
+            except Exception:  # noqa: BLE001
+                got.append(-1)
+        row["article"] = "/".join(map(str, got))
     # полный текст: медиана больше ~1500 знаков (выдержка из статьи обычно 200–600)
     row["verdict"] = ("полный текст" if row["median"] >= 1500 else "выдержка") + \
                      (", платные" if row["paywalled"] > len(posts) / 2 else "") + \
@@ -57,10 +66,11 @@ def main() -> None:
     pool = [{**f, "kind": f.get("kind", "analysis")} for f in FEEDS] + CANDIDATES
     pool = [f for f in pool if not want or f["id"] in want]
     rows = [check(f) for f in pool]
-    head = "| id | раздел | HTTP | постов | за 30 дней | последний | медиана знаков | макс | платных | вывод |\n" \
-           "|---|---|---|---|---|---|---|---|---|---|\n"
+    head = "| id | раздел | HTTP | постов | за 30 дней | последний | медиана знаков | макс | платных | со страницы | вывод |\n" \
+           "|---|---|---|---|---|---|---|---|---|---|---|\n"
     lines = [f"| {r['id']} | {r['kind']} | {r.get('http')} | {r.get('entries', '')} | {r.get('last30', '')} | "
              f"{r.get('latest', '')} | {r.get('median', '')} | {r.get('max', '')} | {r.get('paywalled', '')} | "
+             f"{r.get('article', '')} | "
              f"{r.get('verdict', 'нет ответа')} |" for r in rows]
     table = head + "\n".join(lines)
     print(table)

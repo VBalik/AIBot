@@ -43,6 +43,7 @@ from pathlib import Path
 
 import anthropic
 import feedparser
+import trafilatura
 import httpx
 from bs4 import BeautifulSoup, Comment
 from cryptography.hazmat.primitives import hashes
@@ -285,10 +286,13 @@ def post_id(feed: dict, guid: str) -> str:
 def parse_feed(feed: dict, raw: bytes | str) -> list[Post]:
     parsed = feedparser.parse(raw)
     exclude = re.compile(feed["exclude"]) if feed.get("exclude") else None
+    include = re.compile(feed["include"]) if feed.get("include") else None
     posts = []
     for e in parsed.entries:
         title = html.unescape(e.get("title", "")).strip()
         if exclude and exclude.search(title):
+            continue
+        if include and not include.search(title):
             continue
         url = e.get("link", "")
         guid = e.get("id") or url
@@ -312,6 +316,40 @@ def fetch_feed(feed: dict) -> list[Post]:
                   headers={"User-Agent": "Mozilla/5.0 (ai-digest; personal RSS reader)"})
     r.raise_for_status()
     return parse_feed(feed, r.content)
+
+
+def fetch_article(url: str) -> str | None:
+    """Полный текст со страницы статьи (для лент, где только начало): основной текст по разметке trafilatura."""
+    r = httpx.get(url, timeout=40, follow_redirects=True,
+                  headers={"User-Agent": "Mozilla/5.0 (ai-digest; personal RSS reader)"})
+    if r.status_code != 200:
+        return None
+    out = trafilatura.extract(r.text, url=url, output_format="html", include_images=True, include_links=True,
+                              include_formatting=True, include_tables=True, favor_recall=True)
+    if not out:
+        return None
+    soup = BeautifulSoup(out, "html.parser")
+    body = soup.body or soup
+    for h1 in body.find_all("h1")[:1]:  # заголовок статьи уже есть в шапке
+        h1.decompose()
+    return body.decode_contents()
+
+
+def complete_post(post: Post, article=fetch_article) -> Post:
+    """Для лент с выдержками (fetch_article) подставляет полный текст со страницы, если он заметно длиннее."""
+    if not post.feed.get("fetch_article"):
+        return post
+    short = len(post.text)
+    if short >= 2500:
+        return post
+    try:
+        full = article(post.url)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Статья %s не скачалась: %s", post.url, exc)
+        return post
+    if full and len(BeautifulSoup(full, "html.parser").get_text()) > max(1500, 1.5 * short):
+        post.html = full
+    return post
 
 
 # ---------------------------------------------------------------------------
@@ -819,7 +857,8 @@ def full_status_for(cfg: Config, post: Post, score: int) -> str:
 
 
 def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_feed,
-        extras: list[Writer] | None = None, tg: "telegram.TelegramAPI | None" = None) -> dict:
+        extras: list[Writer] | None = None, tg: "telegram.TelegramAPI | None" = None,
+        article=fetch_article) -> dict:
     data.crypto = vault.meta
     cutoff = _now() - timedelta(days=cfg.lookback_days)
     live: dict[str, Post] = {}
@@ -847,6 +886,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
                 data.mark(post, "old")
                 continue
             stats["new"] += 1
+            complete_post(post, article)
             try:
                 score, reason = writer.score(post)
                 abstract = writer.abstract(post) if score >= cfg.show_min_score else None
@@ -896,6 +936,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
         if post is None:
             it["full"] = "unavailable"
             continue
+        complete_post(post, article)
         log.info("Перевожу (%s): %s", writer.llm.models["translate"], post.title)
         try:
             html_ru = writer.translate(post)

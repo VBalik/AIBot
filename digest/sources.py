@@ -25,8 +25,10 @@ from feeds import FEEDS
 # Тот же набор оттенков, что был на странице: у исходных источников цвета плиток не меняются
 HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60, 280, 100, 240, 32, 160, 316, 72]
 SEED_DATE = "2026-11-17T00:00:00Z"
-FEED_FIELDS = ("id", "symbol", "name", "author", "about", "url", "site", "exclude", "paywall")
-PUBLIC_FIELDS = ("id", "symbol", "name", "author", "about", "site", "hue", "added", "origin", "why")
+FEED_FIELDS = ("id", "kind", "symbol", "name", "author", "about", "url", "site", "exclude", "include", "paywall",
+               "fetch_article")
+PUBLIC_FIELDS = ("id", "kind", "symbol", "name", "author", "about", "site", "hue", "added", "origin", "why")
+KINDS = ("news", "analysis")  # новости (что произошло) и аналитика (что это значит)
 
 
 def _now_iso() -> str:
@@ -47,6 +49,16 @@ class SourceBook:
             }
         for key, default in (("removed", []), ("history", []), ("candidates", []), ("last_review", None)):
             self.data.setdefault(key, default)
+        for s in self.data["active"] + self.data["removed"]:
+            s.setdefault("kind", "analysis")  # первые 11 блогов — аналитика
+        # новые начальные источники (например, раздел новостей) добавляются в уже существующий список один раз
+        known = {s["id"] for s in self.data["active"] + self.data["removed"]}
+        for f in seed:
+            if f["id"] not in known and f.get("kind") == "news" and not self.data.get("news_seeded"):
+                self.data["active"].append({**{k: f[k] for k in FEED_FIELDS if k in f}, "hue": self._free_hue(),
+                                            "added": _now_iso(), "origin": "seed"})
+        if any(f.get("kind") == "news" for f in seed):
+            self.data["news_seeded"] = True
 
     # --- чтение ---
     def active(self) -> list[dict]:
@@ -60,6 +72,9 @@ class SourceBook:
             if s["id"] == sid:
                 return s
         return None
+
+    def of_kind(self, kind: str) -> list[dict]:
+        return [s for s in self.data["active"] if s.get("kind", "analysis") == kind]
 
     def ids(self) -> set[str]:
         return {s["id"] for s in self.data["active"]}

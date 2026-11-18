@@ -11,6 +11,12 @@
     exclude  — (необязательно) регулярное выражение: посты с таким заголовком пропускаются
     paywall  — (необязательно) False, если у блога нет платных постов: проверка «Read more / paid subscribers»
                нужна только для Substack, а в бесплатных рассылках такие слова встречаются в призывах подписаться
+    kind     — раздел: "analysis" (аналитика, по умолчанию) или "news" (новости)
+    include  — (необязательно) регулярное выражение: берутся только посты с таким заголовком
+    fetch_article — (необязательно) True: в ленте только начало статьи, полный текст берётся со страницы статьи
+
+Это начальный набор. Действующий список живёт в ветке data (sources.json): раз в неделю сборщик сам
+заменяет наименее интересный источник раздела на более сильного кандидата (review.py, candidates.py).
 """
 
 FEEDS = [
@@ -120,3 +126,77 @@ FEEDS = [
         "site": "https://www.ben-evans.com",
     },
 ]
+
+# Раздел «Новости» (добавлен 18.11.2026). Ленты проверены workflow «Feed check» с серверов GitHub.
+NEWS = [
+    {
+        "id": "mittrai",
+        "kind": "news",
+        "paywall": False,
+        "symbol": "Mt",
+        "name": "MIT Technology Review",
+        "author": "редакция MIT Technology Review",
+        "about": "Журнал MIT: репортажи и расследования о том, как ИИ меняет индустрии и общество",
+        "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+        "site": "https://www.technologyreview.com/topic/artificial-intelligence/",
+    },
+    {
+        "id": "decoder",
+        "kind": "news",
+        "paywall": False,
+        "fetch_article": True,
+        "symbol": "Dc",
+        "name": "The Decoder",
+        "author": "редакция The Decoder",
+        "about": "Ежедневные новости ИИ: релизы моделей, исследования, индустрия",
+        "url": "https://the-decoder.com/feed/",
+        "site": "https://the-decoder.com",
+    },
+    {
+        "id": "arsai",
+        "kind": "news",
+        "paywall": False,
+        "fetch_article": True,
+        "symbol": "Ar",
+        "name": "Ars Technica AI",
+        "author": "Бендж Эдвардс и редакция Ars Technica",
+        "about": "Подробные новости об ИИ с трезвым взглядом на хайп",
+        "url": "https://arstechnica.com/ai/feed/",
+        "site": "https://arstechnica.com/ai/",
+    },
+    {
+        "id": "willisonlinks",
+        "kind": "news",
+        "paywall": False,
+        "symbol": "Wl",
+        "name": "Simon Willison: ссылки",
+        "author": "Саймон Уиллисон",
+        "about": "Короткие комментарии к главным событиям дня: релизы, инструменты, исследования",
+        "url": "https://simonwillison.net/atom/links/",
+        "site": "https://simonwillison.net",
+    },
+    {
+        "id": "bensbites",
+        "kind": "news",
+        "symbol": "Bb",
+        "name": "Ben's Bites",
+        "author": "Бен Тосселл",
+        "about": "Рассылка о новинках ИИ: продукты, инструменты, сделки — коротко и по делу",
+        "url": "https://www.bensbites.com/feed",
+        "site": "https://www.bensbites.com",
+    },
+    {
+        "id": "ainews",
+        "kind": "news",
+        "paywall": False,
+        "include": r"^\s*\[AINews\]",
+        "symbol": "An",
+        "name": "AINews",
+        "author": "swyx и smol.ai",
+        "about": "Ежедневная сводка того, что обсуждало AI-сообщество: X, Reddit, Discord",
+        "url": "https://www.latent.space/feed",
+        "site": "https://news.smol.ai",
+    },
+]
+
+FEEDS = FEEDS + NEWS
