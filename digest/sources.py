@@ -26,7 +26,7 @@ from feeds import FEEDS
 HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60, 280, 100, 240, 32, 160, 316, 72]
 SEED_DATE = "2026-11-17T00:00:00Z"
 FEED_FIELDS = ("id", "kind", "symbol", "name", "author", "about", "url", "site", "exclude", "include", "paywall",
-               "fetch_article")
+               "fetch_article", "max_chars")
 PUBLIC_FIELDS = ("id", "kind", "symbol", "name", "author", "about", "site", "hue", "added", "origin", "why")
 KINDS = ("news", "analysis")  # новости (что произошло) и аналитика (что это значит)
 
@@ -59,6 +59,16 @@ class SourceBook:
                                             "added": _now_iso(), "origin": "seed"})
         if any(f.get("kind") == "news" for f in seed):
             self.data["news_seeded"] = True
+        # у начальных источников поля ленты берутся из кода: правка feeds.py (адрес, фильтр, лимит) доходит до данных
+        by_id = {f["id"]: f for f in seed}
+        for s in self.data["active"]:
+            f = by_id.get(s["id"])
+            if f and s.get("origin") == "seed":
+                for k in FEED_FIELDS:
+                    if k in f:
+                        s[k] = f[k]
+                    elif k not in ("id", "kind"):
+                        s.pop(k, None)
 
     # --- чтение ---
     def active(self) -> list[dict]:

@@ -1,7 +1,8 @@
 name: Update digest
 
 # Каждый час: читает ленты, пишет абстракты, переводит, публикует данные в ветку `data`
-# и (если задан TELEGRAM_BOT_TOKEN) отправляет готовые статьи в Telegram.
+# и (если задан TELEGRAM_BOT_TOKEN) отправляет готовые статьи в Telegram. Раз в неделю пересматривает источники
+# по оценкам и чтению Валерия (закрытый репозиторий AIBot-feedback, секрет FEEDBACK_TOKEN).
 # Ветка `data` перезаписывается одним коммитом (без истории), чтобы репозиторий не разрастался.
 # Netlify собирает только main, поэтому обновления данных не тратят кредиты Netlify.
 
@@ -14,6 +15,11 @@ on:
         description: "Сколько полных переводов за запуск"
         required: false
         default: ""
+      review:
+        description: "Пересмотреть источники сейчас, не дожидаясь недели"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -53,6 +59,8 @@ jobs:
           DIGEST_PASSWORD: ${{ secrets.DIGEST_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FEEDBACK_TOKEN: ${{ secrets.FEEDBACK_TOKEN }}
+          REVIEW: ${{ inputs.review && 'force' || '' }}
           PROVIDER: ${{ vars.PROVIDER }}
           COMPARE_PROVIDER: ${{ vars.COMPARE_PROVIDER }}
           COMPARE_LIMIT: ${{ vars.COMPARE_LIMIT }}
@@ -75,6 +83,12 @@ jobs:
           INTERESTS: ${{ vars.INTERESTS }}
           TELEGRAM_MAX_POSTS_PER_RUN: ${{ vars.TELEGRAM_MAX_POSTS_PER_RUN }}
           SITE_URL: ${{ vars.SITE_URL }}
+          FEEDBACK_REPO: ${{ vars.FEEDBACK_REPO }}
+          REVIEW_EVERY_DAYS: ${{ vars.REVIEW_EVERY_DAYS }}
+          REVIEW_MIN_SCORE: ${{ vars.REVIEW_MIN_SCORE }}
+          REVIEW_KEEP_SCORE: ${{ vars.REVIEW_KEEP_SCORE }}
+          REVIEW_GRACE_DAYS: ${{ vars.REVIEW_GRACE_DAYS }}
+          REVIEW_MAX_CANDIDATES: ${{ vars.REVIEW_MAX_CANDIDATES }}
         run: python digest/build.py --data data
 
       - name: Опубликовать данные в ветку data

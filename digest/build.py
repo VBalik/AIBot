@@ -53,6 +53,8 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from feeds import FEEDS  # noqa: E402,F401  (начальный набор; действующий список — в data/sources.json)
 from sources import SourceBook  # noqa: E402
+import feedback as fbmod  # noqa: E402
+import review  # noqa: E402
 import telegram  # noqa: E402
 
 log = logging.getLogger("ai-digest")
@@ -116,6 +118,15 @@ class Config:
     telegram_chat_id: str = ""
     telegram_max_posts: int = 2      # сколько статей отправлять за прогон (пока отлаживаем — немного)
     site_url: str = "https://aidigestbot.netlify.app"
+    # оценки и чтение (закрытый репозиторий, куда пишет страница) и еженедельный пересмотр источников
+    feedback_token: str = ""
+    feedback_repo: str = "VBalik/AIBot-feedback"
+    review_every_days: int = 7
+    review_force: bool = False
+    review_min_score: float = 7.5    # кандидат слабее этого не добавляется
+    review_keep_score: float = 1.0   # источник с баллом интереса выше (и без перевеса 👎) не убирается
+    review_grace_days: int = 21      # новый источник не убирается, пока не накопит три недели статистики
+    review_max_candidates: int = 8   # сколько кандидатов в неделю оценивать моделью
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -151,6 +162,14 @@ class Config:
             telegram_chat_id=_env("TELEGRAM_CHAT_ID", "").strip(),
             telegram_max_posts=int(e("TELEGRAM_MAX_POSTS_PER_RUN", "telegram_max_posts")),
             site_url=e("SITE_URL", "site_url"),
+            feedback_token=_env("FEEDBACK_TOKEN", ""),
+            feedback_repo=e("FEEDBACK_REPO", "feedback_repo"),
+            review_every_days=int(e("REVIEW_EVERY_DAYS", "review_every_days")),
+            review_force=_env("REVIEW", "").lower() in ("1", "true", "yes", "force"),
+            review_min_score=float(e("REVIEW_MIN_SCORE", "review_min_score")),
+            review_keep_score=float(e("REVIEW_KEEP_SCORE", "review_keep_score")),
+            review_grace_days=int(e("REVIEW_GRACE_DAYS", "review_grace_days")),
+            review_max_candidates=int(e("REVIEW_MAX_CANDIDATES", "review_max_candidates")),
         )
 
     def main_provider(self) -> str:
@@ -851,18 +870,19 @@ def full_status_for(cfg: Config, post: Post, score: int) -> str:
         return "below"
     if post.paywalled:
         return "paywalled"
-    if len(post.text) > cfg.max_translate_chars:
+    if len(post.text) > post.feed.get("max_chars", cfg.max_translate_chars):
         return "too_long"
     return "pending"
 
 
 def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_feed,
         extras: list[Writer] | None = None, tg: "telegram.TelegramAPI | None" = None,
-        article=fetch_article) -> dict:
+        article=fetch_article, fb: "fbmod.Feedback | None" = None, autodiscover=None) -> dict:
     data.crypto = vault.meta
     cutoff = _now() - timedelta(days=cfg.lookback_days)
     live: dict[str, Post] = {}
-    stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "telegram": 0, "errors": 0, "api_errors": 0}
+    stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "telegram": 0, "errors": 0, "api_errors": 0,
+             "added": [], "removed": [], "suggested": [], "restored": []}
     problems: list[str] = []
 
     def problem(text: str, api: bool = True) -> None:
@@ -987,6 +1007,20 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             api=tg, chat_id=cfg.telegram_chat_id, site_url=cfg.site_url, max_posts=cfg.telegram_max_posts,
             problem=lambda text: problem(text, api=False), save=data.save)
 
+    # 5. Источники: вернуть убранные по просьбе, раз в неделю — пересмотр
+    if fb is not None:
+        stats["restored"] = review.apply_restores(data.sources, fb)
+        if review.due(data.sources, cfg.review_every_days, _now()) or cfg.review_force:
+            try:
+                summary = review.weekly_review(cfg, data, fb, writer.llm, fetch=fetch,
+                                               complete=lambda p: complete_post(p, article),
+                                               autodiscover=autodiscover)
+                stats.update({k: summary[k] for k in ("added", "removed", "suggested")})
+            except Exception as exc:  # noqa: BLE001
+                log.exception("Пересмотр источников не удался")
+                problem(f"Пересмотр источников: {exc}", api=False)
+        data.save()
+
     data.trim(cfg.keep_items)
     # итог прогона лежит в ветке data — по нему видно, что пошло не так, без доступа к журналу Actions
     data.state["last_run"] = {"at": _iso(_now()), "engine": writer.llm.name, "stats": stats,
@@ -1037,7 +1071,15 @@ def main() -> None:
     data = DataDir(Path(args.data))
     vault = Vault(cfg.password, data.crypto, cfg.kdf_iterations)
     tg = telegram.TelegramAPI(cfg.telegram_token) if cfg.telegram_token else None
-    stats = run(cfg, data, writer, vault, extras=extras, tg=tg)
+    try:
+        fb = fbmod.load(cfg.feedback_token, cfg.feedback_repo)
+        if cfg.feedback_token:
+            log.info("Оценки: устройств %d, оценок %d, прочитано %d", fb.devices, len(fb.ratings), len(fb.reads))
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Оценки не загрузились: %s", exc)
+        print(f"::warning::{redact(str(exc))}")
+        fb = fbmod.Feedback()
+    stats = run(cfg, data, writer, vault, extras=extras, tg=tg, fb=fb)
     for msg in data.state["last_run"]["errors"][:5]:
         print(f"::warning::{msg}")  # видно прямо на странице прогона в GitHub Actions
     log.info("Готово: новых %(new)d, на страницу %(shown)d, переведено %(translated)d, "

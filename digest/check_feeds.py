@@ -64,7 +64,12 @@ def check(feed: dict) -> dict:
 def main() -> None:
     want = set(sys.argv[1:])
     pool = [{**f, "kind": f.get("kind", "analysis")} for f in FEEDS] + CANDIDATES
-    pool = [f for f in pool if not want or f["id"] in want]
+    seen, uniq = set(), []
+    for f in pool:  # кандидат, ставший источником, не проверять дважды
+        if f["id"] not in seen and (not want or f["id"] in want):
+            seen.add(f["id"])
+            uniq.append(f)
+    pool = uniq
     rows = [check(f) for f in pool]
     head = "| id | раздел | HTTP | постов | за 30 дней | последний | медиана знаков | макс | платных | со страницы | вывод |\n" \
            "|---|---|---|---|---|---|---|---|---|---|---|\n"

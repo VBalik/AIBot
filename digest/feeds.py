@@ -190,6 +190,7 @@ NEWS = [
         "kind": "news",
         "paywall": False,
         "include": r"^\s*\[AINews\]",
+        "max_chars": 15000,  # сводки огромные (40–50 тыс. знаков): только абстракт, без полного перевода
         "symbol": "An",
         "name": "AINews",
         "author": "swyx и smol.ai",
