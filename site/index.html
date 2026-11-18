@@ -50,10 +50,12 @@
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-html, body { height: 100%; }
+/* Документ прокручивается ровно на 1px: так касание строки состояния iOS («наверх») доходит до страницы —
+   система прокручивает документ к 0, а страница прокручивает к началу открытую ленту (см. scrollToTop). */
+html { height: 100%; overscroll-behavior: none; }
 body {
-  margin: 0; background: var(--paper); color: var(--ink);
-  font: 400 1rem/1.5 var(--sans); overflow: hidden;
+  margin: 0; min-height: calc(100% + 1px); background: var(--paper); color: var(--ink);
+  font: 400 1rem/1.5 var(--sans);
 }
 a { color: inherit; }
 button { font: inherit; color: inherit; }
@@ -61,13 +63,15 @@ button { font: inherit; color: inherit; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ---------- каркас приложения: шапка и два раздела ---------- */
-.app { height: 100%; display: flex; flex-direction: column; }
+.app { position: fixed; inset: 0; display: flex; flex-direction: column; }
 .topbar {
   flex: none; padding: calc(env(safe-area-inset-top) + .5rem) calc(env(safe-area-inset-right) + 1.25rem) .5rem calc(env(safe-area-inset-left) + 1.25rem);
   background: var(--paper); border-bottom: 1px solid var(--rule); z-index: 2;
 }
 .topbar-row { display: flex; align-items: center; gap: .25rem; max-width: 88rem; margin: 0 auto; }
 .brand { font: 750 1.5rem/1.1 var(--sans); letter-spacing: -.03em; margin: 0; flex: 1; }
+.brand button { all: unset; cursor: pointer; }
+.brand button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 .iconbtn {
   all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem;
   border-radius: 50%; color: var(--accent);
@@ -374,7 +378,7 @@ button { font: inherit; color: inherit; }
 <div class="app">
   <header class="topbar">
     <div class="topbar-row">
-      <h1 class="brand">Дайджест ИИ</h1>
+      <h1 class="brand"><button type="button" id="to-top" aria-label="Дайджест ИИ — к началу ленты">Дайджест ИИ</button></h1>
       <button class="iconbtn" id="open-sources" type="button" aria-label="Источники и рейтинг">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
       </button>
@@ -509,7 +513,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-18.4";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "2026-11-18.5";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -917,6 +921,40 @@ pager.addEventListener("scroll", () => {
   });
 }, { passive: true });
 addEventListener("resize", () => { if (!wide()) pager.scrollLeft = KINDS.indexOf(current) * pager.clientWidth; });
+
+/* к началу: касание заголовка, пустого места в шапке или строки состояния iOS */
+function scrollToTop() {
+  const sheet = $$(".sheet").find((sh) => !sh.hidden);
+  const target = sheet ? $(".sheet-card", sheet) : !reader.hidden ? reader
+    : wide() ? null : $(`#pane-${current}`);
+  (target ? [target] : $$(".pane")).forEach(glideToTop);  // iPad: обе колонки
+}
+// своя плавная прокрутка: встроенная smooth в WebKit и Chromium иногда молча не срабатывает у вложенных лент
+function glideToTop(el) {
+  const from = el.scrollTop;
+  if (!from) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.scrollTop = 0; return; }
+  const t0 = performance.now(), dur = Math.min(450, 180 + from / 8);
+  const step = (t) => {
+    const k = Math.min(1, (t - t0) / dur);
+    el.scrollTop = Math.round(from * (1 - (1 - (1 - k) ** 3)));
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+$("#to-top").addEventListener("click", scrollToTop);
+$(".topbar").addEventListener("click", (e) => { if (e.target.closest(".topbar-row, .status") && !e.target.closest("button")) scrollToTop(); });
+let statusTapArmed = false;
+function armStatusTap() { window.scrollTo(0, 1); statusTapArmed = window.scrollY >= 1; }
+window.addEventListener("scroll", () => {
+  if (statusTapArmed && window.scrollY === 0) {
+    statusTapArmed = false;
+    scrollToTop();
+    setTimeout(armStatusTap, 400);
+  }
+}, { passive: true });
+addEventListener("load", () => setTimeout(armStatusTap, 300));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(armStatusTap, 300); });
 
 /* «потяните, чтобы обновить» — в режиме приложения на экране «Домой» у Safari его нет */
 function setupPullToRefresh(pane) {

@@ -132,6 +132,16 @@ with sync_playwright() as p:
     page.wait_for_function("document.getElementById('tab-analysis').getAttribute('aria-selected') === 'true'")
     assert page.evaluate("localStorage.getItem('aid.kind')") == "analysis"
 
+    # к началу ленты: касание заголовка и строки состояния iOS (система прокручивает документ к 0)
+    page.evaluate("document.getElementById('pane-analysis').scrollTop = 600")
+    page.click("#to-top")
+    page.wait_for_function("document.getElementById('pane-analysis').scrollTop === 0")
+    page.wait_for_function("window.scrollY === 1")  # страница «взвела» перехват касания строки состояния
+    page.evaluate("document.getElementById('pane-analysis').scrollTop = 600")
+    page.evaluate("window.scrollTo(0, 0)")
+    page.wait_for_function("document.getElementById('pane-analysis').scrollTop === 0")
+    page.wait_for_function("window.scrollY === 1", timeout=5000)  # и снова готова
+
     # фильтр по источнику внутри раздела
     page.click('#pane-analysis button[data-f="importai"]')
     assert page.locator("#pane-analysis .entry").count() == 1
