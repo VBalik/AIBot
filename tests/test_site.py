@@ -138,10 +138,12 @@ with sync_playwright() as p:
     assert "Джек Кларк" in page.inner_text("#pane-analysis .source-note")
     page.click('#pane-analysis button[data-f="all"]')
 
-    # оценки: «Интересно» / «Мимо», повторное нажатие снимает оценку
+    # оценки: палец вниз слева, вверх справа, без подписей; повторное нажатие снимает оценку
     ia = ITEM["importai"]["id"]
     up = f'.entry[data-id="{ia}"] .rate .up'
     down = f'.entry[data-id="{ia}"] .rate .down'
+    bu, bd = page.locator(up).bounding_box(), page.locator(down).bounding_box()
+    assert bd["x"] < bu["x"] and page.inner_text(up).strip() == "" and page.inner_text(down).strip() == "", (bd, bu)
     page.click(up)
     assert page.get_attribute(up, "aria-pressed") == "true"
     fb = page.evaluate("JSON.parse(localStorage.getItem('aid.fb'))")
@@ -246,7 +248,7 @@ with sync_playwright() as p:
     page.wait_for_selector("#sheet-sources:not([hidden])")
     rows = page.locator("#ranking li")
     assert rows.count() == 3  # importai, dwarkesh, interconnects
-    assert "Import AI" in rows.nth(0).inner_text() and "интересно 1" in rows.nth(0).inner_text()
+    assert "Import AI" in rows.nth(0).inner_text() and "👍 1" in rows.nth(0).inner_text()
     page.click('#ranking button[data-pin="interconnects"]')
     assert page.get_attribute('#ranking button[data-pin="interconnects"]', "aria-pressed") == "true"
     assert "Sean Goedecke" in page.inner_text("#candidates")
