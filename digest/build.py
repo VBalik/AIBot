@@ -50,7 +50,8 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from feeds import FEEDS  # noqa: E402
+from feeds import FEEDS  # noqa: E402,F401  (начальный набор; действующий список — в data/sources.json)
+from sources import SourceBook  # noqa: E402
 import telegram  # noqa: E402
 
 log = logging.getLogger("ai-digest")
@@ -757,6 +758,7 @@ class DataDir:
         feed = _load_json(root / "feed.json", {})
         self.crypto = feed.get("crypto")
         self.items: dict[str, dict] = {it["id"]: it for it in feed.get("items", [])}
+        self.sources = SourceBook(root / "sources.json")
 
     def compare_done(self) -> dict:
         done = self.state.get("compare_done")
@@ -768,7 +770,7 @@ class DataDir:
         return pid in self.state["posts"]
 
     def mark(self, post: Post, status: str, score=None, reason=None) -> None:
-        self.state["posts"][post.id] = {"status": status, "score": score, "reason": reason,
+        self.state["posts"][post.id] = {"status": status, "score": score, "reason": reason, "source": post.feed["id"],
                                         "title": post.title, "published": _iso(post.published)}
 
     def full_path(self, pid: str, engine: str | None = None) -> Path:
@@ -787,16 +789,19 @@ class DataDir:
 
     def save(self) -> None:
         items = sorted(self.items.values(), key=lambda it: it["published"], reverse=True)
-        sources = [{k: f[k] for k in ("id", "symbol", "name", "author", "about", "site")} for f in FEEDS]
         feed = {
             "version": 1,
             "updated_at": max((it["added"] for it in items), default=None),
-            "sources": sources,
+            "sources": self.sources.public({it["source"] for it in items}),
+            # последние замены источников — приложение показывает их на экране источников
+            "source_history": self.sources.data["history"][-12:],
+            "last_review": self.sources.data.get("last_review"),
             "crypto": self.crypto,
             "items": items,
         }
         _write_json(self.root / "feed.json", feed)
         _write_json(self.root / "state.json", self.state)
+        self.sources.save()
 
 
 # ---------------------------------------------------------------------------
@@ -827,7 +832,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
         problems.append(redact(text))
 
     # 1. Новые посты: оценка и абстракт
-    for feed in FEEDS:
+    for feed in list(data.sources.active()):
         try:
             posts = fetch(feed)
         except Exception as exc:
@@ -936,7 +941,8 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
 
         tg_state = data.state.setdefault("telegram", {})  # только смещение getUpdates; chat_id сюда не пишем
         stats["telegram"] = telegram.mirror(
-            list(data.items.values()), {f["id"]: f for f in FEEDS}, load_full, tg_state,
+            list(data.items.values()), {it["source"]: data.sources.get(it["source"]) or {} for it in data.items.values()},
+            load_full, tg_state,
             api=tg, chat_id=cfg.telegram_chat_id, site_url=cfg.site_url, max_posts=cfg.telegram_max_posts,
             problem=lambda text: problem(text, api=False), save=data.save)
 

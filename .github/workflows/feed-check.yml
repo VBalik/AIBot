@@ -1,0 +1,27 @@
+name: Feed check
+
+# Ручная проверка лент (действующих и кандидатов) с серверов GitHub: отвечают ли, есть ли полный текст.
+# Моделей не вызывает и кредитов не тратит.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: "id лент через пробел (пусто — все)"
+        required: false
+        default: ""
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python digest/check_feeds.py $IDS
+        env:
+          IDS: ${{ inputs.ids }}
