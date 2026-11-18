@@ -9,7 +9,7 @@
  * Страница присылает сообщение {type: "cache-images", urls: [...]}: SW докачивает иллюстрации в фоне,
  * чтобы они были доступны офлайн, даже если статью ещё не открывали.
  */
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL = `shell-${VERSION}`;
 const DATA = "data";
 const FONTS = "fonts";

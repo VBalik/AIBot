@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#F1F4F3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14212A" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Дайджест ИИ">
 <title>Дайджест ИИ</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -32,242 +33,484 @@
   --ink-2: #4F5E66;
   --rule: #D3DBDC;
   --accent: #0F6B68;
+  --on-accent: #FFFFFF;
+  --down: #B3412F;
   --tile-s: 42%; --tile-bg-l: 88%; --tile-fg-l: 24%; --tile-bd-l: 74%;
   --sans: "Onest", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
   --measure: 36rem;
+  --bar-h: 6.5rem;
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --paper: #14212A; --surface: #1A2B35; --ink: #E3EAEB; --ink-2: #9DAEB4;
-    --rule: #2B3C46; --accent: #62C4BD;
+    --rule: #2B3C46; --accent: #62C4BD; --on-accent: #0E2A2C; --down: #F08A75;
     --tile-s: 34%; --tile-bg-l: 23%; --tile-fg-l: 84%; --tile-bd-l: 34%;
   }
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+html, body { height: 100%; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
-  font: 400 1rem/1.5 var(--sans);
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  font: 400 1rem/1.5 var(--sans); overflow: hidden;
 }
-body.reading { overflow: hidden; }
 a { color: inherit; }
+button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.wrap { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
-
-/* ---------- шапка ---------- */
-.masthead { padding: 2.75rem 0 1.25rem; }
-.masthead h1 {
-  font: 750 2.25rem/1.05 var(--sans);
-  letter-spacing: -0.03em; margin: 0 0 .5rem;
+/* ---------- каркас приложения: шапка и два раздела ---------- */
+.app { height: 100%; display: flex; flex-direction: column; }
+.topbar {
+  flex: none; padding: calc(env(safe-area-inset-top) + .5rem) calc(env(safe-area-inset-right) + 1.25rem) .5rem calc(env(safe-area-inset-left) + 1.25rem);
+  background: var(--paper); border-bottom: 1px solid var(--rule); z-index: 2;
 }
-.masthead p { margin: 0; color: var(--ink-2); font-size: .9375rem; max-width: 30rem; }
-.masthead .updated { margin-top: .75rem; font-size: .8125rem; }
-.masthead .offline-status { margin-top: .25rem; font-size: .8125rem; }
-.masthead .offline-status.off { color: var(--accent); font-weight: 500; }
+.topbar-row { display: flex; align-items: center; gap: .25rem; max-width: 88rem; margin: 0 auto; }
+.brand { font: 750 1.5rem/1.1 var(--sans); letter-spacing: -.03em; margin: 0; flex: 1; }
+.iconbtn {
+  all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem;
+  border-radius: 50%; color: var(--accent);
+}
+.iconbtn svg { width: 1.375rem; height: 1.375rem; }
+.iconbtn:active { background: var(--surface); }
+.iconbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+.status { max-width: 88rem; margin: .125rem auto 0; font-size: .75rem; color: var(--ink-2); min-height: 1.1rem; }
+.status .off { color: var(--accent); font-weight: 500; }
+
+.seg {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .25rem; padding: .25rem; margin: .5rem auto 0;
+  background: var(--surface); border-radius: .625rem; max-width: 28rem;
+}
+.seg button {
+  all: unset; cursor: pointer; text-align: center; padding: .5rem .25rem; border-radius: .4375rem;
+  font: 600 .9375rem/1.2 var(--sans); color: var(--ink-2);
+}
+.seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seg .cnt { font-weight: 500; opacity: .75; margin-left: .25rem; font-size: .8125rem; }
+
+.pager {
+  flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+}
+.pager::-webkit-scrollbar { display: none; }
+.pane {
+  flex: 0 0 100%; min-width: 0; height: 100%; overflow-y: auto; scroll-snap-align: start; scroll-snap-stop: always;
+  overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; position: relative;
+}
+.pane-inner { max-width: 44rem; margin: 0 auto; padding: 1rem calc(env(safe-area-inset-right) + 1.25rem) calc(env(safe-area-inset-bottom) + 3rem) calc(env(safe-area-inset-left) + 1.25rem); }
+.pane-title { display: none; font: 700 1.25rem/1.2 var(--sans); letter-spacing: -.02em; margin: .25rem 0 .75rem; }
+.pane-title small { font: 500 .8125rem/1 var(--sans); color: var(--ink-2); margin-left: .375rem; letter-spacing: 0; }
+
+/* «потяните, чтобы обновить» */
+.ptr {
+  position: absolute; left: 0; right: 0; top: 0; height: 3.5rem; display: flex; align-items: center; justify-content: center;
+  gap: .5rem; font-size: .8125rem; color: var(--ink-2); opacity: 0; pointer-events: none;
+}
+.ptr .spin { width: 1.125rem; height: 1.125rem; border: 2px solid var(--rule); border-top-color: var(--accent); border-radius: 50%; }
+.ptr.ready .spin { border-color: var(--accent); }
+.ptr.busy .spin { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.pane-inner.pulling { transition: none; }
+.pane-inner.settle { transition: transform .25s ease; }
+
+/* iPad и широкие экраны: оба раздела рядом */
+@media (min-width: 56rem) {
+  .seg { display: none; }
+  .pager { overflow-x: hidden; scroll-snap-type: none; }
+  .pane { flex: 1 1 50%; }
+  .pane + .pane { border-left: 1px solid var(--rule); }
+  .pane-title { display: block; }
+  .brand { font-size: 1.75rem; }
+}
 
 /* ---------- плитки ---------- */
 .tile {
   --h: 200;
   position: relative; display: inline-grid; place-items: center; flex: none;
-  width: 3.5rem; height: 3.5rem; border-radius: .375rem;
+  width: 3.25rem; height: 3.25rem; border-radius: .375rem;
   background: hsl(var(--h) var(--tile-s) var(--tile-bg-l));
   color: hsl(var(--h) 55% var(--tile-fg-l));
   border: 1px solid hsl(var(--h) var(--tile-s) var(--tile-bd-l));
-  font: 650 1.375rem/1 var(--sans); letter-spacing: -.02em;
+  font: 650 1.3125rem/1 var(--sans); letter-spacing: -.02em;
 }
 .tile .n { position: absolute; top: .25rem; right: .3125rem; font: 500 .625rem/1 var(--sans); opacity: .8; }
 .tile.sm { width: 2.25rem; height: 2.25rem; font-size: .9375rem; border-radius: .3125rem; }
-.tile.all { --h: 176; font: 600 .9375rem/1 var(--sans); }
+.tile.all { --h: 176; font: 600 .875rem/1 var(--sans); }
 
-.filters { margin: 0 -1.25rem; padding: .25rem 1.25rem .5rem; display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.filters { margin: 0 -1.25rem; padding: .25rem 1.25rem .5rem; display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; }
 .filters::-webkit-scrollbar { display: none; }
-.filters button { all: unset; cursor: pointer; scroll-snap-align: start; border-radius: .375rem; }
-.filters button .tile { transition: transform .15s ease, box-shadow .15s ease; }
+.filters button { all: unset; cursor: pointer; border-radius: .375rem; }
 .filters button[aria-pressed="true"] .tile { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px hsl(var(--h) 45% 45%); }
 .filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-.source-note { min-height: 2.75rem; margin: .5rem 0 1.5rem; font-size: .875rem; color: var(--ink-2); }
+.source-note { min-height: 2.5rem; margin: .375rem 0 1.25rem; font-size: .875rem; color: var(--ink-2); }
 .source-note b { color: var(--ink); font-weight: 600; }
 
 /* ---------- лента ---------- */
-.entries { list-style: none; margin: 0; padding: 0 0 3rem; }
-.entry + .entry { margin-top: 2.25rem; }
-.entry a { display: grid; grid-template-columns: 2.25rem 1fr; gap: 1rem; text-decoration: none; border-radius: .5rem; }
-.entry a:active .entry-title { color: var(--accent); }
-.entry-title {
-  font: 650 1.1875rem/1.3 var(--sans); letter-spacing: -.01em;
-  margin: 0 0 .375rem; letter-spacing: -.005em; text-wrap: pretty;
-}
+.entries { list-style: none; margin: 0; padding: 0; }
+.entry + .entry { margin-top: 2rem; }
+.entry > a { display: grid; grid-template-columns: 2.25rem 1fr; gap: 1rem; text-decoration: none; border-radius: .5rem; }
+.entry > a:active .entry-title { color: var(--accent); }
+.entry-title { font: 650 1.1875rem/1.3 var(--sans); letter-spacing: -.01em; margin: 0 0 .375rem; text-wrap: pretty; }
 .entry.is-new .entry-title::before {
   content: ""; display: inline-block; width: .5rem; height: .5rem; border-radius: 50%;
   background: var(--accent); margin: 0 .5rem .15rem 0; vertical-align: middle;
 }
-.entry-meta { margin: 0 0 .625rem; font-size: .8125rem; color: var(--ink-2); }
-.entry-abstract { margin: 0; font: 400 1.0625rem/1.6 var(--sans); color: var(--ink); text-wrap: pretty; }
-.entry-state { margin: .625rem 0 0; font-size: .8125rem; font-weight: 500; color: var(--ink-2); }
+.entry.is-read .entry-title { color: var(--ink-2); }
+.entry-meta { margin: 0 0 .5rem; font-size: .8125rem; color: var(--ink-2); }
+.entry-abstract { margin: 0; font: 400 1.0625rem/1.55 var(--sans); color: var(--ink); text-wrap: pretty; }
+.entry-state { margin: .5rem 0 0; font-size: .8125rem; font-weight: 500; color: var(--ink-2); }
 .entry-state.ok { color: var(--accent); }
+.empty { padding: 2rem 0; color: var(--ink-2); font: 400 1.0625rem/1.6 var(--sans); }
 
-.empty { padding: 3rem 0; color: var(--ink-2); font: 400 1.0625rem/1.6 var(--sans); max-width: var(--measure); }
-
-footer.colophon { border-top: 1px solid var(--rule); padding: 2rem 0 3rem; font-size: .875rem; color: var(--ink-2); }
-footer.colophon h2 { font: 600 1rem/1.3 var(--sans); color: var(--ink); margin: 0 0 1rem; }
-.sources { list-style: none; padding: 0; margin: 0 0 1.75rem; display: grid; gap: .875rem; }
-.sources li { display: grid; grid-template-columns: 2.25rem 1fr; gap: .875rem; align-items: start; }
-.sources a { color: var(--ink); font-weight: 500; text-decoration: none; }
-.sources a:hover { text-decoration: underline; }
-.linkbtn { all: unset; cursor: pointer; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+/* оценки */
+.rate { display: flex; gap: .5rem; margin: .5rem 0 0 3.25rem; }
+.rate button {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: .375rem;
+  min-height: 2.25rem; padding: 0 .75rem; border-radius: 1.125rem; border: 1px solid var(--rule);
+  color: var(--ink-2); font: 500 .8125rem/1 var(--sans);
+}
+.rate svg { width: 1.0625rem; height: 1.0625rem; }
+.rate .up[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.rate .down[aria-pressed="true"] { background: var(--down); border-color: var(--down); color: #fff; }
+.rate button[aria-pressed="true"] svg path { fill: currentColor; }
+.rate button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- читалка ---------- */
 .reader {
-  position: fixed; inset: 0; z-index: 10; background: var(--paper);
+  --r-bg: var(--paper); --r-ink: var(--ink); --r-ink-2: var(--ink-2); --r-rule: var(--rule);
+  --r-accent: var(--accent); --r-surface: var(--surface);
+  --r-font: var(--sans); --r-size: 18px; --r-lh: 1.65; --r-weight: 400; --r-measure: 36rem; --r-pad: 1.25rem;
+  position: fixed; inset: 0; z-index: 10; background: var(--r-bg); color: var(--r-ink);
   overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   animation: slide-in .24s cubic-bezier(.2,.7,.2,1);
 }
 .reader[hidden] { display: none; }
 @keyframes slide-in { from { transform: translateX(14%); opacity: 0; } to { transform: none; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .reader { animation: none; } .filters button .tile { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .reader, .sheet-card { animation: none !important; } .pane-inner.settle { transition: none; } }
+
+.reader.theme-quiet { --r-bg: #4A4A4D; --r-ink: #E6E6E6; --r-ink-2: #B8B8BC; --r-rule: #5E5E62; --r-accent: #9FD6D1; --r-surface: #56565A; }
+.reader.theme-paper { --r-bg: #F3EEE4; --r-ink: #2E2A24; --r-ink-2: #6B6256; --r-rule: #DDD3C2; --r-accent: #0F6B68; --r-surface: #FBF8F2; }
+.reader.theme-bold  { --r-bg: #FFFFFF; --r-ink: #000000; --r-ink-2: #3A3A3C; --r-rule: #D1D1D6; --r-accent: #0A5C59; --r-surface: #F2F2F7; }
+.reader.theme-calm  { --r-bg: #EEE2CB; --r-ink: #3B2F22; --r-ink-2: #6E5C47; --r-rule: #D9C9AC; --r-accent: #6A4A1E; --r-surface: #F5ECDC; }
+.reader.theme-focus { --r-bg: #FFFCF4; --r-ink: #1F1F1F; --r-ink-2: #5A5A5A; --r-rule: #E6E0D2; --r-accent: #0F6B68; --r-surface: #FFFFFF; }
+.reader.theme-bold, .reader.bold-text { --r-weight: 550; }
 
 .reader-bar {
-  position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center;
-  padding: .625rem 1.25rem; background: color-mix(in srgb, var(--paper) 88%, transparent);
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rule);
+  position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 1rem;
+  padding: .5rem 1.25rem; background: color-mix(in srgb, var(--r-bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--r-rule);
 }
 .reader-bar button, .reader-bar a {
-  all: unset; cursor: pointer; font: 500 .9375rem/1 var(--sans); color: var(--accent); padding: .5rem 0;
+  all: unset; cursor: pointer; font: 500 .9375rem/1 var(--sans); color: var(--r-accent); padding: .5rem 0;
 }
-.reader-bar button::before { content: "‹"; font-size: 1.5rem; line-height: 0; vertical-align: -.12em; margin-right: .35rem; }
-.reader-bar :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.reader-bar #back { margin-right: auto; }
+.reader-bar #back::before { content: "‹"; font-size: 1.5rem; line-height: 0; vertical-align: -.12em; margin-right: .35rem; }
+.reader-bar #aa { font: 600 1.0625rem/1 var(--sans); padding: .5rem .25rem; letter-spacing: -.01em; }
+.reader-bar :focus-visible { outline: 2px solid var(--r-accent); outline-offset: 2px; }
 
-.doc { max-width: var(--measure); margin: 0 auto; padding: 1.75rem 1.25rem 5rem; }
-.doc-source { display: flex; align-items: center; gap: .75rem; font-size: .875rem; color: var(--ink-2); margin-bottom: 1.25rem; }
-.doc-source b { color: var(--ink); font-weight: 600; display: block; }
-.doc h1.doc-title {
-  font: 700 1.875rem/1.15 var(--sans); letter-spacing: -.025em;
-  letter-spacing: -.012em; margin: 0 0 .75rem; text-wrap: balance;
-}
-.doc-meta { font-size: .8125rem; color: var(--ink-2); margin: 0 0 1.5rem; }
+.doc { max-width: var(--r-measure); margin: 0 auto; padding: 1.75rem var(--r-pad) 5rem; }
+.doc-source { display: flex; align-items: center; gap: .75rem; font-size: .875rem; color: var(--r-ink-2); margin-bottom: 1.25rem; }
+.doc-source b { color: var(--r-ink); font-weight: 600; display: block; }
+.doc h1.doc-title { font: 700 1.75rem/1.18 var(--r-font); letter-spacing: -.015em; margin: 0 0 .75rem; text-wrap: balance; }
+.doc-meta { font-size: .8125rem; color: var(--r-ink-2); margin: 0 0 1.5rem; }
 .lead {
-  font: 400 1.1875rem/1.55 var(--sans); color: var(--ink-2);
-  margin: 0 0 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--rule);
+  font: var(--r-weight) calc(var(--r-size) * 1.04)/1.55 var(--r-font); color: var(--r-ink-2);
+  margin: 0 0 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--r-rule);
 }
 .doc audio { width: 100%; margin: 0 0 2rem; }
 
-.prose { font: 400 1.125rem/1.65 var(--sans); hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
+.prose { font: var(--r-weight) var(--r-size)/var(--r-lh) var(--r-font); hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
+.reader.justify .prose, .reader.justify .lead { text-align: justify; }
 .prose > * { margin: 0 0 1.1em; }
-.prose h1, .prose h2, .prose h3, .prose h4 { line-height: 1.25; letter-spacing: -.015em; margin: 1.8em 0 .6em; hyphens: manual; }
-.prose h1, .prose h2 { font-size: 1.375rem; font-weight: 700; }
-.prose h3 { font-size: 1.1875rem; font-weight: 650; }
-.prose h4, .prose h5, .prose h6 { font-size: 1.0625rem; font-weight: 650; }
-.prose a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.prose h1, .prose h2, .prose h3, .prose h4 { line-height: 1.25; letter-spacing: -.01em; margin: 1.8em 0 .6em; hyphens: manual; text-align: left; }
+.prose h1, .prose h2 { font-size: 1.22em; font-weight: 700; }
+.prose h3 { font-size: 1.08em; font-weight: 650; }
+.prose h4, .prose h5, .prose h6 { font-size: 1em; font-weight: 650; }
+.prose b, .prose strong { font-weight: 700; }
+.prose a { color: var(--r-accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .prose ul, .prose ol { padding-left: 1.4em; }
 .prose li { margin: .35em 0; }
 .prose li > p { margin: 0 0 .5em; }
-.prose blockquote { margin: 1.5em 0; padding: 0 0 0 1.1em; border-left: 3px solid hsl(var(--h, 176) 40% 60%); color: var(--ink-2); }
+.prose blockquote { margin: 1.5em 0; padding: 0 0 0 1.1em; border-left: 3px solid hsl(var(--h, 176) 40% 60%); color: var(--r-ink-2); }
 .prose blockquote > *:last-child { margin-bottom: 0; }
-.prose img { display: block; max-width: 100%; height: auto; border-radius: .375rem; margin: 1.5em auto .5em; background: var(--surface); }
+.prose img { display: block; max-width: 100%; height: auto; border-radius: .375rem; margin: 1.5em auto .5em; background: var(--r-surface); }
 .prose figure { margin: 1.5em 0; }
-.prose figcaption { font: 400 .875rem/1.5 var(--sans); color: var(--ink-2); text-align: center; }
-.prose code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .85em; background: var(--surface); border-radius: .25rem; padding: .1em .3em; hyphens: none; }
-.prose pre { background: var(--surface); border: 1px solid var(--rule); border-radius: .5rem; padding: .9rem 1rem; overflow-x: auto; font-size: .875rem; line-height: 1.5; hyphens: none; }
+.prose figcaption { font: 400 .8em/1.5 var(--sans); color: var(--r-ink-2); text-align: center; }
+.prose code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .85em; background: var(--r-surface); border-radius: .25rem; padding: .1em .3em; hyphens: none; }
+.prose pre { background: var(--r-surface); border: 1px solid var(--r-rule); border-radius: .5rem; padding: .9rem 1rem; overflow-x: auto; font-size: .8em; line-height: 1.5; hyphens: none; text-align: left; }
 .prose pre code { background: none; padding: 0; font-size: inherit; }
-.prose table { border-collapse: collapse; font: 400 .9375rem/1.4 var(--sans); display: block; overflow-x: auto; }
-.prose td, .prose th { border-bottom: 1px solid var(--rule); padding: .4em .75em .4em 0; text-align: left; vertical-align: top; }
+.prose table { border-collapse: collapse; font: 400 .85em/1.4 var(--sans); display: block; overflow-x: auto; text-align: left; }
+.prose td, .prose th { border-bottom: 1px solid var(--r-rule); padding: .4em .75em .4em 0; text-align: left; vertical-align: top; }
 .prose hr { border: 0; text-align: center; margin: 2em 0; }
-.prose hr::after { content: "⁂"; color: var(--ink-2); }
+.prose hr::after { content: "⁂"; color: var(--r-ink-2); }
 
-.notice { font: 400 1rem/1.6 var(--sans); color: var(--ink-2); background: var(--surface); border-radius: .5rem; padding: 1rem 1.125rem; margin: 0 0 1.5rem; }
-.notice a { color: var(--accent); }
-.unlock { background: var(--surface); border-radius: .5rem; padding: 1.25rem 1.125rem; }
-.unlock p { margin: 0 0 1rem; font-size: .9375rem; color: var(--ink-2); }
-.unlock label { display: block; font-size: .8125rem; font-weight: 500; margin-bottom: .375rem; }
-.unlock .row { display: flex; gap: .5rem; }
-.unlock input {
+.notice { font: 400 1rem/1.6 var(--sans); color: var(--r-ink-2); background: var(--r-surface); border-radius: .5rem; padding: 1rem 1.125rem; margin: 0 0 1.5rem; }
+.notice a { color: var(--r-accent); }
+.unlock { background: var(--r-surface); border-radius: .5rem; padding: 1.25rem 1.125rem; }
+.unlock p { margin: 0 0 1rem; font-size: .9375rem; color: var(--r-ink-2); }
+.unlock label, .field label { display: block; font-size: .8125rem; font-weight: 500; margin-bottom: .375rem; }
+.unlock .row, .field .row { display: flex; gap: .5rem; }
+.unlock input, .field input {
   flex: 1; min-width: 0; font: 400 1rem/1.4 var(--sans); color: var(--ink); background: var(--paper);
-  border: 1px solid var(--rule); border-radius: .375rem; padding: .625rem .75rem;
+  border: 1px solid var(--rule); border-radius: .375rem; padding: .625rem .75rem; width: 100%;
 }
-.unlock input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
-.unlock button {
-  font: 600 .9375rem/1 var(--sans); color: #fff; background: var(--accent); border: 0; border-radius: .375rem;
-  padding: 0 1rem; cursor: pointer;
+.unlock input:focus, .field input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.btn {
+  font: 600 .9375rem/1 var(--sans); color: var(--on-accent); background: var(--accent); border: 0; border-radius: .375rem;
+  padding: .75rem 1rem; cursor: pointer;
 }
-@media (prefers-color-scheme: dark) { .unlock button { color: #0E2A2C; } }
-.unlock button[disabled] { opacity: .6; }
-.unlock .err { color: #B3412F; margin: .75rem 0 0; font-size: .875rem; }
-@media (prefers-color-scheme: dark) { .unlock .err { color: #F08A75; } }
-.doc-end { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: .875rem; color: var(--ink-2); }
-.doc-end a { color: var(--accent); }
+.btn.ghost { background: none; color: var(--accent); border: 1px solid var(--rule); }
+.btn[disabled] { opacity: .6; }
+.err { color: var(--down); margin: .75rem 0 0; font-size: .875rem; }
+.doc-end { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--r-rule); font-size: .875rem; color: var(--r-ink-2); }
+.doc-end a { color: var(--r-accent); }
+.doc-rate { margin-top: 2rem; padding: 1.25rem; background: var(--r-surface); border-radius: .75rem; text-align: center; }
+.doc-rate p { margin: 0 0 .75rem; font-weight: 600; color: var(--r-ink); }
+.doc-rate .rate { justify-content: center; margin: 0; }
+.doc-rate .rate button { min-height: 2.75rem; padding: 0 1.25rem; font-size: .9375rem; border-color: var(--r-rule); color: var(--r-ink-2); }
 
-.engines { display: inline-flex; gap: .25rem; padding: .25rem; margin: 0 0 .5rem; background: var(--surface); border-radius: .5rem; }
+.engines { display: inline-flex; gap: .25rem; padding: .25rem; margin: 0 0 .5rem; background: var(--r-surface); border-radius: .5rem; }
 .engines button {
-  all: unset; cursor: pointer; font: 500 .875rem/1 var(--sans); color: var(--ink-2);
+  all: unset; cursor: pointer; font: 500 .875rem/1 var(--sans); color: var(--r-ink-2);
   padding: .5rem .875rem; border-radius: .375rem;
 }
-.engines button[aria-pressed="true"] { background: var(--accent); color: #fff; }
-@media (prefers-color-scheme: dark) { .engines button[aria-pressed="true"] { color: #0E2A2C; } }
-.engines button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.engines-note { font-size: .8125rem; color: var(--ink-2); margin: 0 0 1.75rem; }
+.engines button[aria-pressed="true"] { background: var(--r-accent); color: var(--r-bg); }
+.engines button:focus-visible { outline: 2px solid var(--r-accent); outline-offset: 2px; }
+.engines-note { font-size: .8125rem; color: var(--r-ink-2); margin: 0 0 1.75rem; }
+
+/* ---------- листы: настройки чтения, источники, настройки ---------- */
+.sheet { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; background: rgb(0 0 0 / .32); }
+.sheet[hidden] { display: none; }
+.sheet-card {
+  width: 100%; max-width: 34rem; max-height: 92%; overflow-y: auto; background: var(--paper); color: var(--ink);
+  border-radius: 1rem 1rem 0 0; padding: .75rem 1.25rem calc(env(safe-area-inset-bottom) + 1.25rem);
+  animation: rise .22s cubic-bezier(.2,.7,.2,1); overscroll-behavior: contain;
+}
+.sheet.full .sheet-card { max-width: 44rem; height: 100%; max-height: 100%; border-radius: 0; padding-top: calc(env(safe-area-inset-top) + .75rem); }
+@media (min-width: 56rem) { .sheet.full .sheet-card { height: auto; max-height: 88%; border-radius: 1rem; margin-bottom: 4vh; } .sheet { align-items: center; } }
+@keyframes rise { from { transform: translateY(12%); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+.sheet-head h2 { font: 700 1.25rem/1.2 var(--sans); letter-spacing: -.02em; margin: 0; }
+.sheet-head button { all: unset; cursor: pointer; color: var(--accent); font-weight: 600; padding: .5rem 0; }
+.sheet h3 { font: 600 .8125rem/1.3 var(--sans); color: var(--ink-2); margin: 1.5rem 0 .625rem; }
+.sheet p.hint { font-size: .8125rem; color: var(--ink-2); margin: .5rem 0 0; }
+
+/* «Аа»: размер, темы, шрифт, параметры */
+.sizes { display: grid; grid-template-columns: 3.25rem 1fr 3.25rem; align-items: center; background: var(--surface); border-radius: .625rem; }
+.sizes button { all: unset; cursor: pointer; text-align: center; padding: .625rem 0; color: var(--ink); }
+.sizes #size-down { font: 500 .9375rem/1 var(--sans); }
+.sizes #size-up { font: 500 1.375rem/1 var(--sans); }
+.sizes output { text-align: center; font-size: .8125rem; color: var(--ink-2); border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); padding: .75rem 0; }
+.themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: .625rem; }
+.themes button {
+  all: unset; cursor: pointer; border-radius: .75rem; padding: .75rem .5rem .625rem; text-align: center;
+  border: 1px solid rgb(0 0 0 / .12);
+}
+.themes button b { display: block; font: 600 1.375rem/1.1 var(--sans); margin-bottom: .25rem; }
+.themes button span { font-size: .75rem; }
+.themes button[aria-pressed="true"] { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+.fonts { display: flex; gap: .5rem; overflow-x: auto; margin: 0 -1.25rem; padding: .25rem 1.25rem .5rem; scrollbar-width: none; }
+.fonts::-webkit-scrollbar { display: none; }
+.fonts button {
+  all: unset; cursor: pointer; flex: none; padding: .625rem .875rem; border-radius: .625rem; background: var(--surface);
+  font-size: 1rem; white-space: nowrap;
+}
+.fonts button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.opts { display: grid; gap: .625rem; }
+.opt { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--surface); border-radius: .625rem; padding: .5rem .5rem .5rem .875rem; }
+.opt > span { font-size: .9375rem; }
+.mini { display: inline-flex; gap: .125rem; background: var(--paper); border-radius: .5rem; padding: .1875rem; }
+.mini button { all: unset; cursor: pointer; padding: .4375rem .625rem; border-radius: .375rem; font-size: .8125rem; color: var(--ink-2); }
+.mini button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.switch { all: unset; cursor: pointer; width: 3rem; height: 1.75rem; border-radius: 1rem; background: var(--rule); position: relative; flex: none; }
+.switch::after { content: ""; position: absolute; top: .1875rem; left: .1875rem; width: 1.375rem; height: 1.375rem; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgb(0 0 0 / .25); }
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(1.25rem); }
+.linkbtn { all: unset; cursor: pointer; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; font-size: .875rem; }
+
+/* источники и рейтинг */
+.ranking { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.ranking li { display: grid; grid-template-columns: 1.25rem 2.25rem 1fr auto; gap: .75rem; align-items: start; }
+.ranking .place { font: 600 .875rem/2.25rem var(--sans); color: var(--ink-2); text-align: right; }
+.ranking .who b { display: block; font-weight: 600; }
+.ranking .who a { color: inherit; text-decoration: none; }
+.ranking .who small { display: block; color: var(--ink-2); font-size: .8125rem; line-height: 1.4; }
+.ranking .bar { height: .25rem; border-radius: .125rem; background: var(--rule); margin-top: .375rem; overflow: hidden; }
+.ranking .bar i { display: block; height: 100%; background: var(--accent); }
+.pin { all: unset; cursor: pointer; font-size: .75rem; color: var(--ink-2); border: 1px solid var(--rule); border-radius: .375rem; padding: .375rem .5rem; }
+.pin[aria-pressed="true"] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+.history { list-style: none; margin: 0; padding: 0; display: grid; gap: .625rem; font-size: .875rem; }
+.history li { background: var(--surface); border-radius: .625rem; padding: .625rem .75rem; }
+.history .when { color: var(--ink-2); font-size: .75rem; }
+.history .why { color: var(--ink-2); }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 1.25rem); transform: translateX(-50%); z-index: 30;
+  background: var(--ink); color: var(--paper); font-size: .875rem; font-weight: 500; padding: .625rem 1rem; border-radius: 1.25rem;
+  box-shadow: 0 4px 16px rgb(0 0 0 / .2); max-width: calc(100% - 2.5rem);
+}
+.toast[hidden] { display: none; }
 
 @media (min-width: 40rem) {
-  .masthead { padding-top: 4rem; }
-  .masthead h1 { font-size: 2.875rem; }
-  .doc h1.doc-title { font-size: 2.25rem; }
-  .prose { font-size: 1.1875rem; }
+  .doc h1.doc-title { font-size: 2.125rem; }
 }
 </style>
 </head>
 <body>
-<main class="wrap" id="main">
-  <header class="masthead">
-    <h1>Дайджест ИИ</h1>
-    <p>Лучшие англоязычные тексты об искусственном интеллекте: короткий абстракт и полный перевод на русский.</p>
-    <p class="updated" id="updated"></p>
-    <p class="offline-status" id="offline-status" aria-live="polite"></p>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-row">
+      <h1 class="brand">Дайджест ИИ</h1>
+      <button class="iconbtn" id="open-sources" type="button" aria-label="Источники и рейтинг">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+      </button>
+      <button class="iconbtn" id="open-settings" type="button" aria-label="Настройки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+      </button>
+    </div>
+    <p class="status" aria-live="polite"><span id="updated"></span> <span id="offline-status"></span></p>
+    <div class="seg" role="tablist" aria-label="Разделы">
+      <button type="button" role="tab" id="tab-news" data-kind="news" aria-controls="pane-news" aria-selected="true">Новости<span class="cnt"></span></button>
+      <button type="button" role="tab" id="tab-analysis" data-kind="analysis" aria-controls="pane-analysis" aria-selected="false">Аналитика<span class="cnt"></span></button>
+    </div>
   </header>
 
-  <nav aria-label="Источники">
-    <div class="filters" id="filters"></div>
-    <p class="source-note" id="source-note" aria-live="polite"></p>
-  </nav>
-
-  <ol class="entries" id="entries" aria-label="Тексты"></ol>
-
-  <footer class="colophon" id="colophon" hidden>
-    <h2>Источники</h2>
-    <ul class="sources" id="sources"></ul>
-    <p>Абстракты и переводы сделаны ИИ, модель указана в конце каждого перевода. Тексты принадлежат авторам, у каждого есть ссылка на оригинал.</p>
-    <p id="forget-wrap" hidden><button class="linkbtn" id="forget" type="button">Забыть пароль на этом устройстве</button></p>
-  </footer>
-</main>
+  <main class="pager" id="pager">
+    <section class="pane" id="pane-news" data-kind="news" role="tabpanel" aria-labelledby="tab-news">
+      <div class="ptr" aria-hidden="true"><span class="spin"></span><span class="ptr-text">Потяните, чтобы обновить</span></div>
+      <div class="pane-inner">
+        <h2 class="pane-title">Новости<small></small></h2>
+        <div class="filters"></div>
+        <p class="source-note" aria-live="polite"></p>
+        <ol class="entries" aria-label="Новости"></ol>
+      </div>
+    </section>
+    <section class="pane" id="pane-analysis" data-kind="analysis" role="tabpanel" aria-labelledby="tab-analysis">
+      <div class="ptr" aria-hidden="true"><span class="spin"></span><span class="ptr-text">Потяните, чтобы обновить</span></div>
+      <div class="pane-inner">
+        <h2 class="pane-title">Аналитика<small></small></h2>
+        <div class="filters"></div>
+        <p class="source-note" aria-live="polite"></p>
+        <ol class="entries" aria-label="Аналитика"></ol>
+      </div>
+    </section>
+  </main>
+</div>
 
 <div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="doc-title" hidden>
   <div class="reader-bar">
     <button type="button" id="back">Назад</button>
+    <button type="button" id="aa" aria-label="Оформление текста">Аа</button>
     <a id="orig" href="#" target="_blank" rel="noopener noreferrer">Оригинал</a>
   </div>
   <article class="doc" id="doc"></article>
 </div>
+
+<!-- Оформление текста, как в Apple Books -->
+<div class="sheet" id="sheet-aa" role="dialog" aria-modal="true" aria-labelledby="aa-title" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2 id="aa-title">Оформление</h2><button type="button" data-close>Готово</button></div>
+    <div class="sizes" role="group" aria-label="Размер шрифта">
+      <button type="button" id="size-down" aria-label="Мельче">A</button>
+      <output id="size-out"></output>
+      <button type="button" id="size-up" aria-label="Крупнее">A</button>
+    </div>
+    <h3>Тема</h3>
+    <div class="themes" id="themes"></div>
+    <h3>Шрифт</h3>
+    <div class="fonts" id="fonts"></div>
+    <h3>Параметры</h3>
+    <div class="opts">
+      <div class="opt"><span>Интервал между строками</span>
+        <div class="mini" id="opt-lh" role="group" aria-label="Интервал между строками"></div></div>
+      <div class="opt"><span>Поля</span>
+        <div class="mini" id="opt-margin" role="group" aria-label="Поля"></div></div>
+      <div class="opt"><span>Выравнивание по ширине</span>
+        <button type="button" class="switch" id="opt-justify" role="switch" aria-checked="false" aria-label="Выравнивание по ширине"></button></div>
+      <div class="opt"><span>Жирный текст</span>
+        <button type="button" class="switch" id="opt-bold" role="switch" aria-checked="false" aria-label="Жирный текст"></button></div>
+    </div>
+    <p class="hint"><button type="button" class="linkbtn" id="aa-reset">Вернуть как было</button></p>
+  </div>
+</div>
+
+<!-- Источники и рейтинг -->
+<div class="sheet full" id="sheet-sources" role="dialog" aria-modal="true" aria-labelledby="src-title" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2 id="src-title">Источники</h2><button type="button" data-close>Готово</button></div>
+    <div class="seg" role="tablist" aria-label="Раздел" id="src-tabs" style="margin: 0 0 .5rem">
+      <button type="button" role="tab" data-kind="news" aria-selected="false">Новости</button>
+      <button type="button" role="tab" data-kind="analysis" aria-selected="true">Аналитика</button>
+    </div>
+    <p class="hint" id="src-explain"></p>
+    <h3>Рейтинг за 8 недель</h3>
+    <ol class="ranking" id="ranking"></ol>
+    <h3 id="cand-h">Кандидаты</h3>
+    <ul class="history" id="candidates"></ul>
+    <h3>Изменения</h3>
+    <ul class="history" id="history"></ul>
+  </div>
+</div>
+
+<!-- Настройки -->
+<div class="sheet full" id="sheet-settings" role="dialog" aria-modal="true" aria-labelledby="set-title" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2 id="set-title">Настройки</h2><button type="button" data-close>Готово</button></div>
+    <h3>Обновление</h3>
+    <p class="hint" id="refresh-info"></p>
+    <p><button type="button" class="btn ghost" id="refresh-now">Обновить сейчас</button></p>
+    <h3>Оценки на всех устройствах</h3>
+    <p class="hint">Оценки и статистика чтения хранятся на этом устройстве. Чтобы они были общими для iPhone и iPad
+      и по ним раз в неделю пересматривались источники, укажите токен GitHub с доступом к закрытому репозиторию.</p>
+    <form class="field" id="sync-form" style="margin-top: .75rem">
+      <label for="gh-token">Токен GitHub (fine-grained)</label>
+      <input id="gh-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+      <label for="gh-repo" style="margin-top: .75rem">Репозиторий</label>
+      <input id="gh-repo" type="text" autocomplete="off" spellcheck="false" value="VBalik/AIBot-feedback">
+      <div class="row" style="margin-top: .75rem"><button class="btn" type="submit">Сохранить и проверить</button>
+        <button class="btn ghost" type="button" id="sync-off" hidden>Отключить</button></div>
+      <p class="hint" id="sync-status" role="status"></p>
+    </form>
+    <h3>Пароль к переводам</h3>
+    <p class="hint" id="pw-state"></p>
+    <p><button type="button" class="linkbtn" id="forget">Забыть пароль на этом устройстве</button></p>
+    <h3>О дайджесте</h3>
+    <p class="hint">Абстракты и переводы сделаны ИИ, модель указана в конце каждого перевода. Тексты принадлежат авторам,
+      у каждого есть ссылка на оригинал. Сервер обновляет ленту каждый час и сам переводит новые тексты.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
 
 <script>
 "use strict";
 const params = new URLSearchParams(location.search);
 const DATA_BASE = params.get("data") || "https://raw.githubusercontent.com/VBalik/AIBot/data/";
 const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
+const KINDS = ["news", "analysis"];
+const KIND_RU = { news: "Новости", analysis: "Аналитика" };
+const HOUR = 3600e3;
 
 const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
   del(k) { try { localStorage.removeItem(k); } catch {} },
+  json(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  put(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const nowIso = () => new Date().toISOString().replace(/\.\d+Z$/, "Z");
 
 let FEED = null, ITEMS = new Map(), SOURCES = new Map(), cryptoKey = null, lastOpener = null;
-let filter = store.get("aid.filter") || "all";
+let filters = store.json("aid.filters", { news: "all", analysis: "all" });
+let current = store.get("aid.kind") || "news";
 const lastVisit = Number(store.get("aid.lastVisit") || 0);
+let lastFetch = 0, freshIds = new Set();
 
 /* ---------- форматирование ---------- */
 const plural = (n, one, few, many) => {
@@ -291,6 +534,7 @@ function tile(src, cls = "", count = null) {
   const n = count == null ? "" : `<span class="n" aria-hidden="true">${count}</span>`;
   return `<span class="tile ${cls}" style="--h:${h}" aria-hidden="true">${esc(src ? src.symbol : "Все")}${n}</span>`;
 }
+const kindOf = (it) => (SOURCES.get(it.source) || {}).kind || "analysis";
 const STATE_TEXT = {
   ok: "Полный перевод",
   pending: "Перевод готовится",
@@ -300,77 +544,291 @@ const STATE_TEXT = {
   unavailable: "Только абстракт",
   error: "Только абстракт",
 };
+let toastTimer = 0;
+function toast(text) {
+  const t = $("#toast");
+  t.textContent = text; t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (t.hidden = true), 2800);
+}
 
-/* ---------- загрузка и лента ---------- */
-async function load() {
+/* ---------- оценки и чтение: свой файл устройства + файлы других устройств ---------- */
+const DEVICE = store.get("aid.device") || (() => {
+  const id = "d-" + Array.from(crypto.getRandomValues(new Uint8Array(5)), (b) => b.toString(16).padStart(2, "0")).join("");
+  store.set("aid.device", id);
+  return id;
+})();
+const DEVICE_NAME = /iPad/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+  ? "iPad" : /iPhone/.test(navigator.userAgent) ? "iPhone" : "Браузер";
+const mine = Object.assign({ version: 1, ratings: {}, reads: {}, pins: {}, restore: {} }, store.json("aid.fb", {}));
+let others = store.json("aid.fb.others", []);   // файлы других устройств (последняя копия — работает и без сети)
+
+function saveMine() {
+  mine.device = DEVICE; mine.name = DEVICE_NAME; mine.updated_at = nowIso();
+  store.put("aid.fb", mine);
+  scheduleSync();
+}
+function merged() {
+  const out = { ratings: {}, reads: {}, pins: {} };
+  for (const doc of [...others, mine]) {
+    for (const [pid, r] of Object.entries(doc.ratings || {}))
+      if (!out.ratings[pid] || r.at > out.ratings[pid].at) out.ratings[pid] = r;
+    for (const [pid, r] of Object.entries(doc.reads || {})) {
+      const c = out.reads[pid] || (out.reads[pid] = { s: r.s, sec: 0, p: 0, first: r.first, last: r.last });
+      c.sec += r.sec || 0; c.p = Math.max(c.p, r.p || 0);
+      if (r.last > (c.last || "")) c.last = r.last;
+    }
+    for (const [sid, r] of Object.entries(doc.pins || {}))
+      if (!out.pins[sid] || r.at > out.pins[sid].at) out.pins[sid] = r;
+  }
+  return out;
+}
+const ratingOf = (pid) => (merged().ratings[pid] || {}).v || 0;
+function rate(pid, v) {
+  const it = ITEMS.get(pid);
+  const cur = ratingOf(pid);
+  mine.ratings[pid] = { v: cur === v ? 0 : v, at: nowIso(), s: it ? it.source : undefined };
+  saveMine();
+  refreshRateButtons(pid);
+}
+function rateButtons(pid) {
+  const v = ratingOf(pid);
+  const thumb = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3m0 10V11m0 10h9.3a2 2 0 0 0 2-1.6l1.4-7A2 2 0 0 0 17.7 10H14V5.5A2.5 2.5 0 0 0 11.5 3L7 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+  const down = thumb.replace("<svg ", '<svg style="transform: scaleY(-1)" ');
+  return `<div class="rate" role="group" aria-label="Оценка" data-rate="${esc(pid)}">
+    <button type="button" class="up" data-v="1" aria-pressed="${v === 1}" aria-label="Нравится">${thumb}<span>Интересно</span></button>
+    <button type="button" class="down" data-v="-1" aria-pressed="${v === -1}" aria-label="Не нравится">${down}<span>Мимо</span></button></div>`;
+}
+function refreshRateButtons(pid) {
+  const v = ratingOf(pid);
+  $$(`.rate[data-rate="${CSS.escape(pid)}"]`).forEach((g) => {
+    g.querySelector(".up").setAttribute("aria-pressed", String(v === 1));
+    g.querySelector(".down").setAttribute("aria-pressed", String(v === -1));
+  });
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".rate button");
+  if (!b) return;
+  e.preventDefault();
+  rate(b.closest(".rate").dataset.rate, Number(b.dataset.v));
+});
+
+/* учёт чтения: открыл, сколько секунд читал, до какого места дочитал полный перевод */
+let reading = null;
+function startReading(pid) {
+  stopReading();
+  const it = ITEMS.get(pid);
+  const r = mine.reads[pid] || (mine.reads[pid] = { s: it.source, first: nowIso(), sec: 0, p: 0 });
+  r.last = nowIso();
+  reading = { pid, since: document.hidden ? 0 : performance.now() };
+}
+function pauseReading() {
+  if (!reading || !reading.since) return;
+  const r = mine.reads[reading.pid];
+  r.sec = Math.round((r.sec || 0) + Math.min(3600, (performance.now() - reading.since) / 1000));
+  r.last = nowIso();
+  reading.since = 0;
+}
+function stopReading() {
+  if (!reading) return;
+  pauseReading();
+  const pid = reading.pid;
+  reading = null;
+  saveMine();
+  $$(`.entry[data-id="${CSS.escape(pid)}"]`).forEach((li) => li.classList.add("is-read"));
+}
+function trackProgress() {
+  if (!reading || !$("#full .prose")) return;
+  const el = $("#reader"), r = mine.reads[reading.pid];
+  const p = Math.min(1, (el.scrollTop + el.clientHeight) / el.scrollHeight);
+  if (p > (r.p || 0) + 0.02 || (p >= 0.98 && r.p < 1)) { r.p = Math.round(p * 100) / 100; store.put("aid.fb", mine); }
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) { pauseReading(); if (reading) saveMine(); flushSync(); }
+  else {
+    if (reading) reading.since = performance.now();
+    if (Date.now() - lastFetch > HOUR) refresh(false);
+  }
+});
+
+/* синхронизация с закрытым репозиторием через GitHub API */
+const sync = { token: store.get("aid.gh.token") || "", repo: store.get("aid.gh.repo") || "VBalik/AIBot-feedback", sha: null, timer: 0, busy: false, last: store.get("aid.gh.last") || "", error: "" };
+const ghPath = () => `devices/${DEVICE}.json`;
+async function gh(path, opts = {}) {
+  const r = await fetch(`https://api.github.com/repos/${sync.repo}/contents/${path}`, {
+    ...opts, cache: "no-store",
+    headers: { Authorization: `Bearer ${sync.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(opts.headers || {}) },
+  });
+  return r;
+}
+const b64utf8 = (s) => { const bytes = new TextEncoder().encode(s); let bin = ""; bytes.forEach((b) => (bin += String.fromCharCode(b))); return btoa(bin); };
+const utf8b64 = (s) => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, "")), (c) => c.charCodeAt(0)));
+function scheduleSync() {
+  if (!sync.token) return;
+  clearTimeout(sync.timer);
+  sync.timer = setTimeout(pushMine, 4000);
+}
+function flushSync() { if (sync.token && sync.timer) { clearTimeout(sync.timer); pushMine(); } }
+async function pushMine(retry = true) {
+  sync.timer = 0;
+  if (!sync.token || !navigator.onLine) return;
+  if (sync.busy) { scheduleSync(); return; }
+  sync.busy = true;
   try {
-    const r = await fetch(DATA_BASE + "feed.json?v=" + Math.floor(Date.now() / 60000), { cache: "no-store" });
-    if (r.status === 404) return showEmpty("Пока пусто. Первые тексты появятся после ближайшего запуска сборщика — он работает каждый час.");
+    if (!sync.sha) {
+      const r = await gh(ghPath());
+      if (r.ok) sync.sha = (await r.json()).sha;
+      else if (r.status !== 404) throw new Error("HTTP " + r.status);
+    }
+    const body = { message: `${DEVICE_NAME}: оценки и чтение`, content: b64utf8(JSON.stringify(mine)) };
+    if (sync.sha) body.sha = sync.sha;
+    const r = await gh(ghPath(), { method: "PUT", body: JSON.stringify(body), keepalive: true });
+    if ((r.status === 409 || r.status === 422) && retry) { sync.sha = null; sync.busy = false; return pushMine(false); }
     if (!r.ok) throw new Error("HTTP " + r.status);
-    FEED = await r.json();
+    sync.sha = (await r.json()).content.sha;
+    sync.last = nowIso(); sync.error = "";
+    store.set("aid.gh.last", sync.last);
+  } catch (e) {
+    sync.error = String(e.message || e);
+  } finally {
+    sync.busy = false;
+    renderSyncStatus();
+  }
+}
+async function pullOthers() {
+  if (!sync.token || !navigator.onLine) return;
+  try {
+    const r = await gh("devices");
+    if (r.status === 404) return;
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const list = (await r.json()).filter((f) => f.type === "file" && f.name.endsWith(".json") && f.name !== `${DEVICE}.json`);
+    const docs = [];
+    for (const f of list) {
+      const fr = await gh(f.path);
+      if (fr.ok) { try { docs.push(JSON.parse(utf8b64((await fr.json()).content))); } catch {} }
+    }
+    others = docs;
+    store.put("aid.fb.others", others);
+    sync.error = "";
+  } catch (e) {
+    sync.error = String(e.message || e);
+  }
+  renderSyncStatus();
+}
+
+/* ---------- загрузка, обновление и лента ---------- */
+async function fetchFeed() {
+  const r = await fetch(DATA_BASE + "feed.json?v=" + Math.floor(Date.now() / 60000), { cache: "no-store" });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return await r.json();
+}
+function applyFeed(feed) {
+  FEED = feed;
+  SOURCES = new Map();
+  (FEED.sources || []).forEach((s, i) => SOURCES.set(s.id, { kind: "analysis", ...s, hue: s.hue ?? HUES[i % HUES.length] }));
+  ITEMS = new Map();
+  FEED.items.forEach((it) => ITEMS.set(it.id, it));
+  for (const k of KINDS) if (filters[k] !== "all" && !SOURCES.has(filters[k])) filters[k] = "all";
+}
+async function load() {
+  let feed = null;
+  try {
+    feed = await fetchFeed();
+    lastFetch = Date.now();
+    if (!feed) return showEmptyAll("Пока пусто. Первые тексты появятся после ближайшего запуска сборщика — он работает каждый час.");
   } catch (e) {
     renderOfflineStatus();
-    return showEmpty(navigator.onLine
-      ? "Не удалось загрузить ленту. Проверьте соединение и обновите страницу."
-      : "Нет сети, а сохранённой копии ленты пока нет. Откройте страницу один раз с интернетом — дальше она будет работать и без него.");
+    return showEmptyAll(navigator.onLine
+      ? "Не удалось загрузить ленту. Проверьте соединение и потяните вниз, чтобы повторить."
+      : "Нет сети, а сохранённой копии ленты пока нет. Откройте приложение один раз с интернетом — дальше оно будет работать и без него.");
   }
-  FEED.sources.forEach((s, i) => SOURCES.set(s.id, { ...s, hue: HUES[i % HUES.length] }));
-  FEED.items.forEach((it) => ITEMS.set(it.id, it));
-  if (filter !== "all" && !SOURCES.has(filter)) filter = "all";
-  if (FEED.updated_at) $("#updated").textContent = "Обновлено " + fmtDate(FEED.updated_at, true);
-  renderFilters();
-  renderEntries();
-  renderColophon();
-  renderOfflineStatus();
+  applyFeed(feed);
+  renderAll();
+  goTo(current, false);
   syncOffline();
   store.set("aid.lastVisit", String(Date.now()));
   const m = location.hash.match(/^#\/p\/([\w-]+)$/);
   if (m && ITEMS.has(m[1])) openReader(m[1], false);
+  pullOthers().then(() => { renderAll(); pushMine(); });
 }
-
-function showEmpty(text) {
-  $("#entries").innerHTML = `<li class="empty">${esc(text)}</li>`;
+let refreshing = null;
+async function refresh(manual) {
+  if (refreshing) return refreshing;
+  refreshing = (async () => {
+    try {
+      const feed = await fetchFeed();
+      lastFetch = Date.now();
+      if (!feed) return;
+      const before = new Set(ITEMS.keys());
+      applyFeed(feed);
+      const added = FEED.items.filter((it) => !before.has(it.id));
+      added.forEach((it) => freshIds.add(it.id));
+      renderAll(true);
+      if (manual || added.length) toast(added.length ? `${added.length} ${plural(added.length, "новый текст", "новых текста", "новых текстов")}` : "Новых текстов нет");
+      syncOffline();
+      pullOthers().then(() => renderAll(true));
+    } catch (e) {
+      if (manual) toast(navigator.onLine ? "Не удалось обновить" : "Нет сети");
+      renderOfflineStatus();
+    } finally {
+      refreshing = null;
+    }
+  })();
+  return refreshing;
 }
+setInterval(() => { if (!document.hidden) refresh(false); }, HOUR);
 
-function renderFilters() {
+function showEmptyAll(text) {
+  $$(".entries").forEach((ol) => (ol.innerHTML = `<li class="empty">${esc(text)}</li>`));
+}
+function renderAll(keepScroll = false) {
+  const scrolls = keepScroll ? $$(".pane").map((p) => p.scrollTop) : null;
+  if (FEED && FEED.updated_at) $("#updated").textContent = "Обновлено " + fmtDate(FEED.updated_at, true) + ".";
+  for (const kind of KINDS) renderPane(kind);
+  renderOfflineStatus();
+  if (scrolls) $$(".pane").forEach((p, i) => (p.scrollTop = scrolls[i]));
+  if (!$("#sheet-sources").hidden) renderSources();
+}
+function renderPane(kind) {
+  const pane = $(`#pane-${kind}`);
+  const srcs = [...SOURCES.values()].filter((s) => s.kind === kind && s.active !== false);
+  const items = FEED.items.filter((it) => kindOf(it) === kind);
+  const n = items.length;
+  $(`#tab-${kind} .cnt`).textContent = n ? String(n) : "";
+  $(".pane-title small", pane).textContent = `${srcs.length} ${plural(srcs.length, "источник", "источника", "источников")}`;
   const counts = {};
-  FEED.items.forEach((it) => (counts[it.source] = (counts[it.source] || 0) + 1));
+  items.forEach((it) => (counts[it.source] = (counts[it.source] || 0) + 1));
+  const f = filters[kind];
   const btn = (id, src, count, label) =>
-    `<button type="button" data-f="${id}" aria-pressed="${filter === id}" aria-label="${esc(label)}">${tile(src, id === "all" ? "all" : "", count)}</button>`;
-  let html = btn("all", null, FEED.items.length, "Все источники");
-  for (const s of SOURCES.values()) html += btn(s.id, s, counts[s.id] || 0, s.name);
-  const box = $("#filters");
-  box.innerHTML = html;
-  box.onclick = (e) => {
-    const b = e.target.closest("button[data-f]");
-    if (!b) return;
-    filter = b.dataset.f;
-    store.set("aid.filter", filter);
-    box.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-    renderEntries();
-  };
-}
+    `<button type="button" data-f="${esc(id)}" aria-pressed="${f === id}" aria-label="${esc(label)}">${tile(src, id === "all" ? "all" : "", count)}</button>`;
+  let html = btn("all", null, n, "Все источники раздела");
+  for (const s of srcs) html += btn(s.id, s, counts[s.id] || 0, s.name);
+  $(".filters", pane).innerHTML = html;
 
-function renderNote() {
-  const note = $("#source-note");
-  if (filter === "all") {
-    note.innerHTML = `<b>Все источники</b>, ${SOURCES.size} ${plural(SOURCES.size, "блог", "блога", "блогов")}. Нажмите на плитку, чтобы оставить один.`;
+  const note = $(".source-note", pane);
+  if (f === "all") {
+    note.innerHTML = srcs.length
+      ? `<b>${KIND_RU[kind]}</b>: ${srcs.length} ${plural(srcs.length, "источник", "источника", "источников")}. Нажмите на плитку, чтобы оставить один.`
+      : `<b>${KIND_RU[kind]}</b>: источники этого раздела появятся после ближайшего обновления.`;
   } else {
-    const s = SOURCES.get(filter);
+    const s = SOURCES.get(f);
     note.innerHTML = `<b>${esc(s.name)}</b>, ${esc(s.author)}. ${esc(s.about)}.`;
   }
-}
-
-function renderEntries() {
-  renderNote();
-  const list = FEED.items.filter((it) => filter === "all" || it.source === filter);
-  if (!list.length) return showEmpty(filter === "all"
-    ? "Пока пусто. Первые тексты появятся после ближайшего запуска сборщика — он работает каждый час."
-    : "Из этого блога пока нет отобранных текстов. Новые появятся здесь, как только автор опубликует что-то стоящее.");
-  $("#entries").innerHTML = list.map((it) => {
+  const list = items.filter((it) => f === "all" || it.source === f);
+  const reads = merged().reads;
+  const ol = $(".entries", pane);
+  if (!list.length) {
+    ol.innerHTML = `<li class="empty">${f === "all"
+      ? "Здесь пока пусто. Новые тексты появятся после ближайшего обновления — сервер проверяет источники каждый час."
+      : "Из этого источника пока нет отобранных текстов."}</li>`;
+    return;
+  }
+  ol.innerHTML = list.map((it) => {
     const s = SOURCES.get(it.source);
-    const isNew = lastVisit && Date.parse(it.added) > lastVisit;
-    return `<li class="entry${isNew ? " is-new" : ""}">
+    const isNew = freshIds.has(it.id) || (lastVisit && Date.parse(it.added) > lastVisit);
+    const isRead = reads[it.id] && (reads[it.id].sec >= 15 || reads[it.id].p >= 0.15);
+    return `<li class="entry${isNew ? " is-new" : ""}${isRead ? " is-read" : ""}" data-id="${esc(it.id)}">
       <a href="#/p/${esc(it.id)}" data-id="${esc(it.id)}">
         ${tile(s, "sm")}
         <div>
@@ -379,30 +837,97 @@ function renderEntries() {
           <p class="entry-abstract">${esc(it.abstract)}</p>
           <p class="entry-state${it.full === "ok" ? " ok" : ""}">${STATE_TEXT[it.full] || ""}</p>
         </div>
-      </a></li>`;
+      </a>${rateButtons(it.id)}</li>`;
   }).join("");
 }
-
-$("#entries").addEventListener("click", (e) => {
-  const a = e.target.closest("a[data-id]");
-  if (!a || e.metaKey || e.ctrlKey) return;
-  e.preventDefault();
-  lastOpener = a;
-  openReader(a.dataset.id, true);
-});
-
-function renderColophon() {
-  $("#sources").innerHTML = [...SOURCES.values()].map((s) =>
-    `<li>${tile(s, "sm")}<div><a href="${esc(s.site)}" target="_blank" rel="noopener noreferrer">${esc(s.name)}</a>, ${esc(s.author)}<br>${esc(s.about)}</div></li>`
-  ).join("");
-  $("#colophon").hidden = false;
-  $("#forget-wrap").hidden = !store.get(keyName());
+for (const kind of KINDS) {
+  const pane = $(`#pane-${kind}`);
+  $(".filters", pane).addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-f]");
+    if (!b) return;
+    filters[kind] = b.dataset.f;
+    store.put("aid.filters", filters);
+    renderPane(kind);
+  });
+  $(".entries", pane).addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-id]");
+    if (!a || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    lastOpener = a;
+    openReader(a.dataset.id, true);
+  });
 }
+
+/* ---------- два раздела: смахивание влево-вправо и переключатель ---------- */
+const pager = $("#pager");
+const wide = () => matchMedia("(min-width: 56rem)").matches;
+function markTab(kind) {
+  current = kind;
+  store.set("aid.kind", kind);
+  KINDS.forEach((k) => $(`#tab-${k}`).setAttribute("aria-selected", String(k === kind)));
+}
+function goTo(kind, smooth = true) {
+  markTab(kind);
+  if (wide()) return;
+  pager.scrollTo({ left: KINDS.indexOf(kind) * pager.clientWidth, behavior: smooth ? "smooth" : "auto" });
+}
+$$(".topbar .seg button").forEach((b) => b.addEventListener("click", () => goTo(b.dataset.kind)));
+let scrollRaf = 0;
+pager.addEventListener("scroll", () => {
+  cancelAnimationFrame(scrollRaf);
+  scrollRaf = requestAnimationFrame(() => {
+    if (wide() || !pager.clientWidth) return;
+    const k = KINDS[Math.round(pager.scrollLeft / pager.clientWidth)];
+    if (k && k !== current) markTab(k);
+  });
+}, { passive: true });
+addEventListener("resize", () => { if (!wide()) pager.scrollLeft = KINDS.indexOf(current) * pager.clientWidth; });
+
+/* «потяните, чтобы обновить» — в режиме приложения на экране «Домой» у Safari его нет */
+function setupPullToRefresh(pane) {
+  const ptr = $(".ptr", pane), inner = $(".pane-inner", pane), text = $(".ptr-text", ptr);
+  let y0 = null, x0 = 0, dy = 0, active = false;
+  const reset = () => {
+    inner.classList.remove("pulling"); inner.classList.add("settle");
+    inner.style.transform = ""; ptr.style.opacity = ""; ptr.classList.remove("ready");
+    y0 = null; active = false; dy = 0;
+  };
+  pane.addEventListener("touchstart", (e) => {
+    if (pane.scrollTop > 0 || e.touches.length !== 1 || refreshing) { y0 = null; return; }
+    y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; dy = 0; active = false;
+  }, { passive: true });
+  pane.addEventListener("touchmove", (e) => {
+    if (y0 == null) return;
+    const t = e.touches[0], ddy = t.clientY - y0, ddx = t.clientX - x0;
+    if (!active) {
+      if (Math.abs(ddx) > Math.abs(ddy) || ddy < 0) { if (Math.abs(ddx) > 8 || ddy < -4) y0 = null; return; }
+      if (ddy < 6) return;
+      active = true;
+      inner.classList.add("pulling"); inner.classList.remove("settle");
+    }
+    dy = Math.min(110, ddy * 0.55);
+    inner.style.transform = `translateY(${dy}px)`;
+    ptr.style.opacity = String(Math.min(1, dy / 50));
+    ptr.classList.toggle("ready", dy >= 60);
+    text.textContent = dy >= 60 ? "Отпустите, чтобы обновить" : "Потяните, чтобы обновить";
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+  pane.addEventListener("touchend", async () => {
+    if (!active) { y0 = null; return; }
+    const go = dy >= 60;
+    if (!go) return reset();
+    inner.style.transform = "translateY(56px)";
+    ptr.classList.add("busy"); text.textContent = "Обновляю…";
+    await refresh(true);
+    ptr.classList.remove("busy");
+    reset();
+  });
+}
+$$(".pane").forEach(setupPullToRefresh);
 
 /* ---------- шифрование ---------- */
 const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const keyName = () => "aid.key." + (FEED && FEED.crypto ? FEED.crypto.salt : "");
-
 async function decryptRaw(key, blob) {
   return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(blob.iv) }, key, b64(blob.ct)));
 }
@@ -434,7 +959,6 @@ async function unlock(password) {
   const raw = new Uint8Array(await crypto.subtle.exportKey("raw", key));
   store.set(keyName(), btoa(String.fromCharCode(...raw)));
   cryptoKey = key;
-  $("#forget-wrap").hidden = false;
   setTimeout(syncOffline, 300);  // теперь можно найти иллюстрации внутри переводов и сохранить их
   return true;
 }
@@ -478,6 +1002,7 @@ function openReader(id, push) {
     <p class="lead">${esc(it.abstract)}</p>
     ${it.audio ? `<audio controls preload="none" src="${esc(it.audio)}"></audio>` : ""}
     <div id="full"></div>
+    <div class="doc-rate"><p>Как вам этот текст?</p>${rateButtons(it.id)}</div>
     <p class="doc-end">Текст: <a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(s ? s.author : "автор")}, ${esc(s ? s.name : "")}</a>.<span id="engine-line"></span></p>`;
   if (push) history.pushState({ id }, "", "#/p/" + id);
   document.body.classList.add("reading");
@@ -485,16 +1010,21 @@ function openReader(id, push) {
   reader.scrollTop = 0;
   $("#back").focus({ preventScroll: true });
   document.title = it.title_ru + " — Дайджест ИИ";
+  startReading(id);
   renderFull(it);
 }
 
 function closeReader() {
   if (reader.hidden) return;
+  stopReading();
   reader.hidden = true;
+  closeSheet($("#sheet-aa"));
   document.body.classList.remove("reading");
   document.title = "Дайджест ИИ";
   if (lastOpener) lastOpener.focus({ preventScroll: true });
 }
+let progressRaf = 0;
+reader.addEventListener("scroll", () => { cancelAnimationFrame(progressRaf); progressRaf = requestAnimationFrame(trackProgress); }, { passive: true });
 
 const ENGINE_LABEL = { openai: "OpenAI", gemini: "Gemini", claude: "Claude" };
 // «claude-sonnet-5-5» → «Claude Sonnet», «gemini-3.1-pro-preview» → «Gemini Pro», «gpt-6-astra» → «GPT-6 Astra»
@@ -514,7 +1044,7 @@ async function renderFull(it, engine) {
   const box = $("#full");
   const orig = `<a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">Читать оригинал</a>`;
   const notices = {
-    pending: `Полный перевод готовится и появится здесь в течение пары часов. Пока можно ${orig.replace("Читать", "прочитать")}.`,
+    pending: `Полный перевод готовится на сервере и появится здесь в течение пары часов. Пока можно ${orig.replace("Читать", "прочитать")}.`,
     paywalled: `Полный текст доступен только подписчикам автора, поэтому здесь абстракт. ${orig}.`,
     too_long: `Текст очень длинный — около ${readingTime(it.words_en).replace(" чтения", "")} чтения, поэтому здесь только абстракт. ${orig}.`,
     below: `Этот текст отобран в дайджест, но полный перевод для него не делался. ${orig}.`,
@@ -565,7 +1095,7 @@ function renderUnlock(it, box) {
       <label for="pw">Пароль</label>
       <div class="row">
         <input id="pw" type="password" autocomplete="current-password" required>
-        <button type="submit">Открыть</button>
+        <button class="btn" type="submit">Открыть</button>
       </div>
       <p class="err" id="pw-err" role="alert" hidden>Пароль не подошёл. Проверьте раскладку и попробуйте ещё раз.</p>
     </form>`;
@@ -587,9 +1117,224 @@ window.addEventListener("popstate", () => {
   const m = location.hash.match(/^#\/p\/([\w-]+)$/);
   if (m && ITEMS.has(m[1])) openReader(m[1], false); else closeReader();
 });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !reader.hidden) $("#back").click(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const open = $$(".sheet").find((s) => !s.hidden);
+  if (open) closeSheet(open); else if (!reader.hidden) $("#back").click();
+});
+
+/* ---------- листы ---------- */
+let sheetOpener = null;
+function openSheet(sheet) {
+  sheetOpener = document.activeElement;
+  sheet.hidden = false;
+  const first = sheet.querySelector("[data-close]");
+  if (first) first.focus({ preventScroll: true });
+}
+function closeSheet(sheet) {
+  if (!sheet || sheet.hidden) return;
+  sheet.hidden = true;
+  if (sheetOpener && document.contains(sheetOpener)) sheetOpener.focus({ preventScroll: true });
+}
+$$(".sheet").forEach((sh) => {
+  sh.addEventListener("click", (e) => { if (e.target === sh || e.target.closest("[data-close]")) closeSheet(sh); });
+});
+
+/* ---------- оформление текста, как в Apple Books ---------- */
+const THEMES = [
+  ["original", "Оригинал", null], ["quiet", "Тихая", ["#4A4A4D", "#E6E6E6"]], ["paper", "Бумага", ["#F3EEE4", "#2E2A24"]],
+  ["bold", "Жирная", ["#FFFFFF", "#000000"]], ["calm", "Спокойная", ["#EEE2CB", "#3B2F22"]], ["focus", "Фокус", ["#FFFCF4", "#1F1F1F"]],
+];
+const FONTS = [
+  ["onest", "Onest", '"Onest", -apple-system, system-ui, sans-serif', null],
+  ["sf", "San Francisco", '-apple-system, system-ui, sans-serif', null],
+  ["ny", "New York", 'ui-serif, "New York", Georgia, serif', null],
+  ["georgia", "Georgia", "Georgia, serif", "Georgia"],
+  ["palatino", "Palatino", 'Palatino, "Palatino Linotype", serif', "Palatino"],
+  ["iowan", "Iowan Old Style", '"Iowan Old Style", serif', "Iowan Old Style"],
+  ["charter", "Charter", "Charter, serif", "Charter"],
+  ["athelas", "Athelas", "Athelas, serif", "Athelas"],
+  ["avenir", "Avenir Next", '"Avenir Next", Avenir, sans-serif', "Avenir Next"],
+  ["seravek", "Seravek", "Seravek, sans-serif", "Seravek"],
+  ["times", "Times New Roman", '"Times New Roman", Times, serif', "Times New Roman"],
+];
+const LH = [["1.45", "Плотнее"], ["1.65", "Обычный"], ["1.85", "Свободнее"]];
+const MARGINS = [["narrow", "Узкие", "44rem", "1rem"], ["normal", "Обычные", "36rem", "1.25rem"], ["wide", "Широкие", "31rem", "1.875rem"]];
+const SIZE_MIN = 14, SIZE_MAX = 30;
+const RS_DEFAULT = { theme: "original", font: "onest", size: 18, lh: "1.65", margin: "normal", justify: false, bold: false };
+let RS = { ...RS_DEFAULT, ...store.json("aid.reading", {}) };
+
+// есть ли у системного шрифта кириллица: сравниваем ширину русской строки с запасными шрифтами
+function hasCyrillic(name) {
+  const c = document.createElement("canvas").getContext("2d");
+  const sample = "Съешь же ещё этих мягких булок";
+  return ["monospace", "serif"].some((fallback) => {
+    c.font = `20px ${fallback}`; const a = c.measureText(sample).width;
+    c.font = `20px "${name}", ${fallback}`; return c.measureText(sample).width !== a;
+  });
+}
+let availableFonts = null;
+const fontsAvailable = () => (availableFonts ||= FONTS.filter(([, , , probe]) => !probe || hasCyrillic(probe)));
+
+function applyReading() {
+  const r = reader;
+  THEMES.forEach(([id]) => r.classList.toggle("theme-" + id, RS.theme === id && id !== "original"));
+  const font = FONTS.find((f) => f[0] === RS.font) || FONTS[0];
+  const m = MARGINS.find((x) => x[0] === RS.margin) || MARGINS[1];
+  r.style.setProperty("--r-font", font[2]);
+  r.style.setProperty("--r-size", RS.size + "px");
+  r.style.setProperty("--r-lh", RS.lh);
+  r.style.setProperty("--r-measure", m[2]);
+  r.style.setProperty("--r-pad", m[3]);
+  r.classList.toggle("justify", RS.justify);
+  r.classList.toggle("bold-text", RS.bold);
+  store.put("aid.reading", RS);
+  renderAa();
+}
+function renderAa() {
+  $("#size-out").textContent = RS.size + " pt";
+  $("#size-down").disabled = RS.size <= SIZE_MIN;
+  $("#size-up").disabled = RS.size >= SIZE_MAX;
+  $("#themes").innerHTML = THEMES.map(([id, name, colors]) => {
+    const style = colors ? `background:${colors[0]};color:${colors[1]}` : "background:var(--paper);color:var(--ink)";
+    return `<button type="button" data-theme="${id}" aria-pressed="${RS.theme === id}" style="${style}"><b${id === "bold" ? ' style="font-weight:800"' : ""}>Аа</b><span>${name}</span></button>`;
+  }).join("");
+  $("#fonts").innerHTML = fontsAvailable().map(([id, name, css]) =>
+    `<button type="button" data-font="${id}" aria-pressed="${RS.font === id}" style='font-family:${css}'>${esc(name)}</button>`).join("");
+  $("#opt-lh").innerHTML = LH.map(([v, label]) => `<button type="button" data-lh="${v}" aria-pressed="${RS.lh === v}">${label}</button>`).join("");
+  $("#opt-margin").innerHTML = MARGINS.map(([v, label]) => `<button type="button" data-margin="${v}" aria-pressed="${RS.margin === v}">${label}</button>`).join("");
+  $("#opt-justify").setAttribute("aria-checked", String(RS.justify));
+  $("#opt-bold").setAttribute("aria-checked", String(RS.bold));
+}
+$("#sheet-aa").addEventListener("click", (e) => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.id === "size-down") RS.size = Math.max(SIZE_MIN, RS.size - 1);
+  else if (t.id === "size-up") RS.size = Math.min(SIZE_MAX, RS.size + 1);
+  else if (t.dataset.theme) RS.theme = t.dataset.theme;
+  else if (t.dataset.font) RS.font = t.dataset.font;
+  else if (t.dataset.lh) RS.lh = t.dataset.lh;
+  else if (t.dataset.margin) RS.margin = t.dataset.margin;
+  else if (t.id === "opt-justify") RS.justify = !RS.justify;
+  else if (t.id === "opt-bold") RS.bold = !RS.bold;
+  else if (t.id === "aa-reset") RS = { ...RS_DEFAULT };
+  else return;
+  applyReading();
+});
+$("#aa").addEventListener("click", () => { renderAa(); openSheet($("#sheet-aa")); });
+applyReading();
+
+/* ---------- источники: рейтинг, закрепление, история замен ---------- */
+let srcKind = null;
+function sourceStats() {
+  const m = merged(), since = new Date(Date.now() - 56 * 864e5).toISOString();
+  const st = {};
+  const row = (sid) => (st[sid] ||= { shown: 0, opened: 0, finished: 0, likes: 0, dislikes: 0 });
+  for (const it of FEED.items) if (it.published >= since) row(it.source).shown++;
+  for (const [pid, r] of Object.entries(m.reads)) {
+    const sid = r.s || (ITEMS.get(pid) || {}).source;
+    if (!sid || (r.last || r.first || "") < since) continue;
+    if (r.sec >= 15 || r.p >= 0.15) row(sid).opened++;
+    if (r.p >= 0.8) row(sid).finished++;
+  }
+  for (const [pid, r] of Object.entries(m.ratings)) {
+    const sid = r.s || (ITEMS.get(pid) || {}).source;
+    if (!sid || r.at < since) continue;
+    if (r.v > 0) row(sid).likes++; else if (r.v < 0) row(sid).dislikes++;
+  }
+  for (const x of Object.values(st)) x.score = (x.opened + x.finished + 2 * x.likes - 3 * x.dislikes + 1) / (x.shown + 2);
+  return st;
+}
+function renderSources() {
+  const kind = srcKind || current;
+  $$("#src-tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.kind === kind)));
+  const st = sourceStats(), pins = merged().pins;
+  const srcs = [...SOURCES.values()].filter((s) => s.kind === kind && s.active !== false)
+    .sort((a, b) => ((st[b.id] || {}).score ?? 0) - ((st[a.id] || {}).score ?? 0));
+  const max = Math.max(1, ...srcs.map((s) => (st[s.id] || {}).score || 0));
+  $("#src-explain").textContent = `Раз в неделю сервер ищет более сильный источник для раздела «${KIND_RU[kind]}» и, если находит, ` +
+    "заменяет им последний в рейтинге. Рейтинг считается по тому, что вы открываете, дочитываете и как оцениваете. " +
+    "Закреплённые источники и добавленные меньше трёх недель назад не убираются.";
+  $("#ranking").innerHTML = srcs.map((s, i) => {
+    const x = st[s.id] || { shown: 0, opened: 0, finished: 0, likes: 0, dislikes: 0, score: 0 };
+    const pinned = !!(pins[s.id] && pins[s.id].v);
+    return `<li><span class="place">${i + 1}</span>${tile(s, "sm")}
+      <div class="who"><b><a href="${esc(s.site)}" target="_blank" rel="noopener noreferrer">${esc(s.name)}</a></b>
+        <small>Показано ${x.shown}, открыто ${x.opened}, дочитано ${x.finished}, интересно ${x.likes}, мимо ${x.dislikes}</small>
+        <div class="bar" aria-hidden="true"><i style="width:${Math.round(100 * (x.score || 0) / max)}%"></i></div></div>
+      <button type="button" class="pin" data-pin="${esc(s.id)}" aria-pressed="${pinned}">${pinned ? "Закреплён" : "Закрепить"}</button></li>`;
+  }).join("") || `<li class="empty">В этом разделе пока нет источников.</li>`;
+  const cands = (FEED.source_candidates || []).filter((c) => c.kind === kind);
+  $("#cand-h").hidden = !cands.length;
+  $("#candidates").innerHTML = cands.map((c) =>
+    `<li><b><a href="${esc(c.site)}" target="_blank" rel="noopener noreferrer">${esc(c.name)}</a></b>, ${Number(c.total).toFixed(1)} из 10<br><span class="why">${esc(c.verdict)}</span></li>`).join("");
+  const KIND_EVENT = { added: "Добавлен", removed: "Убран", restored: "Возвращён", suggested: "Предложен" };
+  const hist = (FEED.source_history || []).filter((h) => (SOURCES.get(h.id) || {}).kind === kind || h.kind === "suggested").slice().reverse();
+  $("#history").innerHTML = hist.map((h) => {
+    const s = SOURCES.get(h.id);
+    const canRestore = h.kind === "removed" && !(s && s.active !== false) && !mine.restore[h.id];
+    return `<li><span class="when">${fmtDate(h.at)}</span><br><b>${KIND_EVENT[h.kind] || h.kind}: ${esc(h.name)}</b><br><span class="why">${esc(h.why)}</span>
+      ${canRestore ? `<br><button type="button" class="linkbtn" data-restore="${esc(h.id)}">Вернуть</button>` : ""}
+      ${h.kind === "removed" && mine.restore[h.id] ? "<br><span class=\"why\">Вернётся после ближайшего обновления на сервере.</span>" : ""}</li>`;
+  }).join("") || `<li>Замен пока не было. Первый пересмотр источников — в течение недели после запуска.</li>`;
+}
+$("#open-sources").addEventListener("click", () => { srcKind = current; renderSources(); openSheet($("#sheet-sources")); });
+$("#src-tabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-kind]"); if (b) { srcKind = b.dataset.kind; renderSources(); } });
+$("#sheet-sources").addEventListener("click", (e) => {
+  const pin = e.target.closest("button[data-pin]");
+  if (pin) {
+    const sid = pin.dataset.pin, on = !(merged().pins[sid] || {}).v;
+    mine.pins[sid] = { v: on, at: nowIso() };
+    saveMine(); renderSources();
+    toast(on ? "Источник закреплён и не будет заменён" : "Закрепление снято");
+  }
+  const back = e.target.closest("button[data-restore]");
+  if (back) {
+    mine.restore[back.dataset.restore] = nowIso();
+    saveMine(); renderSources();
+    toast(sync.token ? "Источник вернётся после ближайшего обновления" : "Чтобы сервер узнал о просьбе, включите синхронизацию в настройках");
+  }
+});
+
+/* ---------- настройки ---------- */
+function renderSyncStatus() {
+  const el = $("#sync-status");
+  if (!el) return;
+  $("#sync-off").hidden = !sync.token;
+  if (!sync.token) { el.textContent = "Синхронизация выключена: оценки остаются только на этом устройстве."; return; }
+  el.textContent = sync.error
+    ? `Не получилось: ${sync.error}. Проверьте токен и имя репозитория.`
+    : sync.last ? `Синхронизировано ${fmtDate(sync.last, true)}. Устройств: ${others.length + 1}.` : "Токен сохранён, синхронизирую…";
+}
+function renderSettings() {
+  $("#gh-token").value = sync.token;
+  $("#gh-repo").value = sync.repo;
+  $("#refresh-info").textContent = `Приложение обновляет ленту само раз в час и когда вы к нему возвращаетесь, а также если потянуть ленту вниз.` +
+    (lastFetch ? ` Последняя проверка: ${fmtDate(new Date(lastFetch).toISOString(), true)}.` : "");
+  $("#pw-state").textContent = store.get(keyName()) ? "Пароль сохранён на этом устройстве." : "Пароль ещё не вводился на этом устройстве.";
+  $("#forget").hidden = !store.get(keyName());
+  renderSyncStatus();
+}
+$("#open-settings").addEventListener("click", () => { renderSettings(); openSheet($("#sheet-settings")); });
+$("#refresh-now").addEventListener("click", async () => { await refresh(true); renderSettings(); });
+$("#sync-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  sync.token = $("#gh-token").value.trim();
+  sync.repo = $("#gh-repo").value.trim() || "VBalik/AIBot-feedback";
+  sync.sha = null; sync.error = ""; sync.last = "";
+  store.set("aid.gh.token", sync.token); store.set("aid.gh.repo", sync.repo);
+  renderSyncStatus();
+  if (!sync.token) return;
+  await pushMine();
+  if (!sync.error) await pullOthers();
+  renderAll(true);
+  renderSyncStatus();
+});
+$("#sync-off").addEventListener("click", () => {
+  sync.token = ""; store.del("aid.gh.token"); renderSettings();
+});
 $("#forget").addEventListener("click", () => {
-  store.del(keyName()); cryptoKey = null; $("#forget-wrap").hidden = true;
+  store.del(keyName()); cryptoKey = null; renderSettings();
 });
 
 /* ---------- чтение без сети ---------- */
@@ -599,16 +1344,16 @@ let syncing = false, resync = false;
 function renderOfflineStatus() {
   const el = $("#offline-status");
   if (!navigator.onLine) {
-    el.className = "offline-status off";
+    el.className = "off";
     el.textContent = FEED ? "Нет сети — показана сохранённая версия." : "Нет сети.";
     return;
   }
-  el.className = "offline-status";
+  el.className = "";
   const t = offlineInfo.translations, i = offlineInfo.imagesSaved ?? offlineInfo.images;
   if (!t) { el.textContent = ""; return; }
-  let text = `Без сети доступно: ${t} ${plural(t, "перевод", "перевода", "переводов")}`;
+  let text = `Без сети: ${t} ${plural(t, "перевод", "перевода", "переводов")}`;
   if (i) text += ` и ${i} ${plural(i, "иллюстрация", "иллюстрации", "иллюстраций")}`;
-  else if (!cryptoKey) text += " (иллюстрации сохранятся после ввода пароля)";
+  else if (!cryptoKey) text += " (иллюстрации — после ввода пароля)";
   el.textContent = text + ".";
 }
 
@@ -626,6 +1371,7 @@ async function syncOffline() {
     }
     const sw = navigator.serviceWorker.controller;
     if (!sw) return;
+    if (!cryptoKey) cryptoKey = await savedKey();
     // при первом визите лента загрузилась ещё до SW — запросим её снова, чтобы она попала в кэш
     try { await fetch(DATA_BASE + "feed.json?v=" + Math.floor(Date.now() / 60000), { cache: "no-store" }); } catch {}
     const files = [];
@@ -664,9 +1410,11 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
   });
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
 }
-window.addEventListener("online", () => { renderOfflineStatus(); syncOffline(); });
+window.addEventListener("online", () => { renderOfflineStatus(); refresh(false); flushSync(); });
 window.addEventListener("offline", renderOfflineStatus);
+window.addEventListener("pagehide", () => { pauseReading(); store.put("aid.fb", mine); flushSync(); });
 
+markTab(current);
 load();
 </script>
 </body>
