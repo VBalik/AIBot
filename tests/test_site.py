@@ -159,6 +159,9 @@ with sync_playwright() as p:
     assert page.get_attribute(f"{up} svg", "viewBox") == "0 3 24 26" and page.get_attribute(f"{down} svg", "viewBox") == "0 -5 24 26"
     su, sd = page.locator(f"{up} svg").bounding_box(), page.locator(f"{down} svg").bounding_box()
     assert abs(su["y"] - sd["y"]) < 0.5 and abs(su["height"] - sd["height"]) < 0.5, (su, sd)
+    # рядом и по левому краю текста абстракта
+    ab = page.locator(f'.entry[data-id="{ia}"] .entry-abstract').bounding_box()
+    assert abs(sd["x"] - ab["x"]) < 1.5 and su["x"] - (sd["x"] + sd["width"]) < 14, (sd, su, ab)
     page.click(up)
     assert page.get_attribute(up, "aria-pressed") == "true"
     fb = page.evaluate("JSON.parse(localStorage.getItem('aid.fb'))")
