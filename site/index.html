@@ -165,22 +165,25 @@ button { font: inherit; color: inherit; }
 .empty { padding: 2rem 0; color: var(--ink-2); font: 400 1.0625rem/1.6 var(--sans); }
 
 /* оценки */
-.rate { display: flex; justify-content: flex-end; gap: .75rem; margin: .5rem 0 0 3.25rem; }
+.rate { display: flex; justify-content: flex-end; align-items: center; gap: .5rem; margin: .25rem -.5rem 0 3.25rem; }
 .rate button {
   all: unset; cursor: pointer; display: inline-grid; place-items: center;
-  width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1px solid var(--rule); color: var(--ink-2);
+  width: 2.75rem; height: 2.75rem; border-radius: .5rem; color: var(--ink-2);
 }
-.rate svg { width: 1.25rem; height: 1.25rem; }
-.rate .up[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.rate .down[aria-pressed="true"] { background: var(--down); border-color: var(--down); color: #fff; }
-.rate button[aria-pressed="true"] svg path { fill: currentColor; }
+/* у обоих пальцев рукав в центре рамки — рукава стоят на одной горизонтали */
+.rate svg { width: 1.5rem; height: 1.625rem; }
+.rate .up[aria-pressed="true"] { color: var(--accent); }
+.rate .down[aria-pressed="true"] { color: var(--down); }
+.rate button[aria-pressed="true"] svg path { fill: currentColor; fill-opacity: .18; stroke-width: 2; }
 .rate button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- читалка ---------- */
-.reader {
+.reader, .aa-sample {
   --r-bg: var(--paper); --r-ink: var(--ink); --r-ink-2: var(--ink-2); --r-rule: var(--rule);
   --r-accent: var(--accent); --r-surface: var(--surface);
   --r-font: var(--sans); --r-size: 18px; --r-lh: 1.65; --r-weight: 400; --r-measure: 36rem; --r-pad: 1.25rem;
+}
+.reader {
   position: fixed; inset: 0; z-index: 10; background: var(--r-bg); color: var(--r-ink);
   overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
@@ -190,12 +193,12 @@ button { font: inherit; color: inherit; }
 @keyframes slide-in { from { transform: translateX(14%); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .reader, .sheet-card { animation: none !important; } .pane-inner.settle { transition: none; } }
 
-.reader.theme-quiet { --r-bg: #4A4A4D; --r-ink: #E6E6E6; --r-ink-2: #B8B8BC; --r-rule: #5E5E62; --r-accent: #9FD6D1; --r-surface: #56565A; }
-.reader.theme-paper { --r-bg: #F3EEE4; --r-ink: #2E2A24; --r-ink-2: #6B6256; --r-rule: #DDD3C2; --r-accent: #0F6B68; --r-surface: #FBF8F2; }
-.reader.theme-bold  { --r-bg: #FFFFFF; --r-ink: #000000; --r-ink-2: #3A3A3C; --r-rule: #D1D1D6; --r-accent: #0A5C59; --r-surface: #F2F2F7; }
-.reader.theme-calm  { --r-bg: #EEE2CB; --r-ink: #3B2F22; --r-ink-2: #6E5C47; --r-rule: #D9C9AC; --r-accent: #6A4A1E; --r-surface: #F5ECDC; }
-.reader.theme-focus { --r-bg: #FFFCF4; --r-ink: #1F1F1F; --r-ink-2: #5A5A5A; --r-rule: #E6E0D2; --r-accent: #0F6B68; --r-surface: #FFFFFF; }
-.reader.theme-bold, .reader.bold-text { --r-weight: 550; }
+.theme-quiet { --r-bg: #4A4A4D; --r-ink: #E6E6E6; --r-ink-2: #B8B8BC; --r-rule: #5E5E62; --r-accent: #9FD6D1; --r-surface: #56565A; }
+.theme-paper { --r-bg: #F3EEE4; --r-ink: #2E2A24; --r-ink-2: #6B6256; --r-rule: #DDD3C2; --r-accent: #0F6B68; --r-surface: #FBF8F2; }
+.theme-bold  { --r-bg: #FFFFFF; --r-ink: #000000; --r-ink-2: #3A3A3C; --r-rule: #D1D1D6; --r-accent: #0A5C59; --r-surface: #F2F2F7; }
+.theme-calm  { --r-bg: #EEE2CB; --r-ink: #3B2F22; --r-ink-2: #6E5C47; --r-rule: #D9C9AC; --r-accent: #6A4A1E; --r-surface: #F5ECDC; }
+.theme-focus { --r-bg: #FFFCF4; --r-ink: #1F1F1F; --r-ink-2: #5A5A5A; --r-rule: #E6E0D2; --r-accent: #0F6B68; --r-surface: #FFFFFF; }
+.theme-bold, .bold-text { --r-weight: 550; }
 
 .reader-bar {
   position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 1rem;
@@ -207,7 +210,13 @@ button { font: inherit; color: inherit; }
 }
 .reader-bar #back { margin-right: auto; }
 .reader-bar #back::before { content: "‹"; font-size: 1.5rem; line-height: 0; vertical-align: -.12em; margin-right: .35rem; }
-.reader-bar #aa { font: 600 1.0625rem/1 var(--sans); padding: .5rem .25rem; letter-spacing: -.01em; }
+.reader-bar #aa {
+  font: 600 1rem/1 var(--sans); letter-spacing: -.01em; padding: .5rem .875rem; border-radius: 1rem;
+  background: var(--r-surface); color: var(--r-ink); border: 1px solid var(--r-rule);
+}
+.aa-sample { border-radius: .75rem; padding: 1rem 1.125rem; margin: 0 0 1rem; border: 1px solid rgb(0 0 0 / .1);
+  background: var(--r-bg); color: var(--r-ink); font: var(--r-weight) var(--r-size)/var(--r-lh) var(--r-font); }
+.aa-sample { hyphens: auto; -webkit-hyphens: auto; }
 .reader-bar :focus-visible { outline: 2px solid var(--r-accent); outline-offset: 2px; }
 
 .doc { max-width: var(--r-measure); margin: 0 auto; padding: 1.75rem var(--r-pad) 5rem; }
@@ -222,7 +231,7 @@ button { font: inherit; color: inherit; }
 .doc audio { width: 100%; margin: 0 0 2rem; }
 
 .prose { font: var(--r-weight) var(--r-size)/var(--r-lh) var(--r-font); hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
-.reader.justify .prose, .reader.justify .lead { text-align: justify; }
+.reader.justify .prose, .reader.justify .lead, .aa-sample.justify { text-align: justify; }
 .prose > * { margin: 0 0 1.1em; }
 .prose h1, .prose h2, .prose h3, .prose h4 { line-height: 1.25; letter-spacing: -.01em; margin: 1.8em 0 .6em; hyphens: manual; text-align: left; }
 .prose h1, .prose h2 { font-size: 1.22em; font-weight: 700; }
@@ -269,9 +278,10 @@ button { font: inherit; color: inherit; }
 .doc-rate { margin-top: 2rem; padding: 1.25rem; background: var(--r-surface); border-radius: .75rem; text-align: center; }
 .doc-rate p { margin: 0 0 .75rem; font-weight: 600; color: var(--r-ink); }
 .doc-rate .rate { justify-content: center; margin: 0; }
-.doc-rate .rate { gap: 1.5rem; }
-.doc-rate .rate button { width: 3.25rem; height: 3.25rem; border-color: var(--r-rule); color: var(--r-ink-2); }
-.doc-rate .rate svg { width: 1.5rem; height: 1.5rem; }
+.doc-rate .rate { gap: 2rem; }
+.doc-rate .rate button { width: 3.25rem; height: 3.25rem; color: var(--r-ink-2); }
+.doc-rate .rate .up[aria-pressed="true"] { color: var(--r-accent); }
+.doc-rate .rate svg { width: 1.875rem; height: 2.03rem; }
 
 .engines { display: inline-flex; gap: .25rem; padding: .25rem; margin: 0 0 .5rem; background: var(--r-surface); border-radius: .5rem; }
 .engines button {
@@ -404,7 +414,7 @@ button { font: inherit; color: inherit; }
 <div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="doc-title" hidden>
   <div class="reader-bar">
     <button type="button" id="back">Назад</button>
-    <button type="button" id="aa" aria-label="Оформление текста">Аа</button>
+    <button type="button" id="aa" aria-label="Оформление текста: фон, шрифт, размер">Аа</button>
     <a id="orig" href="#" target="_blank" rel="noopener noreferrer">Оригинал</a>
   </div>
   <article class="doc" id="doc"></article>
@@ -413,7 +423,8 @@ button { font: inherit; color: inherit; }
 <!-- Оформление текста, как в Apple Books -->
 <div class="sheet" id="sheet-aa" role="dialog" aria-modal="true" aria-labelledby="aa-title" hidden>
   <div class="sheet-card">
-    <div class="sheet-head"><h2 id="aa-title">Оформление</h2><button type="button" data-close>Готово</button></div>
+    <div class="sheet-head"><h2 id="aa-title">Оформление текста</h2><button type="button" data-close>Готово</button></div>
+    <p class="aa-sample" id="aa-sample">Крупные языковые модели заметно продвинулись в долгих задачах: агент часами работает над кодом и сам проверяет результат.</p>
     <div class="sizes" role="group" aria-label="Размер шрифта">
       <button type="button" id="size-down" aria-label="Мельче">A</button>
       <output id="size-out"></output>
@@ -460,6 +471,9 @@ button { font: inherit; color: inherit; }
 <div class="sheet full" id="sheet-settings" role="dialog" aria-modal="true" aria-labelledby="set-title" hidden>
   <div class="sheet-card">
     <div class="sheet-head"><h2 id="set-title">Настройки</h2><button type="button" data-close>Готово</button></div>
+    <h3>Оформление текста</h3>
+    <p class="hint">Фон, шрифт, размер, интервал и поля — как в Apple Books. Эти же настройки открываются кнопкой «Аа» вверху любой статьи.</p>
+    <p><button type="button" class="btn ghost" id="open-aa">Аа  Фон и шрифт</button></p>
     <h3>Обновление</h3>
     <p class="hint" id="refresh-info"></p>
     <p><button type="button" class="btn ghost" id="refresh-now">Обновить сейчас</button></p>
@@ -479,6 +493,7 @@ button { font: inherit; color: inherit; }
     <p class="hint" id="pw-state"></p>
     <p><button type="button" class="linkbtn" id="forget">Забыть пароль на этом устройстве</button></p>
     <h3>О дайджесте</h3>
+    <p class="hint" id="app-version"></p>
     <p class="hint">Абстракты и переводы сделаны ИИ, модель указана в конце каждого перевода. Тексты принадлежат авторам,
       у каждого есть ссылка на оригинал. Сервер обновляет ленту каждый час и сам переводит новые тексты.</p>
   </div>
@@ -494,6 +509,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
+const APP_VERSION = "2026-11-18.4";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -594,8 +610,10 @@ function rate(pid, v) {
 }
 function rateButtons(pid) {
   const v = ratingOf(pid);
-  const thumb = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3m0 10V11m0 10h9.3a2 2 0 0 0 2-1.6l1.4-7A2 2 0 0 0 17.7 10H14V5.5A2.5 2.5 0 0 0 11.5 3L7 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
-  const down = thumb.replace("<svg ", '<svg style="transform: scaleY(-1)" ');
+  // рукав (x 3–7, y 11–21) — центр в (5, 16); рамки подобраны так, чтобы центр рукава был по центру у обоих пальцев
+  const hand = '<path d="M7 21H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3m0 10V11m0 10h9.3a2 2 0 0 0 2-1.6l1.4-7A2 2 0 0 0 17.7 10H14V5.5A2.5 2.5 0 0 0 11.5 3L7 11z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>';
+  const thumb = `<svg viewBox="0 3 24 26" aria-hidden="true">${hand}</svg>`;
+  const down = `<svg viewBox="0 -5 24 26" aria-hidden="true"><g transform="matrix(1 0 0 -1 0 24)">${hand}</g></svg>`;
   // палец вниз слева, вверх справа; без подписей
   return `<div class="rate" role="group" aria-label="Оценка" data-rate="${esc(pid)}">
     <button type="button" class="down" data-v="-1" aria-pressed="${v === -1}" aria-label="Не интересно">${down}</button>
@@ -767,6 +785,7 @@ async function refresh(manual) {
       const added = FEED.items.filter((it) => !before.has(it.id));
       added.forEach((it) => freshIds.add(it.id));
       renderAll(true);
+      checkAppUpdate();
       if (manual || added.length) toast(added.length ? `${added.length} ${plural(added.length, "новый текст", "новых текста", "новых текстов")}` : "Новых текстов нет");
       syncOffline();
       pullOthers().then(() => renderAll(true));
@@ -780,6 +799,20 @@ async function refresh(manual) {
   return refreshing;
 }
 setInterval(() => { if (!document.hidden) refresh(false); }, HOUR);
+
+// новая версия страницы: перезагрузиться, если статья не открыта (иначе — при закрытии)
+let updatePending = false;
+async function checkAppUpdate() {
+  if (location.protocol === "file:" || !navigator.onLine) return;
+  try {
+    const r = await fetch("index.html", { cache: "no-store" });
+    const m = (await r.text()).match(/const APP_VERSION = "([^"]+)"/);
+    if (m && m[1] !== APP_VERSION) {
+      updatePending = true;
+      if (reader.hidden && $$(".sheet").every((sh) => sh.hidden)) location.reload();
+    }
+  } catch {}
+}
 
 function showEmptyAll(text) {
   $$(".entries").forEach((ol) => (ol.innerHTML = `<li class="empty">${esc(text)}</li>`));
@@ -1014,10 +1047,15 @@ function openReader(id, push) {
   document.title = it.title_ru + " — Дайджест ИИ";
   startReading(id);
   renderFull(it);
+  if (!store.get("aid.hint.aa")) {
+    store.set("aid.hint.aa", "1");
+    setTimeout(() => toast("Фон, шрифт и размер — кнопка «Аа» вверху"), 600);
+  }
 }
 
 function closeReader() {
   if (reader.hidden) return;
+  if (updatePending) { stopReading(); location.reload(); return; }
   stopReading();
   reader.hidden = true;
   closeSheet($("#sheet-aa"));
@@ -1179,17 +1217,18 @@ let availableFonts = null;
 const fontsAvailable = () => (availableFonts ||= FONTS.filter(([, , , probe]) => !probe || hasCyrillic(probe)));
 
 function applyReading() {
-  const r = reader;
-  THEMES.forEach(([id]) => r.classList.toggle("theme-" + id, RS.theme === id && id !== "original"));
   const font = FONTS.find((f) => f[0] === RS.font) || FONTS[0];
   const m = MARGINS.find((x) => x[0] === RS.margin) || MARGINS[1];
-  r.style.setProperty("--r-font", font[2]);
-  r.style.setProperty("--r-size", RS.size + "px");
-  r.style.setProperty("--r-lh", RS.lh);
-  r.style.setProperty("--r-measure", m[2]);
-  r.style.setProperty("--r-pad", m[3]);
-  r.classList.toggle("justify", RS.justify);
-  r.classList.toggle("bold-text", RS.bold);
+  for (const r of [reader, $("#aa-sample")]) {  // читалка и образец текста в листе «Аа»
+    THEMES.forEach(([id]) => r.classList.toggle("theme-" + id, RS.theme === id && id !== "original"));
+    r.style.setProperty("--r-font", font[2]);
+    r.style.setProperty("--r-size", RS.size + "px");
+    r.style.setProperty("--r-lh", RS.lh);
+    r.style.setProperty("--r-measure", m[2]);
+    r.style.setProperty("--r-pad", m[3]);
+    r.classList.toggle("justify", RS.justify);
+    r.classList.toggle("bold-text", RS.bold);
+  }
   store.put("aid.reading", RS);
   renderAa();
 }
@@ -1224,6 +1263,7 @@ $("#sheet-aa").addEventListener("click", (e) => {
   applyReading();
 });
 $("#aa").addEventListener("click", () => { renderAa(); openSheet($("#sheet-aa")); });
+$("#open-aa").addEventListener("click", () => { closeSheet($("#sheet-settings")); renderAa(); openSheet($("#sheet-aa")); });
 applyReading();
 
 /* ---------- источники: рейтинг, закрепление, история замен ---------- */
@@ -1313,6 +1353,7 @@ function renderSettings() {
   $("#gh-repo").value = sync.repo;
   $("#refresh-info").textContent = `Приложение обновляет ленту само раз в час и когда вы к нему возвращаетесь, а также если потянуть ленту вниз.` +
     (lastFetch ? ` Последняя проверка: ${fmtDate(new Date(lastFetch).toISOString(), true)}.` : "");
+  $("#app-version").textContent = `Версия приложения: ${APP_VERSION}.`;
   $("#pw-state").textContent = store.get(keyName()) ? "Пароль сохранён на этом устройстве." : "Пароль ещё не вводился на этом устройстве.";
   $("#forget").hidden = !store.get(keyName());
   renderSyncStatus();

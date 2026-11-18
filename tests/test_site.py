@@ -144,6 +144,11 @@ with sync_playwright() as p:
     down = f'.entry[data-id="{ia}"] .rate .down'
     bu, bd = page.locator(up).bounding_box(), page.locator(down).bounding_box()
     assert bd["x"] < bu["x"] and page.inner_text(up).strip() == "" and page.inner_text(down).strip() == "", (bd, bu)
+    assert page.evaluate(f"getComputedStyle(document.querySelector('{up}')).borderTopWidth") == "0px"  # без кружков
+    # рукава на одной горизонтали: центр рукава (y=16 у «вверх», y=8 у «вниз») совпадает с центром рамки
+    assert page.get_attribute(f"{up} svg", "viewBox") == "0 3 24 26" and page.get_attribute(f"{down} svg", "viewBox") == "0 -5 24 26"
+    su, sd = page.locator(f"{up} svg").bounding_box(), page.locator(f"{down} svg").bounding_box()
+    assert abs(su["y"] - sd["y"]) < 0.5 and abs(su["height"] - sd["height"]) < 0.5, (su, sd)
     page.click(up)
     assert page.get_attribute(up, "aria-pressed") == "true"
     fb = page.evaluate("JSON.parse(localStorage.getItem('aid.fb'))")
@@ -243,6 +248,17 @@ with sync_playwright() as p:
     page.go_back()
     page.wait_for_selector("#reader", state="hidden")
 
+    # «Аа» открывается и из настроек; образец текста показывает выбранную тему
+    page.click("#open-settings")
+    page.click("#open-aa")
+    page.wait_for_selector("#sheet-aa:not([hidden])")
+    assert page.is_hidden("#sheet-settings")
+    page.click('#themes button[data-theme="calm"]')
+    assert page.evaluate("getComputedStyle(document.getElementById('aa-sample')).backgroundColor") == "rgb(238, 226, 203)"
+    page.screenshot(path=str(OUT / "3f-aa-from-settings.png"))
+    page.click('#themes button[data-theme="original"]')
+    page.click("#sheet-aa [data-close]")
+
     # источники: рейтинг раздела, закрепление, история и «вернуть»
     page.click("#open-sources")
     page.wait_for_selector("#sheet-sources:not([hidden])")
@@ -265,6 +281,7 @@ with sync_playwright() as p:
     # синхронизация оценок через GitHub: свой файл уходит, оценка с iPad приходит
     page.click("#open-settings")
     page.wait_for_selector("#sheet-settings:not([hidden])")
+    assert "Версия приложения" in page.inner_text("#app-version")
     page.fill("#gh-token", "test-token")
     page.click("#sync-form button[type=submit]")
     page.wait_for_function("document.getElementById('sync-status').textContent.includes('Устройств: 2')", timeout=10000)
