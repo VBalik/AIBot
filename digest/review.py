@@ -271,8 +271,12 @@ def weekly_review(cfg, data, fb: fbmod.Feedback, llm, fetch, complete=None, auto
         log.info("Пересмотр: %s [%s] %.2f — %s", cand["id"], cand["kind"], verdict["total"], verdict["verdict_ru"])
 
     results.sort(key=lambda x: x[0], reverse=True)
-    book.data["candidates"] = [{"id": c["id"], "kind": c["kind"], "name": v.get("name") or c["name"], "site": c["site"],
-                                "total": t, "verdict": v["verdict_ru"]} for t, c, v in results[:8]]
+    # кандидаты: свежие оценки плюс прежние (если кандидат ещё не источник), лучшие по оценке
+    fresh = [{"id": c["id"], "kind": c["kind"], "name": v.get("name") or c["name"], "site": c["site"],
+              "total": t, "verdict": v["verdict_ru"], "at": _iso(now)} for t, c, v in results]
+    seen = {c["id"] for c in fresh}
+    keep = [c for c in book.data.get("candidates", []) if c["id"] not in seen and c["id"] not in book.ids()]
+    book.data["candidates"] = sorted(fresh + keep, key=lambda c: c["total"], reverse=True)[:10]
 
     stats = fbmod.source_stats(fb, data.state.get("posts", {}), data.items, now=now)
     pinned = fb.pinned()

@@ -853,7 +853,7 @@ class DataDir:
             # последние замены источников — приложение показывает их на экране источников
             "source_history": self.sources.data["history"][-12:],
             "last_review": self.sources.data.get("last_review"),
-            "source_candidates": self.sources.data.get("candidates", [])[:6],
+            "source_candidates": self.sources.data.get("candidates", [])[:10],
             "crypto": self.crypto,
             "items": items,
         }
