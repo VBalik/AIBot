@@ -240,10 +240,14 @@ def weekly_review(cfg, data, fb: fbmod.Feedback, llm, fetch, complete=None, auto
 
     liked, disliked = taste(fb, data)
     results = []
-    budget = cfg.review_max_candidates
+    # бюджет оценок моделью делится поровну между разделами (найденные по ссылкам блоги — в аналитику)
+    budget = {"news": cfg.review_max_candidates // 2, "analysis": cfg.review_max_candidates - cfg.review_max_candidates // 2}
     for cand in pool:
-        if budget <= 0:
-            break
+        slot = cand.get("kind") or "analysis"
+        if budget[slot] <= 0:
+            if all(v <= 0 for v in budget.values()):
+                break
+            continue
         try:
             posts = fetch(cand)
         except Exception as exc:  # noqa: BLE001
@@ -255,7 +259,7 @@ def weekly_review(cfg, data, fb: fbmod.Feedback, llm, fetch, complete=None, auto
         if not ok:
             log.info("Пересмотр: %s отсеян — %s", cand["id"], why)
             continue
-        budget -= 1
+        budget[slot] -= 1
         try:
             verdict = judge(cfg, llm, cand, posts, book, liked, disliked)
         except Exception as exc:  # noqa: BLE001
