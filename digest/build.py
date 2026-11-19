@@ -849,6 +849,7 @@ class DataDir:
         feed = {
             "version": 1,
             "updated_at": max((it["added"] for it in items), default=None),
+            "built_at": _iso(_now()),  # когда сервер последний раз проверял источники
             "sources": self.sources.public({it["source"] for it in items}),
             # последние замены источников — приложение показывает их на экране источников
             "source_history": self.sources.data["history"][-12:],

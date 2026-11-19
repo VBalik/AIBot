@@ -113,6 +113,7 @@ with sync_playwright() as p:
     assert page.get_attribute("#tab-news", "aria-selected") == "true"  # слева новости — с них и начинаем
     assert page.evaluate("document.getElementById('pager').scrollLeft") == 0
     assert page.inner_text("#tab-news .cnt") == "1" and page.inner_text("#tab-analysis .cnt") == "3"
+    assert page.inner_text("#updated").startswith("Сервер проверял источники")
     page.wait_for_function(FONT_LOADED, timeout=10000)  # свой шрифт загрузился и используется
     for sel in (".brand", ".entry-abstract", ".entry-title"):
         fam = page.evaluate(f"getComputedStyle(document.querySelector({sel!r})).fontFamily")
@@ -234,16 +235,24 @@ with sync_playwright() as p:
     page.wait_for_selector("#sheet-aa", state="hidden")
     page.evaluate("document.getElementById('reader').scrollTop = 0")
     page.screenshot(path=str(OUT / "3d-reader-paper.png"))
+    # тема и шрифт действуют на весь дайджест, а не только на статью
+    assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(243, 238, 228)"
+    ab_style = page.evaluate("(() => { const s = getComputedStyle(document.querySelector('.entry-abstract')); return [s.fontFamily, s.fontSize, s.fontWeight, s.textAlign]; })()")
+    assert "ui-serif" in ab_style[0] and abs(float(ab_style[1][:-2]) - 17 * 20 / 18) < 0.2 and int(ab_style[2]) >= 500 and ab_style[3] == "justify", ab_style
+    assert page.evaluate("document.querySelector('meta[name=theme-color]').content") == "#F3EEE4"
     saved = page.evaluate("JSON.parse(localStorage.getItem('aid.reading'))")
     assert saved == {"theme": "paper", "font": "ny", "size": 20, "lh": "1.85", "margin": "wide", "justify": True, "bold": True}, saved
     page.click("#aa")
     page.click('#themes button[data-theme="quiet"]')
     page.click("#sheet-aa [data-close]")
     page.screenshot(path=str(OUT / "3e-reader-quiet.png"))
+    assert page.evaluate("getComputedStyle(document.querySelector('.topbar')).backgroundColor") == "rgb(74, 74, 77)"  # «Тихая» — и шапка
     page.click("#aa")
     page.click("#aa-reset")
     page.click("#sheet-aa [data-close]")
     assert page.evaluate("JSON.parse(localStorage.getItem('aid.reading')).theme") == "original"
+    assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(241, 244, 243)"
+    assert page.evaluate("getComputedStyle(document.querySelector('.entry-abstract')).fontSize") == "17px"
 
     # учёт чтения: долистал до конца — текст дочитан
     page.evaluate("const r = document.getElementById('reader'); r.scrollTop = r.scrollHeight; r.dispatchEvent(new Event('scroll'))")
@@ -273,6 +282,8 @@ with sync_playwright() as p:
     assert page.is_hidden("#sheet-settings")
     page.click('#themes button[data-theme="calm"]')
     assert page.evaluate("getComputedStyle(document.getElementById('aa-sample')).backgroundColor") == "rgb(238, 226, 203)"
+    assert page.evaluate("getComputedStyle(document.querySelector('.pane')).backgroundColor") in ("rgba(0, 0, 0, 0)", "rgb(238, 226, 203)")
+    assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(238, 226, 203)"  # фон ленты сменился
     page.screenshot(path=str(OUT / "3f-aa-from-settings.png"))
     page.click('#themes button[data-theme="original"]')
     page.click("#sheet-aa [data-close]")

@@ -4,10 +4,15 @@
 [build]
   publish = "site"
   command = ""
-  # Каждый production-деплой стоит 15 кредитов Netlify. Пересобираем сайт только при изменениях в site/:
-  # правки сборщика, тестов и документации деплой не запускают (git diff --quiet = 0 → сборка пропускается).
-  # Если нужно задеплоить вручную: в Netlify Deploys → Trigger deploy.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- site/"
+  # Каждый production-деплой стоит 15 кредитов Netlify. Пересобираем сайт только при изменениях в site/,
+  # netlify/ (функции) и этом файле: правки сборщика, тестов и документации деплой не запускают
+  # (git diff --quiet = 0 → сборка пропускается). Ручной Deploys → Trigger deploy того же коммита
+  # (CACHED_COMMIT_REF = COMMIT_REF) проходит всегда — нужен, например, после изменения переменных окружения.
+  ignore = "[ \"$CACHED_COMMIT_REF\" = \"$COMMIT_REF\" ] && exit 1; git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- site/ netlify/ netlify.toml"
+
+# Ежечасный запуск сборщика (netlify/functions/hourly-update.mjs) — замена ненадёжному расписанию GitHub
+[functions]
+  directory = "netlify/functions"
 
 [[headers]]
   for = "/*"
