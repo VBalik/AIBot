@@ -66,7 +66,7 @@ Netlify — site/index.html (публикуется только при изме
    - На github.com/new создайте репозиторий `AIBot-feedback`: выберите **Private**, включите **Add README** и нажмите **Create repository**.
    - Откройте **Settings** (через фото профиля) → **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**. Задайте имя, срок (**Expiration**) — подольше, в **Repository access** выберите **Only select repositories** → `AIBot-feedback`, в **Permissions** → **Repository permissions** → **Contents** выберите **Read and write**. Нажмите **Generate token** и скопируйте токен.
    - Добавьте его секретом `FEEDBACK_TOKEN` (как в шаге 4).
-   - В приложении на каждом устройстве откройте **Настройки** (кнопка с ползунками), вставьте тот же токен и нажмите «Сохранить и проверить».
+   - В приложении на каждом устройстве откройте **Настройки** (шестерёнка справа вверху), вставьте тот же токен и нажмите «Сохранить и проверить».
 
 ## Настройки
 

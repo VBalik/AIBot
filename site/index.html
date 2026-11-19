@@ -16,7 +16,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <script>/* тема «Аа» — до первой отрисовки, чтобы при запуске не мелькал другой фон */
-try { const r = JSON.parse(localStorage.getItem("aid.reading")); if (r && r.theme && r.theme !== "original") document.documentElement.classList.add("t-" + r.theme); } catch {}
+try {
+  const r = JSON.parse(localStorage.getItem("aid.reading")), h = document.documentElement;
+  if (r && r.theme && r.theme !== "original") h.classList.add("t-" + r.theme);
+  const pad = { narrow: [".75rem", "48rem"], wide: ["2.25rem", "38rem"] }[r && r.margin];
+  if (pad) { h.style.setProperty("--c-pad", pad[0]); h.style.setProperty("--c-measure", pad[1]); }
+} catch {}
 </script>
 <style>
 /* Onest (OFL, github.com/simpals/onest): современный гротеск, нарисованный с кириллицей наравне с латиницей.
@@ -69,7 +74,7 @@ button { font: inherit; color: inherit; }
 /* ---------- каркас приложения: шапка и два раздела ---------- */
 .app { position: fixed; inset: 0; display: flex; flex-direction: column; }
 .topbar {
-  flex: none; padding: calc(env(safe-area-inset-top) + .5rem) calc(env(safe-area-inset-right) + 1.25rem) .5rem calc(env(safe-area-inset-left) + 1.25rem);
+  flex: none; padding: calc(env(safe-area-inset-top) + .5rem) calc(env(safe-area-inset-right) + var(--c-pad, 1.25rem)) .5rem calc(env(safe-area-inset-left) + var(--c-pad, 1.25rem));
   background: var(--paper); border-bottom: 1px solid var(--rule); z-index: 2;
 }
 .topbar-row { display: flex; align-items: center; gap: .25rem; max-width: 88rem; margin: 0 auto; }
@@ -82,6 +87,14 @@ button { font: inherit; color: inherit; }
 }
 .iconbtn svg { width: 1.375rem; height: 1.375rem; }
 .iconbtn:active { background: var(--surface); }
+/* линии значка источников начинаются ровно по левому краю ленты, шестерёнка доходит до правого */
+.iconbtn.hd-left { margin: 0 -.125rem 0 -.75rem; }
+.iconbtn.hd-right { margin-right: -.625rem; }
+/* «Обновить» — только там, где нет жеста «потяните вниз»: мышь или трекпад */
+.iconbtn.desk { display: none; }
+@media (hover: hover) and (pointer: fine) { .iconbtn.desk { display: inline-grid; } .iconbtn:hover { background: var(--surface); } }
+.iconbtn.busy svg { animation: spin .9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .iconbtn.busy svg { animation: none; opacity: .5; } }
 .iconbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
 .status { max-width: 88rem; margin: .125rem auto 0; font-size: .75rem; color: var(--ink-2); min-height: 1.1rem; }
 .status .off { color: var(--accent); font-weight: 500; }
@@ -107,7 +120,7 @@ button { font: inherit; color: inherit; }
   flex: 0 0 100%; min-width: 0; height: 100%; overflow-y: auto; scroll-snap-align: start; scroll-snap-stop: always;
   overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; position: relative;
 }
-.pane-inner { max-width: 44rem; margin: 0 auto; padding: 1rem calc(env(safe-area-inset-right) + 1.25rem) calc(env(safe-area-inset-bottom) + 3rem) calc(env(safe-area-inset-left) + 1.25rem); }
+.pane-inner { max-width: var(--c-measure, 44rem); margin: 0 auto; padding: 1rem calc(env(safe-area-inset-right) + var(--c-pad, 1.25rem)) calc(env(safe-area-inset-bottom) + 3rem) calc(env(safe-area-inset-left) + var(--c-pad, 1.25rem)); }
 .pane-title { display: none; font: 700 1.25rem/1.2 var(--sans); letter-spacing: -.02em; margin: .25rem 0 .75rem; }
 .pane-title small { font: 500 .8125rem/1 var(--sans); color: var(--ink-2); margin-left: .375rem; letter-spacing: 0; }
 
@@ -147,7 +160,7 @@ button { font: inherit; color: inherit; }
 .tile.sm { width: 2.25rem; height: 2.25rem; font-size: .9375rem; border-radius: .3125rem; }
 .tile.all { --h: 176; font: 600 .875rem/1 var(--sans); }
 
-.filters { margin: 0 -1.25rem; padding: .25rem 1.25rem .5rem; display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; }
+.filters { margin: 0 calc(-1 * var(--c-pad, 1.25rem)); padding: .25rem var(--c-pad, 1.25rem) .5rem; display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; }
 .filters::-webkit-scrollbar { display: none; }
 .filters button { all: unset; cursor: pointer; border-radius: .375rem; }
 .filters button[aria-pressed="true"] .tile { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px hsl(var(--h) 45% 45%); }
@@ -235,7 +248,7 @@ html.t-justify .entry-abstract { text-align: justify; hyphens: auto; -webkit-hyp
 
 .reader-bar {
   position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 1rem;
-  padding: .5rem 1.25rem; background: color-mix(in srgb, var(--r-bg) 88%, transparent);
+  padding: .5rem var(--r-pad); background: color-mix(in srgb, var(--r-bg) 88%, transparent);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--r-rule);
 }
 .reader-bar button, .reader-bar a {
@@ -247,9 +260,13 @@ html.t-justify .entry-abstract { text-align: justify; hyphens: auto; -webkit-hyp
   font: 600 1rem/1 var(--sans); letter-spacing: -.01em; padding: .5rem .875rem; border-radius: 1rem;
   background: var(--r-surface); color: var(--r-ink); border: 1px solid var(--r-rule);
 }
-.aa-sample { border-radius: .75rem; padding: 1rem 1.125rem; margin: 0 0 1rem; border: 1px solid rgb(0 0 0 / .1);
+.aa-sample { border-radius: .75rem; padding: 1rem var(--r-pad); margin: 0 0 1rem; border: 1px solid rgb(0 0 0 / .1);
   background: var(--r-bg); color: var(--r-ink); font: var(--r-weight) var(--r-size)/var(--r-lh) var(--r-font); }
 .aa-sample { hyphens: auto; -webkit-hyphens: auto; }
+.aa-clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+/* заголовок листа и образец текста остаются наверху, пока листаешь настройки: результат любого нажатия виден сразу */
+.aa-top { position: sticky; top: -.75rem; z-index: 1; background: var(--paper); margin: -.75rem -1.25rem .25rem; padding: .75rem 1.25rem; }
+.aa-top .aa-sample { margin: 0; }
 .reader-bar :focus-visible { outline: 2px solid var(--r-accent); outline-offset: 2px; }
 
 .doc { max-width: var(--r-measure); margin: 0 auto; padding: 1.75rem var(--r-pad) 5rem; }
@@ -405,12 +422,16 @@ html.t-justify .entry-abstract { text-align: justify; hyphens: auto; -webkit-hyp
 <div class="app">
   <header class="topbar">
     <div class="topbar-row">
-      <h1 class="brand"><button type="button" id="to-top" aria-label="Дайджест ИИ — к началу ленты">Дайджест ИИ</button></h1>
-      <button class="iconbtn" id="open-sources" type="button" aria-label="Источники и рейтинг">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+      <!-- слева — источники и рейтинг (значок «выравнивание по левому краю»), справа — настройки (шестерёнка) -->
+      <button class="iconbtn hd-left" id="open-sources" type="button" aria-label="Источники и рейтинг">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 6h17M3.5 10h11M3.5 14h17M3.5 18h11"/></svg>
       </button>
-      <button class="iconbtn" id="open-settings" type="button" aria-label="Настройки">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+      <h1 class="brand"><button type="button" id="to-top" aria-label="Дайджест ИИ — к началу ленты">Дайджест ИИ</button></h1>
+      <button class="iconbtn desk" id="refresh-btn" type="button" aria-label="Обновить" title="Обновить (R)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12A7.5 7.5 0 1 1 17 6.4"/><path d="M17.6 2.4v4.4h-4.4"/></svg>
+      </button>
+      <button class="iconbtn hd-right" id="open-settings" type="button" aria-label="Настройки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.77 4.94L10.25 2.56A9.6 9.6 0 0 1 13.75 2.56L14.23 4.94A7.4 7.4 0 0 1 15.42 5.44L17.44 4.09A9.6 9.6 0 0 1 19.91 6.56L18.56 8.58A7.4 7.4 0 0 1 19.06 9.77L21.44 10.25A9.6 9.6 0 0 1 21.44 13.75L19.06 14.23A7.4 7.4 0 0 1 18.56 15.42L19.91 17.44A9.6 9.6 0 0 1 17.44 19.91L15.42 18.56A7.4 7.4 0 0 1 14.23 19.06L13.75 21.44A9.6 9.6 0 0 1 10.25 21.44L9.77 19.06A7.4 7.4 0 0 1 8.58 18.56L6.56 19.91A9.6 9.6 0 0 1 4.09 17.44L5.44 15.42A7.4 7.4 0 0 1 4.94 14.23L2.56 13.75A9.6 9.6 0 0 1 2.56 10.25L4.94 9.77A7.4 7.4 0 0 1 5.44 8.58L4.09 6.56A9.6 9.6 0 0 1 6.56 4.09L8.58 5.44A7.4 7.4 0 0 1 9.77 4.94Z"/><circle cx="12" cy="12" r="3.1"/></svg>
       </button>
     </div>
     <p class="status" aria-live="polite"><span id="updated"></span> <span id="offline-status"></span></p>
@@ -454,8 +475,10 @@ html.t-justify .entry-abstract { text-align: justify; hyphens: auto; -webkit-hyp
 <!-- Оформление текста, как в Apple Books -->
 <div class="sheet" id="sheet-aa" role="dialog" aria-modal="true" aria-labelledby="aa-title" hidden>
   <div class="sheet-card">
+    <div class="aa-top">
     <div class="sheet-head"><h2 id="aa-title">Оформление текста</h2><button type="button" data-close>Готово</button></div>
-    <p class="aa-sample" id="aa-sample">Крупные языковые модели заметно продвинулись в долгих задачах: агент часами работает над кодом и сам проверяет результат.</p>
+    <p class="aa-sample" id="aa-sample"><span class="aa-clamp">Крупные языковые модели заметно продвинулись в долгих задачах: агент часами работает над кодом и сам проверяет результат.</span></p>
+    </div>
     <div class="sizes" role="group" aria-label="Размер шрифта">
       <button type="button" id="size-down" aria-label="Мельче">A</button>
       <output id="size-out"></output>
@@ -503,7 +526,7 @@ html.t-justify .entry-abstract { text-align: justify; hyphens: auto; -webkit-hyp
   <div class="sheet-card">
     <div class="sheet-head"><h2 id="set-title">Настройки</h2><button type="button" data-close>Готово</button></div>
     <h3>Оформление текста</h3>
-    <p class="hint">Фон, шрифт, размер, интервал и поля — как в Apple Books. Фон и шрифт меняются во всём дайджесте, поля — в статьях. Эти же настройки открываются кнопкой «Аа» вверху любой статьи.</p>
+    <p class="hint">Фон, шрифт, размер, интервал и поля — как в Apple Books. Всё это меняется во всём дайджесте, и в ленте, и в статьях. Эти же настройки открываются кнопкой «Аа» вверху любой статьи.</p>
     <p><button type="button" class="btn ghost" id="open-aa">Аа  Фон и шрифт</button></p>
     <h3>Обновление</h3>
     <p class="hint" id="refresh-info"></p>
@@ -540,7 +563,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-19.1";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "2026-11-19.2";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -1224,6 +1247,11 @@ window.addEventListener("popstate", () => {
   if (m && ITEMS.has(m[1])) openReader(m[1], false); else closeReader();
 });
 document.addEventListener("keydown", (e) => {
+  // R — обновить ленту (на компьютере), если не печатаем в поле и не открыта статья или лист
+  if ((e.key === "r" || e.key === "R" || e.key === "к" || e.key === "К") && !e.metaKey && !e.ctrlKey && !e.altKey
+      && !e.target.closest("input, textarea, select, [contenteditable]") && reader.hidden && !$$(".sheet").some((s) => !s.hidden)) {
+    e.preventDefault(); refreshByHand(); return;
+  }
   if (e.key !== "Escape") return;
   const open = $$(".sheet").find((s) => !s.hidden);
   if (open) closeSheet(open); else if (!reader.hidden) $("#back").click();
@@ -1265,7 +1293,8 @@ const FONTS = [
   ["times", "Times New Roman", '"Times New Roman", Times, serif', "Times New Roman"],
 ];
 const LH = [["1.45", "Плотнее"], ["1.65", "Обычный"], ["1.85", "Свободнее"]];
-const MARGINS = [["narrow", "Узкие", "44rem", "1rem"], ["normal", "Обычные", "36rem", "1.25rem"], ["wide", "Широкие", "31rem", "1.875rem"]];
+// [id, подпись, ширина колонки статьи, ширина колонки ленты, отступ от краёв]
+const MARGINS = [["narrow", "Узкие", "44rem", "48rem", ".75rem"], ["normal", "Обычные", "36rem", "44rem", "1.25rem"], ["wide", "Широкие", "30rem", "38rem", "2.25rem"]];
 const SIZE_MIN = 14, SIZE_MAX = 30;
 const RS_DEFAULT = { theme: "original", font: "onest", size: 18, lh: "1.65", margin: "normal", justify: false, bold: false };
 let RS = { ...RS_DEFAULT, ...store.json("aid.reading", {}) };
@@ -1295,13 +1324,15 @@ function applyReading() {
   root.style.setProperty("--c-font", font[2]);
   root.style.setProperty("--c-scale", String(RS.size / 18));
   root.style.setProperty("--c-lh", String(Math.round((Number(RS.lh) - 0.1) * 100) / 100));
+  root.style.setProperty("--c-measure", m[3]);
+  root.style.setProperty("--c-pad", m[4]);
   $$('meta[name="theme-color"]').forEach((meta, i) => (meta.content = THEME_COLOR[RS.theme] || META_DEFAULT[i]));
   for (const r of [reader, $("#aa-sample")]) {  // читалка и образец текста в листе «Аа»
     r.style.setProperty("--r-font", font[2]);
     r.style.setProperty("--r-size", RS.size + "px");
     r.style.setProperty("--r-lh", RS.lh);
     r.style.setProperty("--r-measure", m[2]);
-    r.style.setProperty("--r-pad", m[3]);
+    r.style.setProperty("--r-pad", m[4]);
     r.classList.toggle("justify", RS.justify);
     r.classList.toggle("bold-text", RS.bold);
   }
@@ -1436,6 +1467,12 @@ function renderSettings() {
 }
 $("#open-settings").addEventListener("click", () => { renderSettings(); openSheet($("#sheet-settings")); });
 $("#refresh-now").addEventListener("click", async () => { await refresh(true); renderSettings(); });
+async function refreshByHand() {
+  const b = $("#refresh-btn");
+  b.classList.add("busy"); b.disabled = true;
+  try { await refresh(true); } finally { b.classList.remove("busy"); b.disabled = false; }
+}
+$("#refresh-btn").addEventListener("click", refreshByHand);
 $("#sync-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   sync.token = $("#gh-token").value.trim();

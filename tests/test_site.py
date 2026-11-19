@@ -225,11 +225,20 @@ with sync_playwright() as p:
     page.click('#fonts button[data-font="ny"]')
     assert "ui-serif" in page.evaluate("getComputedStyle(document.querySelector('.prose')).fontFamily")
     page.click('#opt-lh button[data-lh="1.85"]')
+    pad = lambda sel: page.evaluate(f"getComputedStyle(document.querySelector('{sel}')).paddingLeft")
+    assert pad(".doc") == "20px" and pad("#aa-sample") == "20px" and pad("#pane-news .pane-inner") == "20px"
     page.click('#opt-margin button[data-margin="wide"]')
+    # поля видны сразу: в образце, в статье и в ленте под листом
+    got = [pad(s) for s in (".doc", "#aa-sample", "#pane-news .pane-inner", ".topbar")]
+    assert got == ["36px"] * 4, got
     page.click("#opt-justify")
     page.click("#opt-bold")
     assert page.evaluate("getComputedStyle(document.querySelector('.prose p')).textAlign") == "justify"
     assert int(page.evaluate("getComputedStyle(document.querySelector('.prose p')).fontWeight")) >= 500
+    # лист пролистан к нижним настройкам, а образец текста всё равно на виду
+    card_top, card_scroll = page.evaluate("(() => { const c = document.querySelector('#sheet-aa .sheet-card'); return [c.getBoundingClientRect().top, c.scrollTop]; })()")
+    sample = page.locator("#aa-sample").bounding_box()
+    assert card_scroll > 100 and sample["y"] >= card_top - 1 and sample["y"] + sample["height"] < 844 / 2, (card_top, card_scroll, sample)
     page.screenshot(path=str(OUT / "3c-aa-sheet.png"))
     page.click("#sheet-aa [data-close]")
     page.wait_for_selector("#sheet-aa", state="hidden")
@@ -250,6 +259,7 @@ with sync_playwright() as p:
     page.click("#aa")
     page.click("#aa-reset")
     page.click("#sheet-aa [data-close]")
+    assert page.evaluate("getComputedStyle(document.querySelector('#pane-news .pane-inner')).paddingLeft") == "20px"
     assert page.evaluate("JSON.parse(localStorage.getItem('aid.reading')).theme") == "original"
     assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(241, 244, 243)"
     assert page.evaluate("getComputedStyle(document.querySelector('.entry-abstract')).fontSize") == "17px"
@@ -361,6 +371,17 @@ with sync_playwright() as p:
     dp.wait_for_timeout(300)
     dp.screenshot(path=str(OUT / "5-dark.png"))
 
+    # шапка: слева значок источников (линии по левому краю ленты), справа шестерёнка; «Обновить» на телефоне не нужен
+    page.goto(URL)
+    page.wait_for_selector("#pane-news .entry")
+    xs = [page.locator(s).bounding_box()["x"] for s in ("#open-sources", "#to-top", "#open-settings")]
+    assert xs[0] < xs[1] < xs[2], xs
+    lines_x = page.evaluate("(() => { const b = document.querySelector('#open-sources svg').getBoundingClientRect(); return b.left + b.width * 2.6 / 24; })()")
+    text_x = page.evaluate("(() => { const e = document.querySelector('#pane-news .pane-inner'); return e.getBoundingClientRect().left + parseFloat(getComputedStyle(e).paddingLeft); })()")
+    assert abs(lines_x - text_x) < 2, (lines_x, text_x)
+    assert page.is_hidden("#refresh-btn")
+    page.screenshot(path=str(OUT / "1c-header.png"), clip={"x": 0, "y": 0, "width": 390, "height": 140})
+
     # iPad: оба раздела рядом, без переключателя
     wide = stub_external(browser.new_context(viewport={"width": 1024, "height": 1366}, device_scale_factor=2))
     wp = wide.new_page()
@@ -371,6 +392,21 @@ with sync_playwright() as p:
     assert box_n["x"] < box_a["x"] and box_a["x"] + box_a["width"] <= 1024 + 1, (box_n, box_a)
     wp.wait_for_timeout(300)
     wp.screenshot(path=str(OUT / "6-ipad.png"))
+    # компьютер (мышь): кнопка «Обновить» и клавиша R вместо жеста «потяните вниз»
+    assert wp.is_visible("#refresh-btn")
+    fresh2 = copy.deepcopy(ITEM["latentspace"])
+    fresh2.update(id="latentspace-fresh00002", title_ru="Ещё одна свежая новость", added="2026-11-18T10:00:00Z",
+                  published="2026-11-18T09:30:00Z", full="pending")
+    feed3 = json.loads((UI / "feed.json").read_text())
+    feed3["items"].insert(0, fresh2)
+    (UI / "feed.json").write_text(json.dumps(feed3, ensure_ascii=False))
+    wp.click("#refresh-btn")
+    wp.wait_for_selector('#pane-news .entry.is-new:has-text("Ещё одна свежая новость")', timeout=10000)
+    assert "1 новый текст" in wp.inner_text("#toast")
+    wp.wait_for_function("!document.getElementById('refresh-btn').disabled")
+    wp.evaluate("document.getElementById('toast').textContent = ''")
+    wp.keyboard.press("r")
+    wp.wait_for_function("document.getElementById('toast').textContent.includes('Новых текстов нет')", timeout=10000)
     browser.close()
 
 srv.shutdown()
