@@ -31,7 +31,7 @@ jobs:
         run: |
           for f in probe/*.body; do
             echo "===== $f"; sed -n '1,25p' "${f%.body}.headers"; echo "-----"
-            head -c 400000 "$f"; echo
+            head -c 400000 "$f" | fold -w 2000; echo
           done
       - uses: actions/upload-artifact@v4
         with:
