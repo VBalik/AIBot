@@ -8,7 +8,10 @@ name: Update digest
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    # GitHub выполняет расписание с большими пропусками (17–19.11.2026 из 24 ежечасных запусков в сутки
+    # проходило 3–4). Поэтому попыток шесть в час, а шаг gate пропускает лишние: если сервер обновлял
+    # данные меньше 50 минут назад, сборка не запускается (это занимает секунды и ничего не стоит).
+    - cron: "3-59/10 * * * *"
   workflow_dispatch:
     inputs:
       max_translations:
@@ -29,7 +32,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        name: Нужен ли запуск
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" != "schedule" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          age=$( (curl -fsS --max-time 20 "https://raw.githubusercontent.com/VBalik/AIBot/data/feed.json?t=$(date +%s)" || true) | python3 -c '
+          import json, sys, datetime as d
+          try:
+              b = json.load(sys.stdin).get("built_at")
+              t = d.datetime.fromisoformat(b.replace("Z", "+00:00"))
+              print(int((d.datetime.now(d.timezone.utc) - t).total_seconds() // 60))
+          except Exception:
+              print(9999)')
+          echo "Данные обновлялись $age мин назад"
+          if [ "$age" -ge 50 ]; then echo "run=true" >> "$GITHUB_OUTPUT"; else echo "run=false" >> "$GITHUB_OUTPUT"; fi
+
   build:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
