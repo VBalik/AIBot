@@ -174,16 +174,16 @@ def check_run():
     assert stats["errors"] == 0, data.state["last_run"]
     radar_items = [it for it in data.items.values() if it["source"] == "tldrai"]
     got = sorted(it["via"] for it in radar_items)
-    # из выпуска — не больше 4 первоисточников, главные разделы первыми: openai, blog.google, anthropic, epoch
-    # (engineering.fb.com из Quick Links не берётся). openai уже пришёл из ленты Willison — дубль;
-    # blog.google без текста не показан; Mistral из второго выпуска (оценка 6 < 7) не показан
-    assert got == ["anthropic.com", "epoch.ai"], got
+    # главные разделы первыми: openai (дубль — уже пришёл из ленты Willison), blog.google (нет текста — сайт закрыт
+    # для серверов, место не занимает), anthropic; затем Quick Links: epoch, engineering.fb. Mistral из второго выпуска
+    # (оценка 6 < 7) не показан. Лимит max_per_issue считает только статьи с текстом — проверяется ниже отдельно
+    assert got == ["anthropic.com", "engineering.fb.com", "epoch.ai"], got
     assert [it["source"] for it in data.items.values() if "openai.com" in it["url"]] == ["willison"]
     assert all(it["full"] == "ok" for it in radar_items), [it["full"] for it in radar_items]
     assert "anthropic.com" in w.seen and "TLDR AI" not in w.seen  # модель видит сайт первоисточника, а не подборку
     statuses = {p["title"]: p["status"] for p in data.state["posts"].values() if p["source"] == "tldrai"}
     assert statuses == {"Inside the Codex sandbox": "dup", "Gemini Neon": "no_text", "Interpretability update": "shown",
-                        "Compute growth": "shown", "Mistral Large 4": "skipped"}, statuses
+                        "Compute growth": "shown", "Agents at Meta": "shown", "Mistral Large 4": "skipped"}, statuses
     # выпуски разобраны и сохранены, в том числе недельной давности; старше 8 недель — не скачивается
     issues = data.state["radar"]["tldrai"]["issues"]
     assert sorted(issues) == sorted(f"https://tldr.tech/ai/{DAY(n)}" for n in (0, 1, 6)), sorted(issues)
@@ -202,6 +202,13 @@ def check_run():
     # Telegram и страница подписывают первоисточник
     msg = telegram.build_messages(radar_items[0], data.sources.get("tldrai"), None, "https://x.test")[0]
     assert f"{radar_items[0]['via']} через TLDR AI" in msg, msg
+
+    # лимит: из выпуска не больше max_per_issue статей с текстом
+    data2 = make_data()
+    data2.sources.get("tldrai")["max_per_issue"] = 2
+    build.run(cfg, data2, FakeWriter(), vault, fetch=fake_fetch, article=fake_article, radar_get=fake_get)
+    got2 = sorted(it["via"] for it in data2.items.values() if it["source"] == "tldrai")
+    assert got2 == ["anthropic.com", "epoch.ai"], got2  # engineering.fb.com — третья с текстом, не взята
     print("радар: первоисточники в новостях, дубли, без текста, порог, кэш выпусков — ok")
     return data
 

@@ -912,6 +912,12 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
 
     # 1. Новые посты: оценка и абстракт. Подборки-радары — последними: их ссылки, уже пришедшие из своих лент, — дубли
     known_urls = {radarmod.norm_url(it["url"]) for it in data.items.values()}
+    # сколько первоисточников с текстом уже взято из каждого выпуска подборки (лимит max_per_issue)
+    taken: dict[tuple[str, str], int] = {}
+    for p in data.state["posts"].values():
+        if p.get("status") in ("shown", "skipped"):
+            key = (p.get("source"), p.get("published"))
+            taken[key] = taken.get(key, 0) + 1
     for feed in sorted(data.sources.active(), key=lambda f: bool(f.get("radar"))):
         try:
             posts = radar_posts(feed, rd, cutoff) if feed.get("radar") else fetch(feed)
@@ -931,11 +937,16 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             if feed.get("radar") and radarmod.norm_url(post.url) in known_urls:
                 data.mark(post, "dup")  # уже есть в ленте из своего источника
                 continue
+            issue_key = (feed["id"], _iso(post.published))
+            if feed.get("radar") and taken.get(issue_key, 0) >= feed.get("max_per_issue", 4):
+                continue  # из этого выпуска уже взято достаточно; не помечаем — вдруг место освободится
             complete_post(post, article)
             if feed.get("radar") and len(post.text) < feed.get("article_min", 500):
-                data.mark(post, "no_text")  # первоисточник не отдал текст: пересказ подборки не показываем
+                data.mark(post, "no_text")  # первоисточник не отдал текст (например, сайт закрыт для серверов)
                 log.info("Без текста первоисточника: %s", post.url)
                 continue
+            if feed.get("radar"):
+                taken[issue_key] = taken.get(issue_key, 0) + 1
             stats["new"] += 1
             try:
                 score, reason = writer.score(post)

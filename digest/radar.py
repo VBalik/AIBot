@@ -158,17 +158,15 @@ class Radar:
         """Первоисточники из выпусков не старше since: (дата выпуска, ссылка).
 
         Выпуски разбираются и сохраняются за более долгий срок cache_since: их ссылки нужны пересмотру источников.
-
-        Из выпуска берётся не больше feed["max_per_issue"] ссылок: сначала главные разделы (запуски, разборы,
-        исследования), «Quick Links» и прочее — в конце. Так переводов не становится слишком много."""
+        Внутри выпуска сначала главные разделы (запуски, разборы, исследования), «Quick Links» и прочее — в конце:
+        сборщик берёт из выпуска не больше feed["max_per_issue"] статей, у которых нашёлся текст."""
         out = []
-        limit = feed.get("max_per_issue", 4)
         for issue in self.refresh(feed, min(since, cache_since or since)).values():
             date = datetime.strptime(issue["date"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
             if date < since:
                 continue
             picks = sorted((x for x in issue["links"] if is_primary(x["u"])), key=lambda x: section_rank(x["s"]))
-            out += [(date, x) for x in picks[:limit]]
+            out += [(date, x) for x in picks]
         return out
 
     def links(self, days: int = 56) -> list[str]:
