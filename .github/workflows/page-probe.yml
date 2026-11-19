@@ -27,6 +27,12 @@ jobs:
                    -D "probe/$i.headers" -o "probe/$i.body" -w "%{http_code}" "$u" || echo "ERR")
             echo "$i $code $(wc -c < probe/$i.body 2>/dev/null || echo 0) $u" | tee -a probe/index.txt
           done
+      - name: Показать ответы в журнале
+        run: |
+          for f in probe/*.body; do
+            echo "===== $f"; sed -n '1,25p' "${f%.body}.headers"; echo "-----"
+            head -c 400000 "$f"; echo
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: probe
