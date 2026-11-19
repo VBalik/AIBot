@@ -106,7 +106,9 @@ def check_parse():
     assert radar.is_primary("https://huggingface.co/blog/post") and not radar.is_primary("https://huggingface.co/models")
     assert not radar.is_primary("https://kernel.dev/blog/x") and not radar.is_primary("https://notopenai.com/x")
     assert radar.clean_url("https://a.dev/p/?utm_source=tldrai&id=7#top") == "https://a.dev/p/?id=7"
-    assert radar.norm_url("https://www.a.dev/p/") == radar.norm_url("https://a.dev/p?x=1")
+    assert radar.norm_url("https://www.a.dev/p/?utm_source=tldrai") == radar.norm_url("https://a.dev/p")
+    assert radar.norm_url("https://qwen.ai/blog?id=a") != radar.norm_url("https://qwen.ai/blog?id=b")
+    assert radar.clean_url("https://qwen.ai/blog?id=qwen4-max&amp;amp;utm_source=tldrai") == "https://qwen.ai/blog?id=qwen4-max"
     print("радар: разбор выпуска — ok")
 
 

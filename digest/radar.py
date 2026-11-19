@@ -14,6 +14,7 @@ TLDR AI — не блог, а подборка ссылок: в каждом в�
 from __future__ import annotations
 
 import calendar
+import html
 import logging
 import re
 from datetime import datetime, timedelta, timezone
@@ -58,16 +59,18 @@ def host_of(url: str) -> str:
 
 
 def clean_url(url: str) -> str:
-    """Ссылка без меток рассылки (utm_*, ref) и без якоря."""
-    p = urlparse(url.strip())
+    """Ссылка без меток рассылки (utm_*, ref) и без якоря. В вёрстке выпуска бывает «&amp;amp;» — раскрываем."""
+    p = urlparse(html.unescape(html.unescape(url.strip())))
     query = urlencode([(k, v) for k, v in parse_qsl(p.query, keep_blank_values=True) if not TRACKING_RE.match(k)])
     return urlunparse((p.scheme, p.netloc, p.path, p.params, query, ""))
 
 
 def norm_url(url: str) -> str:
-    """Ключ для поиска дублей: домен без www, путь без конечной косой черты, без параметров."""
-    p = urlparse(url)
-    return host_of(url) + (p.path.rstrip("/") or "/")
+    """Ключ для поиска дублей: домен без www, путь без конечной косой черты, значимые параметры по порядку
+    (у некоторых блогов адрес статьи — это параметр: qwen.ai/blog?id=…)."""
+    p = urlparse(clean_url(url))
+    query = "&".join(sorted(f"{k}={v}" for k, v in parse_qsl(p.query, keep_blank_values=True)))
+    return host_of(url) + (p.path.rstrip("/") or "/") + ("?" + query if query else "")
 
 
 def is_primary(url: str) -> bool:
