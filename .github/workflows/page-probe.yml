@@ -1,0 +1,34 @@
+name: Page probe
+
+# Ручная проверка: как страница выглядит для серверов GitHub. Сохраняет ответ (заголовки и HTML) как артефакт,
+# чтобы по нему написать разбор новой ленты или понять, почему сайт не отдаёт текст. Моделей не вызывает.
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "адреса страниц через пробел"
+        required: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Скачать страницы
+        env:
+          URLS: ${{ inputs.urls }}
+        run: |
+          mkdir -p probe
+          i=0
+          for u in $URLS; do
+            i=$((i+1))
+            code=$(curl -sS -L --max-time 40 -A "Mozilla/5.0 (ai-digest; personal RSS reader)" \
+                   -D "probe/$i.headers" -o "probe/$i.body" -w "%{http_code}" "$u" || echo "ERR")
+            echo "$i $code $(wc -c < probe/$i.body 2>/dev/null || echo 0) $u" | tee -a probe/index.txt
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe
+          path: probe/
+          retention-days: 3
