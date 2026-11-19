@@ -107,8 +107,10 @@ def host_key(url: str) -> str | None:
 
 
 def discover(posts: list, book: SourceBook, known_hosts: set[str], min_posts: int = 3, limit: int = 4,
-             autodiscover=None) -> list[dict]:
-    """Блоги, на которые ссылаются не меньше min_posts разных постов действующих источников."""
+             autodiscover=None, extra_links: list[str] | None = None) -> list[dict]:
+    """Блоги, на которые ссылаются не меньше min_posts разных постов действующих источников.
+
+    extra_links — ссылки из подборок-радаров (TLDR AI): каждая считается отдельным упоминанием сайта."""
     cites: dict[str, set[str]] = {}
     for p in posts:
         own = host_key(p.feed.get("site", "")) or ""
@@ -116,6 +118,10 @@ def discover(posts: list, book: SourceBook, known_hosts: set[str], min_posts: in
             h = host_key(a["href"])
             if h and h != own and h not in known_hosts:
                 cites.setdefault(h, set()).add(p.id)
+    for url in extra_links or []:
+        h = host_key(url)
+        if h and h not in known_hosts:
+            cites.setdefault(h, set()).add(url)
     ranked = sorted(((len(v), h) for h, v in cites.items() if len(v) >= min_posts), reverse=True)
     found = []
     for n, host in ranked[: limit * 2]:
@@ -215,7 +221,7 @@ def _symbol(want: str, name: str, taken: set[str]) -> str:
 
 
 def weekly_review(cfg, data, fb: fbmod.Feedback, llm, fetch, complete=None, autodiscover=None,
-                  now: datetime | None = None) -> dict:
+                  now: datetime | None = None, radar_links: list[str] | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     book: SourceBook = data.sources
     summary = {"evaluated": 0, "added": [], "removed": [], "suggested": []}
@@ -223,13 +229,16 @@ def weekly_review(cfg, data, fb: fbmod.Feedback, llm, fetch, complete=None, auto
     # действующие источники: свежие посты — для поиска часто цитируемых блогов
     active_posts = []
     for s in book.active():
+        if s.get("radar"):  # у подборки своих текстов нет, её ссылки приходят через radar_links
+            continue
         try:
             active_posts += fetch(s)
         except Exception as exc:  # noqa: BLE001
             log.info("Пересмотр: лента %s недоступна: %s", s["name"], exc)
     known_hosts = {host_key(s.get("site", "")) for s in book.active() + book.data["removed"]} | \
                   {host_key(c["site"]) for c in CANDIDATES}
-    pool = [dict(c) for c in CANDIDATES] + discover(active_posts, book, known_hosts - {None}, autodiscover=autodiscover)
+    pool = [dict(c) for c in CANDIDATES] + discover(active_posts, book, known_hosts - {None}, autodiscover=autodiscover,
+                                                       extra_links=radar_links)
 
     recent_removed = {s["id"] for s in book.data["removed"]
                       if s.get("removed", "") >= _iso(now - timedelta(days=90))}

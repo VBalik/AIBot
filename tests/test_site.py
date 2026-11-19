@@ -371,9 +371,30 @@ with sync_playwright() as p:
     dp.wait_for_timeout(300)
     dp.screenshot(path=str(OUT / "5-dark.png"))
 
+    # первоисточник из подборки TLDR AI подписан сайтом статьи
+    feed_r = json.loads((UI / "feed.json").read_text())
+    feed_r["sources"].append({"id": "tldrai", "kind": "news", "symbol": "Tl", "name": "TLDR AI", "author": "редакция TLDR",
+                              "about": "Из ежедневной подборки берутся только первоисточники", "site": "https://tldr.tech/ai",
+                              "hue": 60, "active": True})
+    rad = copy.deepcopy(ITEM["latentspace"])
+    rad.update(id="tldrai-0123456789", source="tldrai", via="openai.com", url="https://openai.com/index/inside-the-codex-sandbox/",
+               title_ru="Как устроена песочница Codex", full="pending", added="2026-11-18T07:00:00Z", alt=[])
+    feed_r["items"].insert(0, rad)
+    (UI / "feed.json").write_text(json.dumps(feed_r, ensure_ascii=False))
+
     # шапка: слева значок источников (линии по левому краю ленты), справа шестерёнка; «Обновить» на телефоне не нужен
     page.goto(URL)
     page.wait_for_selector("#pane-news .entry")
+    page.click("#tab-news")
+    page.wait_for_selector('#pane-news .entry:has-text("Как устроена песочница Codex")')
+    meta = page.inner_text('#pane-news .entry:has-text("Как устроена песочница Codex") .entry-meta')
+    assert meta.startswith("openai.com через TLDR AI"), meta
+    page.click('#pane-news .entry:has-text("Как устроена песочница Codex") .entry-title')
+    page.wait_for_selector("#reader:not([hidden]) .doc-source")
+    src_txt = page.inner_text(".doc-source")
+    assert "openai.com" in src_txt and "найдено в подборке TLDR AI" in src_txt, src_txt
+    page.click("#back")
+    page.wait_for_selector("#reader", state="hidden")
     xs = [page.locator(s).bounding_box()["x"] for s in ("#open-sources", "#to-top", "#open-settings")]
     assert xs[0] < xs[1] < xs[2], xs
     lines_x = page.evaluate("(() => { const b = document.querySelector('#open-sources svg').getBoundingClientRect(); return b.left + b.width * 2.6 / 24; })()")

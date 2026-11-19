@@ -2,7 +2,9 @@
 
 Личная страница с лучшими англоязычными текстами об ИИ. По каждому тексту есть русский абстракт на 3–5 предложений, а по нажатию открывается полный литературный перевод.
 
-**Источники:** Simon Willison, Import AI, One Useful Thing, Interconnects, Latent Space, Ahead of AI (Raschka), Understanding AI, AI as Normal Technology, Andrej Karpathy, Dwarkesh Podcast, Benedict Evans. Список лежит в `digest/feeds.py`.
+**Источники:** два раздела. Аналитика — Simon Willison, Import AI, One Useful Thing, Interconnects, Latent Space, Ahead of AI (Raschka), Understanding AI, AI as Normal Technology, Andrej Karpathy, Dwarkesh Podcast, Benedict Evans. Новости — MIT Technology Review, The Decoder, Ars Technica, ссылки Simon Willison, Ben's Bites, AINews и TLDR AI. Начальный набор лежит в `digest/feeds.py`, действующий список сервер ведёт сам.
+
+TLDR AI — подборка ссылок, поэтому из неё берутся только первоисточники: статьи из блогов лабораторий и исследовательских центров (OpenAI, Anthropic, Google DeepMind, Meta, Epoch AI и других) с полным переводом, не больше четырёх из выпуска. Сайты, на которые подборка часто ссылается, сервер раз в неделю рассматривает как новые источники.
 
 ## Как это работает
 
@@ -104,6 +106,7 @@ Netlify — site/index.html (публикуется только при изме
 pip install -r requirements.txt playwright && playwright install chromium
 python tests/test_build.py    # сборщик с имитацией OpenAI, Gemini, Claude и Telegram API → tests/out/data
 python tests/test_review.py   # оценки, рейтинг источников и еженедельная замена
+python tests/test_radar.py    # радар TLDR AI: разбор выпуска, первоисточники, ссылки для пересмотра
 python tests/test_site.py     # страница в браузере (телефон, тёмная тема, iPad) → скриншоты в tests/out
 python tests/test_offline.py  # офлайн-режим: service worker, сохранённые переводы и иллюстрации
 ```

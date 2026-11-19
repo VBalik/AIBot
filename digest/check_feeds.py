@@ -18,12 +18,41 @@ sys.path.insert(0, str(Path(__file__).parent))
 import httpx  # noqa: E402
 
 import build  # noqa: E402
+import radar  # noqa: E402
 from candidates import CANDIDATES  # noqa: E402
 from feeds import FEEDS  # noqa: E402
 
 
+def check_radar(feed: dict, row: dict) -> dict:
+    """Подборка (TLDR AI): разбираются ли выпуски и отдают ли первоисточники текст со страницы."""
+    now = build._now()
+    rd = radar.Radar({}, now=now)
+    try:
+        links = rd.primary_links(feed, now - timedelta(days=7))
+    except Exception as exc:  # noqa: BLE001
+        row["http"] = type(exc).__name__
+        return row
+    issues = rd.state.get(feed["id"], {}).get("issues", {})
+    row.update(http=200, entries=len(issues), last30=len(issues), latest=max((v["date"][:10] for v in issues.values()), default="—"),
+               median=sum(len(v["links"]) for v in issues.values()), max=len(links), paywalled=0)
+    got = []
+    for _, x in links[:6]:
+        try:
+            full = build.fetch_article(x["u"])
+            got.append(len(build.BeautifulSoup(full, "html.parser").get_text()) if full else 0)
+        except Exception:  # noqa: BLE001
+            got.append(-1)
+        print(f"  {feed['id']}: {got[-1]:>6} знаков — {x['u']}")
+    row["article"] = "/".join(map(str, got))
+    ok = sum(n >= feed.get("article_min", 500) for n in got)
+    row["verdict"] = f"подборка: выпусков {len(issues)}, ссылок {row['median']}, первоисточников {len(links)}, с текстом {ok} из {len(got)}"
+    return row
+
+
 def check(feed: dict) -> dict:
     row = {"id": feed["id"], "kind": feed.get("kind", "analysis"), "name": feed.get("name", feed["id"])}
+    if feed.get("radar"):
+        return check_radar(feed, row)
     try:
         r = httpx.get(feed["url"], timeout=30, follow_redirects=True,
                       headers={"User-Agent": "Mozilla/5.0 (ai-digest; personal RSS reader)"})

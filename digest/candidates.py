@@ -38,7 +38,6 @@ CANDIDATES = [
      "site": "https://huggingface.co/blog", "paywall": False},
     {"id": "bensbites", "kind": "news", "name": "Ben's Bites", "url": "https://www.bensbites.com/feed",
      "site": "https://www.bensbites.com"},
-    {"id": "tldrai", "kind": "news", "name": "TLDR AI", "url": "https://tldr.tech/api/rss/ai", "site": "https://tldr.tech/ai"},
     {"id": "wiredai", "kind": "news", "name": "WIRED AI", "url": "https://www.wired.com/feed/tag/ai/latest/rss",
      "site": "https://www.wired.com/tag/artificial-intelligence/"},
     {"id": "nvidiablog", "kind": "news", "name": "NVIDIA Blog", "url": "https://blogs.nvidia.com/feed/",

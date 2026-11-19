@@ -26,7 +26,7 @@ from feeds import FEEDS
 HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60, 280, 100, 240, 32, 160, 316, 72]
 SEED_DATE = "2026-11-17T00:00:00Z"
 FEED_FIELDS = ("id", "kind", "symbol", "name", "author", "about", "url", "site", "exclude", "include", "paywall",
-               "fetch_article", "max_chars")
+               "fetch_article", "max_chars", "article_min", "radar", "min_score", "max_per_issue", "lookback_days")
 PUBLIC_FIELDS = ("id", "kind", "symbol", "name", "author", "about", "site", "hue", "added", "origin", "why")
 KINDS = ("news", "analysis")  # новости (что произошло) и аналитика (что это значит)
 
@@ -51,12 +51,19 @@ class SourceBook:
             self.data.setdefault(key, default)
         for s in self.data["active"] + self.data["removed"]:
             s.setdefault("kind", "analysis")  # первые 11 блогов — аналитика
-        # новые начальные источники (например, раздел новостей) добавляются в уже существующий список один раз
+        # новые начальные источники добавляются в уже существующий список один раз: раздел новостей целиком
+        # (news_seeded), а источники, дописанные в feeds.py позже (late), — каждый по отдельности (late_seeded).
+        # Убранный при пересмотре так и остаётся убранным.
         known = {s["id"] for s in self.data["active"] + self.data["removed"]}
+        late_done = self.data.setdefault("late_seeded", [])
         for f in seed:
-            if f["id"] not in known and f.get("kind") == "news" and not self.data.get("news_seeded"):
+            if f["id"] in known or f["id"] in late_done:
+                continue
+            if f.get("late") or (f.get("kind") == "news" and not self.data.get("news_seeded")):
                 self.data["active"].append({**{k: f[k] for k in FEED_FIELDS if k in f}, "hue": self._free_hue(),
                                             "added": _now_iso(), "origin": "seed"})
+                known.add(f["id"])
+        late_done += [f["id"] for f in seed if f.get("late") and f["id"] not in late_done]
         if any(f.get("kind") == "news" for f in seed):
             self.data["news_seeded"] = True
         # у начальных источников поля ленты берутся из кода: правка feeds.py (адрес, фильтр, лимит) доходит до данных

@@ -55,6 +55,7 @@ from feeds import FEEDS  # noqa: E402,F401  (начальный набор; де
 from sources import SourceBook  # noqa: E402
 import feedback as fbmod  # noqa: E402
 import review  # noqa: E402
+import radar as radarmod  # noqa: E402
 import telegram  # noqa: E402
 
 log = logging.getLogger("ai-digest")
@@ -366,7 +367,7 @@ def complete_post(post: Post, article=fetch_article) -> Post:
     except Exception as exc:  # noqa: BLE001
         log.warning("Статья %s не скачалась: %s", post.url, exc)
         return post
-    if full and len(BeautifulSoup(full, "html.parser").get_text()) > max(1500, 1.5 * short):
+    if full and len(BeautifulSoup(full, "html.parser").get_text()) > max(post.feed.get("article_min", 1500), 1.5 * short):
         post.html = full
     return post
 
@@ -868,7 +869,7 @@ class DataDir:
 # ---------------------------------------------------------------------------
 
 def full_status_for(cfg: Config, post: Post, score: int) -> str:
-    if score < cfg.translate_min_score:
+    if score < max(cfg.translate_min_score, post.feed.get("min_score", 0)):
         return "below"
     if post.paywalled:
         return "paywalled"
@@ -877,10 +878,27 @@ def full_status_for(cfg: Config, post: Post, score: int) -> str:
     return "pending"
 
 
+def radar_posts(feed: dict, rd: "radarmod.Radar", since: datetime) -> list[Post]:
+    """Первоисточники из подборки (TLDR AI) как посты: текста пока нет, он берётся со страницы статьи."""
+    posts = []
+    # новости устаревают быстро: из подборки берутся только последние дни, а выпуски хранятся 8 недель для пересмотра
+    if feed.get("lookback_days"):
+        since = max(since, _now() - timedelta(days=feed["lookback_days"]))
+    for date, x in rd.primary_links(feed, since, cache_since=_now() - timedelta(days=56)):
+        site = radarmod.site_label(x["u"])
+        # для модели и страницы источник — сам сайт статьи, а подборка — только «где нашли»
+        view = {**feed, "name": site, "author": f"найдено в подборке {feed['name']}"}
+        posts.append(Post(id=post_id(feed, radarmod.norm_url(x["u"])), feed=view, title=x["t"], url=x["u"],
+                          published=date, html=""))
+    return posts
+
+
 def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_feed,
         extras: list[Writer] | None = None, tg: "telegram.TelegramAPI | None" = None,
-        article=fetch_article, fb: "fbmod.Feedback | None" = None, autodiscover=None) -> dict:
+        article=fetch_article, fb: "fbmod.Feedback | None" = None, autodiscover=None,
+        radar_get=None) -> dict:
     data.crypto = vault.meta
+    rd = radarmod.Radar(data.state.setdefault("radar", {}), get=radar_get)
     cutoff = _now() - timedelta(days=cfg.lookback_days)
     live: dict[str, Post] = {}
     stats = {"new": 0, "shown": 0, "translated": 0, "compared": 0, "telegram": 0, "errors": 0, "api_errors": 0,
@@ -892,26 +910,36 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
         stats["api_errors"] += int(api)
         problems.append(redact(text))
 
-    # 1. Новые посты: оценка и абстракт
-    for feed in list(data.sources.active()):
+    # 1. Новые посты: оценка и абстракт. Подборки-радары — последними: их ссылки, уже пришедшие из своих лент, — дубли
+    known_urls = {radarmod.norm_url(it["url"]) for it in data.items.values()}
+    for feed in sorted(data.sources.active(), key=lambda f: bool(f.get("radar"))):
         try:
-            posts = fetch(feed)
+            posts = radar_posts(feed, rd, cutoff) if feed.get("radar") else fetch(feed)
         except Exception as exc:
             log.warning("Лента %s недоступна: %s", feed["name"], exc)
             problem(f"Лента {feed['name']}: {exc}", api=False)
             continue
         for post in posts:
             live[post.id] = post
+            if not feed.get("radar"):
+                known_urls.add(radarmod.norm_url(post.url))
             if data.seen(post.id):
                 continue
             if post.published < cutoff:
                 data.mark(post, "old")
                 continue
-            stats["new"] += 1
+            if feed.get("radar") and radarmod.norm_url(post.url) in known_urls:
+                data.mark(post, "dup")  # уже есть в ленте из своего источника
+                continue
             complete_post(post, article)
+            if feed.get("radar") and len(post.text) < feed.get("article_min", 500):
+                data.mark(post, "no_text")  # первоисточник не отдал текст: пересказ подборки не показываем
+                log.info("Без текста первоисточника: %s", post.url)
+                continue
+            stats["new"] += 1
             try:
                 score, reason = writer.score(post)
-                abstract = writer.abstract(post) if score >= cfg.show_min_score else None
+                abstract = writer.abstract(post) if score >= max(cfg.show_min_score, feed.get("min_score", 0)) else None
             except Exception as exc:
                 log.error("Не удалось обработать «%s»: %s", post.title, exc)
                 problem(f"Оценка/абстракт «{post.title}»: {exc}")
@@ -930,6 +958,9 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
                     "words_en": len(post.text.split()),
                     "full": full_status_for(cfg, post, score),
                 }
+                if feed.get("radar"):
+                    data.items[post.id]["via"] = radarmod.site_label(post.url)  # первоисточник; подборка — source
+                known_urls.add(radarmod.norm_url(post.url))
                 stats["shown"] += 1
             data.mark(post, "shown" if abstract else "skipped", score, reason)
             log.info("[%2d] %-9s %s — %s", score, "показан" if abstract else "пропущен", post.title, reason)
@@ -959,6 +990,9 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             it["full"] = "unavailable"
             continue
         complete_post(post, article)
+        if post.feed.get("radar") and len(post.text) < post.feed.get("article_min", 500):
+            it["full"] = "unavailable"  # страница первоисточника перестала отдавать текст
+            continue
         log.info("Перевожу (%s): %s", writer.llm.models["translate"], post.title)
         try:
             html_ru = writer.translate(post)
@@ -1016,7 +1050,7 @@ def run(cfg: Config, data: DataDir, writer: Writer, vault: Vault, fetch=fetch_fe
             try:
                 summary = review.weekly_review(cfg, data, fb, writer.llm, fetch=fetch,
                                                complete=lambda p: complete_post(p, article),
-                                               autodiscover=autodiscover)
+                                               autodiscover=autodiscover, radar_links=rd.links(56))
                 stats.update({k: summary[k] for k in ("added", "removed", "suggested")})
             except Exception as exc:  # noqa: BLE001
                 log.exception("Пересмотр источников не удался")

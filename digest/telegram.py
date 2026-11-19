@@ -182,8 +182,9 @@ def _date_ru(iso: str) -> str:
 def build_messages(item: dict, source: dict, html_ru: str | None, site_url: str) -> list[str]:
     """Сообщения для одной статьи: шапка + абстракт + (полный перевод) + ссылки."""
     name = source.get("name", item.get("source", ""))
+    who = f"{item['via']} через {name}" if item.get("via") else f"{name}, {source.get('author', '')}"  # первоисточник из подборки
     head = (f"<b>{esc(item['title_ru'])}</b>\n"
-            f"<i>{esc(name)}, {esc(source.get('author', ''))}, {_date_ru(item['published'])}</i>")
+            f"<i>{esc(who)}, {_date_ru(item['published'])}</i>")
     blocks = [head, f"<blockquote>{esc(item['abstract'])}</blockquote>"]
     if html_ru:
         blocks += html_to_tg_blocks(html_ru)

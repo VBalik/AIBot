@@ -563,7 +563,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-19.2";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "2026-11-19.3";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -923,7 +923,7 @@ function renderPane(kind) {
         ${tile(s, "sm")}
         <div>
           <h2 class="entry-title">${isNew ? '<span class="sr">Новое: </span>' : ""}${esc(it.title_ru)}</h2>
-          <p class="entry-meta">${esc(s ? s.name : it.source)}, ${fmtDate(it.published)}, ${readingTime(it.words_en)}</p>
+          <p class="entry-meta">${esc(sourceLabel(it, s))}, ${fmtDate(it.published)}, ${readingTime(it.words_en)}</p>
           <p class="entry-abstract">${esc(it.abstract)}</p>
           <p class="entry-state${it.full === "ok" ? " ok" : ""}">${STATE_TEXT[it.full] || ""}</p>
         </div>
@@ -1113,6 +1113,8 @@ function cleanFragment(html) {
 /* ---------- читалка ---------- */
 const reader = $("#reader"), docEl = $("#doc");
 
+// первоисточник из подборки (TLDR AI): «openai.com через TLDR AI»; обычный пост — название источника
+const sourceLabel = (it, s) => it.via ? `${it.via} через ${s ? s.name : it.source}` : (s ? s.name : it.source);
 function openReader(id, push) {
   const it = ITEMS.get(id);
   if (!it) return;
@@ -1120,14 +1122,14 @@ function openReader(id, push) {
   reader.style.setProperty("--h", s ? s.hue : 176);
   $("#orig").href = it.url;
   docEl.innerHTML = `
-    <div class="doc-source">${tile(s)}<div><b>${esc(s ? s.name : it.source)}</b>${esc(s ? s.author : "")}</div></div>
+    <div class="doc-source">${tile(s)}<div><b>${esc(it.via || (s ? s.name : it.source))}</b>${esc(it.via ? `найдено в подборке ${s ? s.name : it.source}` : s ? s.author : "")}</div></div>
     <h1 class="doc-title" id="doc-title">${esc(it.title_ru)}</h1>
     <p class="doc-meta">${fmtDate(it.published)}, ${readingTime(it.words_en)}<br>Оригинал: <i>${esc(it.title_en)}</i></p>
     <p class="lead">${esc(it.abstract)}</p>
     ${it.audio ? `<audio controls preload="none" src="${esc(it.audio)}"></audio>` : ""}
     <div id="full"></div>
     <div class="doc-rate"><p>Как вам этот текст?</p>${rateButtons(it.id)}</div>
-    <p class="doc-end">Текст: <a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(s ? s.author : "автор")}, ${esc(s ? s.name : "")}</a>.<span id="engine-line"></span></p>`;
+    <p class="doc-end">Текст: <a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${it.via ? esc(it.via) : `${esc(s ? s.author : "автор")}, ${esc(s ? s.name : "")}`}</a>.<span id="engine-line"></span></p>`;
   if (push) history.pushState({ id }, "", "#/p/" + id);
   document.body.classList.add("reading");
   reader.hidden = false;
