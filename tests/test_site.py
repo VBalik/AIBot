@@ -149,25 +149,42 @@ with sync_playwright() as p:
     assert "Джек Кларк" in page.inner_text("#pane-analysis .source-note")
     page.click('#pane-analysis button[data-f="all"]')
 
-    # оценки: палец вниз слева, вверх справа, без подписей; повторное нажатие снимает оценку
+    # действия, как под ответом Claude: скопировать, поделиться, палец вверх, палец вниз — справа, без подписей и рамок
     ia = ITEM["importai"]["id"]
-    up = f'.entry[data-id="{ia}"] .rate .up'
-    down = f'.entry[data-id="{ia}"] .rate .down'
-    bu, bd = page.locator(up).bounding_box(), page.locator(down).bounding_box()
-    assert bd["x"] < bu["x"] and page.inner_text(up).strip() == "" and page.inner_text(down).strip() == "", (bd, bu)
+    bar = f'.entry[data-id="{ia}"] .rate'
+    up, down, cp, sh = f"{bar} .up", f"{bar} .down", f"{bar} .act-copy", f"{bar} .act-share"
+    xs = [page.locator(x).bounding_box()["x"] for x in (cp, sh, up, down)]
+    assert xs == sorted(xs), xs
+    assert all(page.inner_text(x).strip() == "" for x in (cp, sh, up, down))
     assert page.evaluate(f"getComputedStyle(document.querySelector('{up}')).borderTopWidth") == "0px"  # без кружков
     # рукава на одной горизонтали: центр рукава (y=16 у «вверх», y=8 у «вниз») совпадает с центром рамки
     assert page.get_attribute(f"{up} svg", "viewBox") == "0 3 24 26" and page.get_attribute(f"{down} svg", "viewBox") == "0 -5 24 26"
     su, sd = page.locator(f"{up} svg").bounding_box(), page.locator(f"{down} svg").bounding_box()
+    sc = page.locator(f"{cp} svg").bounding_box()
     assert abs(su["y"] - sd["y"]) < 0.5 and abs(su["height"] - sd["height"]) < 0.5, (su, sd)
-    # рядом, справа, на одной линии со строкой состояния («Полный перевод» / «Перевод готовится»)
+    assert abs((sc["y"] + sc["height"] / 2) - (su["y"] + su["height"] / 2)) < 1.5, (sc, su)  # все значки на одной линии
+    # справа, на одной линии со строкой состояния («Полный перевод» / «Переводится»)
     ab = page.locator(f'.entry[data-id="{ia}"] .entry-abstract').bounding_box()
     st = page.locator(f'.entry[data-id="{ia}"] .entry-state').bounding_box()
-    assert abs((su["x"] + su["width"]) - (ab["x"] + ab["width"])) < 1.5, (su, ab)
-    assert su["x"] - (sd["x"] + sd["width"]) < 14, (sd, su)
+    assert abs((sd["x"] + sd["width"]) - (ab["x"] + ab["width"])) < 1.5, (sd, ab)
     assert abs((su["y"] + su["height"] / 2) - (st["y"] + st["height"] / 2)) < 2, (su, st)
     state_text = page.evaluate(f"(() => {{ const r = document.createRange(); r.selectNodeContents(document.querySelector('.entry[data-id=\"{ia}\"] .entry-state')); return r.getBoundingClientRect().right; }})()")
-    assert state_text < sd["x"], (state_text, sd)  # текст состояния не заходит под пальцы
+    assert state_text < sc["x"], (state_text, sc)  # текст состояния не заходит под значки
+    page.screenshot(path=str(OUT / "1d-actions.png"), clip={"x": 0, "y": st["y"] - 140, "width": 390, "height": 190})
+    # скопировать: заголовок, абстракт и ссылка; значок ненадолго становится галочкой
+    page.evaluate("""Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async (t) => { window.__copied = t; }}});
+                     navigator.share = async (d) => { window.__shared = d; };""")
+    page.click(cp)
+    page.wait_for_function("window.__copied !== undefined")
+    copied = page.evaluate("window.__copied")
+    assert copied.startswith(ITEM["importai"]["title_ru"]) and ITEM["importai"]["abstract"] in copied and ITEM["importai"]["url"] in copied, copied
+    assert "done" in page.get_attribute(cp, "class") and page.get_attribute(cp, "aria-label") == "Скопировано"
+    page.wait_for_function(f"!document.querySelector('{cp}').classList.contains('done')", timeout=4000)
+    # поделиться: абстракт и ссылка на оригинал
+    page.click(sh)
+    page.wait_for_function("window.__shared !== undefined")
+    shared = page.evaluate("window.__shared")
+    assert shared["url"] == ITEM["importai"]["url"] and ITEM["importai"]["abstract"] in shared["text"], shared
     page.click(up)
     assert page.get_attribute(up, "aria-pressed") == "true"
     fb = page.evaluate("JSON.parse(localStorage.getItem('aid.fb'))")
@@ -195,6 +212,17 @@ with sync_playwright() as p:
     assert "Крупные языковые модели" in prose and "def f(x):" in prose
     assert "Gemini" in page.inner_text("#engine-line")
     assert page.get_attribute(f'.doc-rate .rate[data-rate="{ia}"] .up', "aria-pressed") == "true"  # оценка видна и в читалке
+    # в статье «скопировать» берёт весь перевод, а «поделиться» — по-прежнему только абстракт и ссылку
+    page.evaluate("window.__copied = undefined; window.__shared = undefined")
+    page.click(f'.doc-rate .rate[data-rate="{ia}"] .act-copy')
+    page.wait_for_function("window.__copied !== undefined")
+    assert "def f(x):" in page.evaluate("window.__copied")
+    page.click(f'.doc-rate .rate[data-rate="{ia}"] .act-share')
+    page.wait_for_function("window.__shared !== undefined")
+    assert "def f(x):" not in json.dumps(page.evaluate("window.__shared"), ensure_ascii=False)
+    dr, dq = page.locator(f'.doc-rate .rate[data-rate="{ia}"] .down svg').bounding_box(), page.locator(".doc-rate p").bounding_box()
+    pr = page.locator(".prose").bounding_box()
+    assert abs((dr["x"] + dr["width"]) - (pr["x"] + pr["width"])) < 2 and dq["x"] < dr["x"], (dr, pr)  # справа, вопрос слева
 
     # переключатель Gemini / Claude: у этого поста два перевода
     assert page.locator(".engines button").count() == 2
