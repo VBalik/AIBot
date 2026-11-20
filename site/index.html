@@ -167,6 +167,10 @@ button { font: inherit; color: inherit; }
 .filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .source-note { min-height: 2.5rem; margin: .375rem 0 1.25rem; font-size: .875rem; color: var(--ink-2); }
 .source-note b { color: var(--ink); font-weight: 600; }
+/* выбран один источник: это видно сразу, и вернуть все тексты — одно касание */
+.filter-on { display: block; margin-top: .375rem; color: var(--ink); font-weight: 500; }
+.filter-on button { all: unset; cursor: pointer; color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: .15em; }
+.filter-on button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: .25rem; }
 
 /* ---------- лента ---------- */
 .entries { list-style: none; margin: 0; padding: 0; }
@@ -568,7 +572,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-20.1";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "2026-11-20.2";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -583,7 +587,10 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const nowIso = () => new Date().toISOString().replace(/\.\d+Z$/, "Z");
 
 let FEED = null, ITEMS = new Map(), SOURCES = new Map(), cryptoKey = null, lastOpener = null;
-let filters = store.json("aid.filters", { news: "all", analysis: "all" });
+// фильтр по источнику живёт только до закрытия приложения: 20.11.2026 сохранённый фильтр оставил в «Аналитике»
+// 2 текста из 19, и выглядело это как пропажа. Прежнее сохранённое значение стираем
+let filters = { news: "all", analysis: "all" };
+store.del("aid.filters");
 let current = store.get("aid.kind") || "news";
 const lastVisit = Number(store.get("aid.lastVisit") || 0);
 let lastFetch = 0, freshIds = new Set();
@@ -960,7 +967,9 @@ function renderPane(kind) {
       : `<b>${KIND_RU[kind]}</b>: источники этого раздела появятся после ближайшего обновления.`;
   } else {
     const s = SOURCES.get(f);
-    note.innerHTML = `<b>${esc(s.name)}</b>, ${esc(s.author)}. ${esc(s.about)}.`;
+    const shown = items.filter((it) => it.source === f).length;
+    note.innerHTML = `<b>${esc(s.name)}</b>, ${esc(s.author)}. ${esc(s.about)}.
+      <span class="filter-on">Показаны только его тексты: ${shown} из ${n}. <button type="button" data-show-all>Показать все</button></span>`;
   }
   const list = items.filter((it) => f === "all" || it.source === f);
   const reads = merged().reads;
@@ -993,7 +1002,11 @@ for (const kind of KINDS) {
     const b = e.target.closest("button[data-f]");
     if (!b) return;
     filters[kind] = b.dataset.f;
-    store.put("aid.filters", filters);
+    renderPane(kind);
+  });
+  $(".source-note", pane).addEventListener("click", (e) => {
+    if (!e.target.closest("[data-show-all]")) return;
+    filters[kind] = "all";
     renderPane(kind);
   });
   $(".entries", pane).addEventListener("click", (e) => {

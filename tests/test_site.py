@@ -147,7 +147,18 @@ with sync_playwright() as p:
     page.click('#pane-analysis button[data-f="importai"]')
     assert page.locator("#pane-analysis .entry").count() == 1
     assert "Джек Кларк" in page.inner_text("#pane-analysis .source-note")
-    page.click('#pane-analysis button[data-f="all"]')
+    total = page.locator('#pane-analysis button[data-f="all"] .n').inner_text()
+    assert f"Показаны только его тексты: 1 из {total}" in page.inner_text("#pane-analysis .filter-on")
+    page.click("#pane-analysis [data-show-all]")  # «Показать все» прямо под описанием источника
+    assert page.locator("#pane-analysis .entry").count() == int(total)
+    assert page.get_attribute('#pane-analysis button[data-f="all"]', "aria-pressed") == "true"
+    # фильтр не переживает перезапуск приложения: после перезагрузки снова все тексты
+    page.click('#pane-analysis button[data-f="importai"]')
+    page.reload()
+    page.wait_for_selector("#pane-analysis .entry")
+    assert page.locator("#pane-analysis .entry").count() == int(total)
+    page.click("#tab-analysis")
+    page.wait_for_function("window.scrollY === 1")
 
     # действия, как под ответом Claude: скопировать, поделиться, палец вверх, палец вниз — справа, без подписей и рамок
     ia = ITEM["importai"]["id"]
