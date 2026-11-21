@@ -80,7 +80,7 @@ Netlify — site/index.html (публикуется только при изме
 | `COMPARE_PROVIDER` | auto (все остальные движки с ключами) | Чем переводить для сравнения: `openai`, `gemini`, `claude`; `off` — не сравнивать |
 | `COMPARE_MODEL` | auto (для Claude — Haiku) | Ещё одна модель того же движка для сравнения переводов; `off` — не сравнивать |
 | `COMPARE_LIMIT` | 3 | Сколько постов перевести каждым вариантом для сравнения |
-| `OPENAI_MODEL_TRANSLATE` | gpt-6-astra | Модель-переводчик OpenAI: `gpt-6.1-sol` дешевле в 5 раз (и `OPENAI_MODEL_ABSTRACT`, `OPENAI_MODEL_SCORE`) |
+| `OPENAI_MODEL_TRANSLATE` | gpt-6.2-sol | Модель-переводчик OpenAI: `gpt-6-astra` дороже в 5 раз (и `OPENAI_MODEL_ABSTRACT`, `OPENAI_MODEL_SCORE`) |
 | `OPENAI_REASONING_EFFORT` | low | Глубина размышлений моделей OpenAI: low, medium, high, xhigh, max |
 | `GEMINI_MODEL_TRANSLATE` | gemini-3.1-pro-preview | Модель-переводчик Gemini (и `GEMINI_MODEL_ABSTRACT`, `GEMINI_MODEL_SCORE`) |
 | `GEMINI_THINKING_LEVEL` | LOW | Глубина «размышлений» Gemini: MINIMAL, LOW, MEDIUM, HIGH |

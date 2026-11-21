@@ -104,7 +104,8 @@ class Config:
     # OpenAI (оплачивается кредитами подписки ChatGPT Pro)
     openai_model_score: str = "gpt-6-luna"
     openai_model_abstract: str = "gpt-6.1-sol"
-    openai_model_translate: str = "gpt-6-astra"
+    # gpt-6.2-sol ($2/$10) в 5 раз дешевле gpt-6-astra ($10/$50); решение Валерия 21.11.2026
+    openai_model_translate: str = "gpt-6.2-sol"
     openai_effort: str = "low"       # reasoning.effort: low | medium | high | xhigh | max; пусто — по умолчанию модели
     show_min_score: int = 6          # с этой оценки пост попадает на страницу (абстракт)
     translate_min_score: int = 6     # с этой оценки делается полный перевод

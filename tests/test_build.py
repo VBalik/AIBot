@@ -183,7 +183,7 @@ def openai_handler(req: httpx.Request):
         return openai_reply(json.dumps({"title_ru": TITLES_RU.get(title, title),
                                         "abstract_ru": ". ".join(RU["openai"][:3]) + "."}, ensure_ascii=False))
     calls["o_translate"] += 1
-    assert model == "gpt-6-astra" and system == build.TRANSLATOR_SYSTEM
+    assert model == "gpt-6.2-sol" and system == build.TRANSLATOR_SYSTEM
     src = source_of(user)
     if len(src) > 4000:
         calls["o_truncated"] += 1
@@ -575,7 +575,7 @@ def main():
     feed_c = json.loads((out_c / "feed.json").read_text())
     ia_c = next(it for it in feed_c["items"] if it["title_en"].startswith("Import AI 481"))
     assert st_c["translated"] == 1 and st_c["compared"] == 1 and st_c["new"] == 5
-    assert ia_c["engine"] == "openai" and ia_c["model"] == "gpt-6-astra"
+    assert ia_c["engine"] == "openai" and ia_c["model"] == "gpt-6.2-sol"
     assert ia_c["alt"] == [{"id": "claude", "model": "claude-sonnet-5-5"}]
     assert calls["o_score"] == 5 and calls["o_abstract"] == 4 and calls["o_truncated"] >= 1
     assert calls["c_score"] == before["c_score"] and calls["g_score"] == before["g_score"]
