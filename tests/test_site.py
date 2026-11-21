@@ -441,7 +441,7 @@ with sync_playwright() as p:
     r = page.request.get(BASE + "site/" + touch)
     assert r.ok, touch
     img = Image.open(io.BytesIO(r.body()))
-    assert img.size == (180, 180) and img.mode == "RGB", (img.size, img.mode)
+    assert img.size == (180, 180) and img.mode in ("RGB", "P") and "transparency" not in img.info, (img.size, img.mode)
     man = page.request.get(BASE + "site/manifest.webmanifest").json()
     for ic in man["icons"]:
         got = Image.open(io.BytesIO(page.request.get(BASE + "site/" + ic["src"]).body()))
