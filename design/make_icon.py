@@ -1,36 +1,62 @@
-"""Иконка приложения (просьба Валерия 21.11.2026): точечная матрица 17×17 на «озёрном» градиенте.
-Все точки одного золотого цвета и различаются только размером: крупные образуют «AI», остальные — мелкий фон.
+"""Иконка приложения (просьбы Валерия 21.11.2026): чёрно-белая, «AI» набрано типографским шрифтом
+(Liberation Serif Bold — свободный аналог Times) и выложено растром из точек 48×48, как в газетной печати:
+внутри букв точки крупные, по краям — промежуточные, на фоне — мелкие. Все точки одного белого цвета на чёрном.
 
-    python design/make_icon.py   # пишет design/app-icon.svg, site/favicon.svg и PNG в site/icons/ (нужен Playwright)
+    python design/make_icon.py   # пишет design/app-icon.svg, site/favicon.svg и PNG в site/icons/ (нужны Pillow и Playwright)
 """
+import math
 from pathlib import Path
 
+from PIL import Image, ImageDraw, ImageFont
+
 ROOT = Path(__file__).resolve().parent.parent
-N = 17  # точек в ряду (21.11.2026 Валерий попросил больше точек и все одного цвета — различаются только размером)
-# буквы 7×11 и 5×11, у «A» острый верх (иначе читается как «H»)
-A = ["...#...", "..#.#..", "..#.#..", ".#...#.", ".#...#.", "#.....#", "#######", "#.....#", "#.....#", "#.....#", "#.....#"]
-I = ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"]
-LETTER = {(r + 3, c + 2) for r, row in enumerate(A) for c, ch in enumerate(row) if ch == "#"} | \
-         {(r + 3, c + 10) for r, row in enumerate(I) for c, ch in enumerate(row) if ch == "#"}
+FONT = "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf"  # пакет fonts-liberation, лицензия OFL
+N = 48                      # точек в ряду
+R_MIN, R_MAX = 0.09, 0.50   # радиус точки в долях шага растра: фон — внутри буквы
+S = 2048                    # разрешение маски букв
 
 
-def icon(scale: float = 1.0, rounded: bool = False, size: int = 1024) -> str:
-    start, big, small = 112, 22, 6
-    step = (1024 - 2 * start) / (N - 1)
-    dots = "".join(f'<circle cx="{start + c * step:.1f}" cy="{start + r * step:.1f}" r="{big if (r, c) in LETTER else small}"/>'
-                   for r in range(N) for c in range(N))
+def letters_mask(text: str = "AI", cap: float = 0.50, max_w: float = 0.74, track: float = 0.06) -> Image.Image:
+    """Чёрно-белая маска набранного текста: высота прописной — cap, ширина — не больше max_w квадрата."""
+    probe = ImageFont.truetype(FONT, 1000)
+    b = probe.getbbox("I")
+    size = int(1000 * cap * S / (b[3] - b[1]))
+    for _ in range(2):
+        font = ImageFont.truetype(FONT, size)
+        boxes = [font.getbbox(ch) for ch in text]
+        total = sum(x[2] - x[0] for x in boxes) + track * size * (len(text) - 1)
+        if total <= max_w * S:
+            break
+        size = int(size * max_w * S / total)
+    im = Image.new("L", (S, S), 0)
+    d = ImageDraw.Draw(im)
+    x = (S - total) / 2
+    ib = font.getbbox("I")
+    y = (S - (ib[3] - ib[1])) / 2 - ib[1]
+    for ch, bx in zip(text, boxes):
+        d.text((x - bx[0], y), ch, font=font, fill=255)
+        x += bx[2] - bx[0] + track * size
+    return im
+
+
+def dots(n: int = N) -> str:
+    mask, cell, k = letters_mask(), 1024 / n, S / 1024
+    out = []
+    for r in range(n):
+        for c in range(n):
+            cx, cy = (c + .5) * cell, (r + .5) * cell
+            crop = mask.crop((int((cx - cell / 2) * k), int((cy - cell / 2) * k), int((cx + cell / 2) * k), int((cy + cell / 2) * k)))
+            cover = sum(crop.histogram()[i] * i for i in range(256)) / (255 * crop.width * crop.height)
+            out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{cell * (R_MIN + (R_MAX - R_MIN) * math.sqrt(cover)):.1f}"/>')
+    return "".join(out)
+
+
+def icon(scale: float = 1.0, rounded: bool = False, size: int = 1024, n: int = N) -> str:
     k = 512 * (1 - scale)
-    clip = '<clipPath id="r"><rect width="1024" height="1024" rx="230"/></clipPath>' if rounded else ""
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="{size}" height="{size}"><defs>{clip}'
-            '<linearGradient id="bg" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" stop-color="#1E8A84"/>'
-            '<stop offset="0.55" stop-color="#0F6B68"/><stop offset="1" stop-color="#0A4547"/></linearGradient>'
-            '<radialGradient id="glow" cx="0.28" cy="0.18" r="0.75"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"/>'
-            '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>'
-            '<linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="100" y1="100" x2="924" y2="924">'
-            '<stop offset="0" stop-color="#FFDB8E"/><stop offset="1" stop-color="#EFA437"/></linearGradient></defs>'
-            f'<g{" clip-path=" + chr(34) + "url(#r)" + chr(34) if rounded else ""}>'
-            '<rect width="1024" height="1024" fill="url(#bg)"/><rect width="1024" height="1024" fill="url(#glow)"/>'
-            f'<g transform="translate({k:.1f} {k:.1f}) scale({scale})" fill="url(#gold)">{dots}</g></g></svg>')
+    clip = '<defs><clipPath id="r"><rect width="1024" height="1024" rx="230"/></clipPath></defs>' if rounded else ""
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="{size}" height="{size}">{clip}'
+            f'<g{" clip-path=" + chr(34) + "url(#r)" + chr(34) if rounded else ""}><rect width="1024" height="1024" fill="#000"/>'
+            f'<g transform="translate({k:.1f} {k:.1f}) scale({scale})" fill="#FFF">{dots(n)}</g></g></svg>')
 
 
 def render() -> None:
@@ -60,6 +86,6 @@ def render() -> None:
 
 if __name__ == "__main__":
     (ROOT / "design" / "app-icon.svg").write_text(icon())
-    (ROOT / "site" / "favicon.svg").write_text(icon(rounded=True, size=64))
+    (ROOT / "site" / "favicon.svg").write_text(icon(rounded=True, size=64, n=24))  # во вкладке крупнее растр и легче файл
     render()
     print("готово")
