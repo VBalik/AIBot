@@ -1,27 +1,24 @@
-"""Иконка приложения (просьба Валерия 21.11.2026): точечная матрица 11×11 на «озёрном» градиенте,
-крупные золотые точки образуют «AI», остальные — мелкий светлый фон.
+"""Иконка приложения (просьба Валерия 21.11.2026): точечная матрица 17×17 на «озёрном» градиенте.
+Все точки одного золотого цвета и различаются только размером: крупные образуют «AI», остальные — мелкий фон.
 
     python design/make_icon.py   # пишет design/app-icon.svg, site/favicon.svg и PNG в site/icons/ (нужен Playwright)
 """
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-A = ["..#..", ".#.#.", "#...#", "#...#", "#####", "#...#", "#...#"]   # 5×7, острый верх — читается как «A»
-I = ["###", ".#.", ".#.", ".#.", ".#.", ".#.", "###"]
-LETTER = {(r + 2, c + 1) for r, row in enumerate(A) for c, ch in enumerate(row) if ch == "#"} | \
-         {(r + 2, c + 7) for r, row in enumerate(I) for c, ch in enumerate(row) if ch == "#"}
+N = 17  # точек в ряду (21.11.2026 Валерий попросил больше точек и все одного цвета — различаются только размером)
+# буквы 7×11 и 5×11, у «A» острый верх (иначе читается как «H»)
+A = ["...#...", "..#.#..", "..#.#..", ".#...#.", ".#...#.", "#.....#", "#######", "#.....#", "#.....#", "#.....#", "#.....#"]
+I = ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"]
+LETTER = {(r + 3, c + 2) for r, row in enumerate(A) for c, ch in enumerate(row) if ch == "#"} | \
+         {(r + 3, c + 10) for r, row in enumerate(I) for c, ch in enumerate(row) if ch == "#"}
 
 
 def icon(scale: float = 1.0, rounded: bool = False, size: int = 1024) -> str:
-    start, step, big, small = 152, 72, 29, 8
-    dots = []
-    for r in range(11):
-        for c in range(11):
-            x, y = start + c * step, start + r * step
-            if (r, c) in LETTER:
-                dots.append(f'<circle cx="{x}" cy="{y}" r="{big}" fill="url(#gold)"/>')
-            else:
-                dots.append(f'<circle cx="{x}" cy="{y}" r="{small}" fill="#F6F1E6" fill-opacity=".3"/>')
+    start, big, small = 112, 22, 6
+    step = (1024 - 2 * start) / (N - 1)
+    dots = "".join(f'<circle cx="{start + c * step:.1f}" cy="{start + r * step:.1f}" r="{big if (r, c) in LETTER else small}"/>'
+                   for r in range(N) for c in range(N))
     k = 512 * (1 - scale)
     clip = '<clipPath id="r"><rect width="1024" height="1024" rx="230"/></clipPath>' if rounded else ""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="{size}" height="{size}"><defs>{clip}'
@@ -29,11 +26,11 @@ def icon(scale: float = 1.0, rounded: bool = False, size: int = 1024) -> str:
             '<stop offset="0.55" stop-color="#0F6B68"/><stop offset="1" stop-color="#0A4547"/></linearGradient>'
             '<radialGradient id="glow" cx="0.28" cy="0.18" r="0.75"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".16"/>'
             '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>'
-            '<linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="150" y1="150" x2="874" y2="874">'
+            '<linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="100" y1="100" x2="924" y2="924">'
             '<stop offset="0" stop-color="#FFDB8E"/><stop offset="1" stop-color="#EFA437"/></linearGradient></defs>'
             f'<g{" clip-path=" + chr(34) + "url(#r)" + chr(34) if rounded else ""}>'
             '<rect width="1024" height="1024" fill="url(#bg)"/><rect width="1024" height="1024" fill="url(#glow)"/>'
-            f'<g transform="translate({k:.1f} {k:.1f}) scale({scale})">{"".join(dots)}</g></g></svg>')
+            f'<g transform="translate({k:.1f} {k:.1f}) scale({scale})" fill="url(#gold)">{dots}</g></g></svg>')
 
 
 def render() -> None:
