@@ -9,7 +9,7 @@
  * Страница присылает сообщение {type: "cache-images", urls: [...]}: SW докачивает иллюстрации в фоне,
  * чтобы они были доступны офлайн, даже если статью ещё не открывали.
  */
-const VERSION = "v3";
+const VERSION = "v4";
 const SHELL = `shell-${VERSION}`;
 const DATA = "data";
 const FONTS = "fonts";
@@ -17,7 +17,7 @@ const IMAGES = "images";
 const MAX_IMAGES = 800;
 const SHELL_FILES = [
   "./", "index.html", "favicon.svg", "manifest.webmanifest",
-  "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png",
+  "icons/app-192.png", "icons/app-512.png", "icons/app-maskable-512.png", "icons/app-180.png",
 ];
 const FONT_FILES = ["fonts/onest-cyrillic.woff2", "fonts/onest-latin.woff2"];
 

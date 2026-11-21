@@ -93,6 +93,7 @@ handler.log_message = lambda *a: None
 srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f"http://localhost:{srv.server_port}/site/index.html?data=/tests/out/data-ui/"
+BASE = f"http://localhost:{srv.server_port}/"
 
 errors = []
 with sync_playwright() as p:
@@ -409,6 +410,19 @@ with sync_playwright() as p:
     dp.wait_for_selector(".entry")
     dp.wait_for_timeout(300)
     dp.screenshot(path=str(OUT / "5-dark.png"))
+
+    # иконка для экрана «Домой»: 180×180 без прозрачности, иконки манифеста на месте
+    from PIL import Image
+    import io
+    touch = page.get_attribute('link[rel="apple-touch-icon"]', "href")
+    r = page.request.get(BASE + "site/" + touch)
+    assert r.ok, touch
+    img = Image.open(io.BytesIO(r.body()))
+    assert img.size == (180, 180) and img.mode == "RGB", (img.size, img.mode)
+    man = page.request.get(BASE + "site/manifest.webmanifest").json()
+    for ic in man["icons"]:
+        got = Image.open(io.BytesIO(page.request.get(BASE + "site/" + ic["src"]).body()))
+        assert f"{got.size[0]}x{got.size[1]}" == ic["sizes"], ic
 
     # первоисточник из подборки TLDR AI подписан сайтом статьи
     feed_r = json.loads((UI / "feed.json").read_text())

@@ -12,7 +12,8 @@
 <title>Дайджест ИИ</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!-- иконка для экрана «Домой» (21.11.2026): золотые точки сгущаются в строку текста; исходник — design/app-icon.svg -->
+<link rel="apple-touch-icon" href="icons/app-180.png">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preload" href="fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <script>/* тема «Аа» — до первой отрисовки, чтобы при запуске не мелькал другой фон */
@@ -572,7 +573,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-20.2";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "2026-11-21.1";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
