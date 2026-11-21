@@ -361,7 +361,28 @@ with sync_playwright() as p:
     page.click('#themes button[data-theme="original"]')
     page.click("#sheet-aa [data-close]")
 
-    # источники: рейтинг раздела, закрепление, история и «вернуть»
+    # для друзей: в источниках только список, без рейтинга, закрепления, кандидатов и замен
+    assert page.evaluate("document.documentElement.classList.contains('owner')") is False
+    page.click("#open-sources")
+    page.wait_for_selector("#sheet-sources:not([hidden])")
+    assert page.locator("#ranking.plain li").count() == 3
+    assert page.locator("#ranking button[data-pin]").count() == 0 and page.locator("#ranking .bar").count() == 0
+    assert page.is_hidden("#ranking-h") and page.is_hidden("#candidates") and page.is_hidden("#history")
+    assert "Откуда берутся тексты" in page.inner_text("#src-explain")
+    page.screenshot(path=str(OUT / "9a-sources-friends.png"))
+    page.click("#sheet-sources [data-close]")
+    # в настройках нет синхронизации; пять быстрых касаний версии включают режим владельца
+    page.click("#open-settings")
+    page.wait_for_selector("#sheet-settings:not([hidden])")
+    assert page.is_hidden("#sync-form") and page.is_visible("#forget")  # пароль на этом устройстве введён
+    for _ in range(4):
+        page.click("#app-version")
+    assert page.is_hidden("#sync-form")
+    page.click("#app-version")
+    assert page.is_visible("#sync-form") and page.evaluate("localStorage.getItem('aid.owner')") == "1"
+    page.click("#sheet-settings [data-close]")
+
+    # источники у владельца: рейтинг раздела, закрепление, история и «вернуть»
     page.click("#open-sources")
     page.wait_for_selector("#sheet-sources:not([hidden])")
     rows = page.locator("#ranking li")
@@ -433,6 +454,12 @@ with sync_playwright() as p:
     dp.wait_for_selector(".entry")
     dp.wait_for_timeout(300)
     dp.screenshot(path=str(OUT / "5-dark.png"))
+    # на новом устройстве без пароля ссылки «Забыть пароль» нет (раньше её показывало правило all: unset)
+    dp.click("#open-settings")
+    dp.wait_for_selector("#sheet-settings:not([hidden])")
+    assert dp.is_hidden("#forget") and dp.is_hidden("#sync-form")
+    assert "спросят один раз" in dp.inner_text("#pw-state")
+    dp.click("#sheet-settings [data-close]")
 
     # иконка для экрана «Домой»: 180×180 без прозрачности, иконки манифеста на месте
     from PIL import Image
