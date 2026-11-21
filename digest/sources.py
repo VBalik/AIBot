@@ -99,13 +99,19 @@ class SourceBook:
     def known_ids(self) -> set[str]:
         return self.ids() | {s["id"] for s in self.data["removed"]}
 
+    def _icon(self, sid: str) -> dict:
+        """Фирменный значок (digest/icons.py): путь в ветке data с хэшем для сброса кэша."""
+        m = self.data.get("icons", {}).get(sid) or {}
+        return {"icon": f"{m['file']}?v={m['v']}"} if m.get("file") else {}
+
     def public(self, referenced: set[str]) -> list[dict]:
         """Метаданные для feed.json: активные плюс убранные, чьи посты ещё лежат в ленте."""
-        out = [{k: s[k] for k in PUBLIC_FIELDS if k in s} | {"active": True} for s in self.data["active"]]
+        out = [{k: s[k] for k in PUBLIC_FIELDS if k in s} | {"active": True} | self._icon(s["id"]) for s in self.data["active"]]
         seen = {s["id"] for s in out}
         for s in reversed(self.data["removed"]):
             if s["id"] in referenced and s["id"] not in seen:
-                out.append({k: s[k] for k in PUBLIC_FIELDS if k in s} | {"active": False, "removed": s.get("removed")})
+                out.append({k: s[k] for k in PUBLIC_FIELDS if k in s} | {"active": False, "removed": s.get("removed")}
+                           | self._icon(s["id"]))
                 seen.add(s["id"])
         return out
 

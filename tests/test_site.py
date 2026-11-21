@@ -32,6 +32,16 @@ feed["source_candidates"] = [{"id": "goedecke", "kind": "analysis", "name": "Sea
 for s in feed["sources"]:
     if s["id"] == "willison":
         s["active"] = False
+# фирменные значки: у Import AI есть, у Interconnects файл пропал (страница должна показать буквы)
+from PIL import Image as _Image  # noqa: E402
+(UI / "icons").mkdir(exist_ok=True)
+_Image.new("RGBA", (160, 160), (196, 60, 40, 255)).save(UI / "icons" / "importai.png")
+for s in feed["sources"]:
+    if s["id"] == "importai":
+        s["icon"] = "icons/importai.png?v=t1"
+    if s["id"] == "interconnects":
+        s["icon"] = "icons/missing.png?v=1"
+feed["source_candidates"][0]["icon"] = "icons/importai.png?v=t1"
 (UI / "feed.json").write_text(json.dumps(feed, ensure_ascii=False))
 ITEM = {it["source"]: it for it in feed["items"]}
 
@@ -104,7 +114,8 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
     # 404 от GitHub API на ещё не созданный файл устройства — штатный ответ, не ошибка страницы
     page.on("console", lambda m: m.type == "error" and "ERR_TUNNEL_CONNECTION_FAILED" not in m.text
-            and "api.github.com" not in (m.location or {}).get("url", "") and errors.append(m.text))
+            and "api.github.com" not in (m.location or {}).get("url", "")
+            and "icons/missing.png" not in (m.location or {}).get("url", "") and errors.append(m.text))  # значок пропал нарочно
 
     page.goto(URL)
     page.wait_for_selector("#pane-analysis .entry")
@@ -145,6 +156,18 @@ with sync_playwright() as p:
     page.wait_for_function("window.scrollY === 1", timeout=5000)  # и снова готова
 
     # фильтр по источнику внутри раздела
+    # фирменные значки вместо букв; не загрузился — снова буквы; число текстов — кружок у угла
+    page.wait_for_function("""(() => { const i = document.querySelector('#pane-analysis button[data-f="importai"] .tile.logo img');
+                                 return i && i.complete && i.naturalWidth === 160; })()""")
+    page.wait_for_function("""!document.querySelector('#pane-analysis button[data-f="interconnects"] .tile').classList.contains('logo')""")
+    assert page.locator(f'.entry[data-id="{ITEM["importai"]["id"]}"] .tile.sm.logo img').count() == 1
+    sym = page.inner_text('#pane-analysis button[data-f="interconnects"] .tile .sym')
+    assert sym and page.is_visible('#pane-analysis button[data-f="interconnects"] .tile .sym'), sym
+    badge = page.locator('#pane-analysis button[data-f="importai"] .n').bounding_box()
+    tb = page.locator('#pane-analysis button[data-f="importai"] .tile').bounding_box()
+    assert badge["x"] + badge["width"] > tb["x"] + tb["width"] and badge["y"] < tb["y"], (badge, tb)
+    page.screenshot(path=str(OUT / "1e-logos.png"), clip={"x": 0, "y": tb["y"] - 30, "width": 390, "height": 260})
+
     page.click('#pane-analysis button[data-f="importai"]')
     assert page.locator("#pane-analysis .entry").count() == 1
     assert "Джек Кларк" in page.inner_text("#pane-analysis .source-note")

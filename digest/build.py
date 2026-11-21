@@ -56,6 +56,7 @@ from sources import SourceBook  # noqa: E402
 import feedback as fbmod  # noqa: E402
 import review  # noqa: E402
 import radar as radarmod  # noqa: E402
+import icons as iconsmod  # noqa: E402
 import telegram  # noqa: E402
 
 log = logging.getLogger("ai-digest")
@@ -855,7 +856,8 @@ class DataDir:
             # последние замены источников — приложение показывает их на экране источников
             "source_history": self.sources.data["history"][-12:],
             "last_review": self.sources.data.get("last_review"),
-            "source_candidates": self.sources.data.get("candidates", [])[:10],
+            "source_candidates": [{**c, **({"icon": p} if (p := iconsmod.public_path(self.sources, c["id"])) else {})}
+                                  for c in self.sources.data.get("candidates", [])[:10]],
             "crypto": self.crypto,
             "items": items,
         }
@@ -1126,6 +1128,12 @@ def main() -> None:
         log.warning("Оценки не загрузились: %s", exc)
         print(f"::warning::{redact(str(exc))}")
         fb = fbmod.Feedback()
+    try:  # фирменные значки источников: недостающие и устаревшие (раз в 30 дней)
+        got = iconsmod.refresh(data.root, data.sources, extra=data.sources.data.get("candidates", [])[:10])
+        if got:
+            log.info("Значков источников обновлено: %d", got)
+    except Exception as exc:  # noqa: BLE001 — без значков страница покажет плитки с буквами
+        log.warning("Значки источников не обновились: %s", exc)
     stats = run(cfg, data, writer, vault, extras=extras, tg=tg, fb=fb)
     for msg in data.state["last_run"]["errors"][:5]:
         print(f"::warning::{msg}")  # видно прямо на странице прогона в GitHub Actions
