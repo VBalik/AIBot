@@ -21,8 +21,13 @@ from sources import SourceBook  # noqa: E402
 
 
 def png(w, h, color=(200, 30, 30, 255), fmt="PNG"):
+    """Картинка-«логотип»: цветной квадрат с белым кругом (однотонная считалась бы пустой, если цвет белый)."""
+    from PIL import ImageDraw
+    im = Image.new("RGBA", (w, h), color)
+    if color[3] and color[:3] != (255, 255, 255):
+        ImageDraw.Draw(im).ellipse((w // 4, h // 4, 3 * w // 4, 3 * h // 4), fill=(255, 255, 255, 255))
     buf = io.BytesIO()
-    Image.new("RGBA", (w, h), color).save(buf, fmt, **({"sizes": [(16, 16), (48, 48)]} if fmt == "ICO" else {}))
+    im.save(buf, fmt, **({"sizes": [(16, 16), (48, 48)]} if fmt == "ICO" else {}))
     return buf.getvalue()
 
 
@@ -54,6 +59,8 @@ def check_normalize():
     assert icons.normalize(png(1200, 630)) is None      # баннер, не значок
     assert icons.normalize(png(16, 16)) is None          # слишком мелкий
     assert icons.normalize(b"<html>not an image</html>") is None
+    assert icons.normalize(png(180, 180, (255, 255, 255, 255))) is None   # пустая белая
+    assert icons.normalize(png(180, 180, (0, 0, 0, 0))) is None           # пустая прозрачная
     assert Image.open(io.BytesIO(icons.normalize(png(48, 48, fmt="ICO")))).size == (icons.SIZE, icons.SIZE)  # .ico
     assert Image.open(io.BytesIO(icons.normalize(png(200, 180)))).size == (icons.SIZE, icons.SIZE)  # почти квадрат — обрезка
     print("значки: квадрат 160×160, баннеры и крошечные favicon отбрасываются, .ico читается — ok")

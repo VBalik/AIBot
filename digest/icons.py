@@ -23,7 +23,7 @@ from urllib.parse import urljoin, urlparse
 import feedparser
 import httpx
 from bs4 import BeautifulSoup
-from PIL import Image
+from PIL import Image, ImageStat
 
 log = logging.getLogger("digest.icons")
 
@@ -34,7 +34,7 @@ REFRESH_DAYS = 30
 RETRY_DAYS = 7
 MAX_PER_RUN = 30        # источников за один прогон (каждый — до 10 коротких запросов)
 GOOD_SIDE = 150         # нашли картинку такого размера — дальше не ищем
-ALG = 2                 # версия поиска: значки, найденные прежней версией, пересматриваются сразу
+ALG = 3                 # версия поиска: значки, найденные прежней версией, пересматриваются сразу
 # значки платформ, а не издателей: буква W от WordPress, медвежонок Bear Blog — лучше плитка с буквами
 GENERIC = (("s0.wp.com", "/i/"), ("wordpress.com", "/i/"), ("bearblog.dev", "/apple-touch-icon"),
            ("bearblog.dev", "/favicon"))
@@ -116,6 +116,10 @@ def normalize(raw: bytes, with_side: bool = False):
         return None
     side = min(w, h)
     im = im.convert("RGBA").crop(((w - side) // 2, (h - side) // 2, (w - side) // 2 + side, (h - side) // 2 + side))
+    flat = Image.new("RGBA", im.size, (255, 255, 255, 255))
+    flat.alpha_composite(im)
+    if ImageStat.Stat(flat.convert("L")).stddev[0] < 4:
+        return None  # пустая картинка: белая или прозрачная (так выглядел apple-touch-icon у jack-clark.net)
     im = im.resize((SIZE, SIZE), Image.LANCZOS)
     buf = io.BytesIO()
     im.save(buf, "PNG", optimize=True)
