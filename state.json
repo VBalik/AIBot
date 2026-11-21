@@ -1,0 +1,4161 @@
+{
+ "version": 1,
+ "posts": {
+  "willison-6857dc224a": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Qwen 3.8 27B on my laptop can interpret model weights, too",
+   "published": "2026-11-03T16:29:48Z"
+  },
+  "willison-6bf0704cb5": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The U.S. Census Bureau and “Super Intelligence”",
+   "published": "2026-11-02T13:31:26Z"
+  },
+  "willison-93b9dc1d31": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The October inflection point for vibe game development",
+   "published": "2026-10-28T13:55:15Z"
+  },
+  "willison-3b5ce86c8c": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Battle Drones - a vibe coded RTS with audio-based multiplayer",
+   "published": "2026-10-20T19:34:19Z"
+  },
+  "willison-92f57cbc84": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Hello Python 3.15, goodbye 3.10, and now I can use 3.11",
+   "published": "2026-10-12T18:15:38Z"
+  },
+  "willison-95fd0fb1a7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "A new feature for my blog, built using my voice",
+   "published": "2026-10-09T12:54:06Z"
+  },
+  "willison-6dcb3088ac": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Claude Haiku 5.5",
+   "published": "2026-10-07T20:56:21Z"
+  },
+  "willison-5a3f1f4a82": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "We're going to need default hard budget caps on pretty much everything",
+   "published": "2026-10-03T23:34:02Z"
+  },
+  "willison-3bd3ec89a4": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "OpenAI DevDay 2026 live blog",
+   "published": "2026-09-29T15:55:13Z"
+  },
+  "willison-5588418545": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "2026 in LLMs (so far)",
+   "published": "2026-09-27T23:54:15Z"
+  },
+  "willison-f526d76790": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Claude Opus 5.5, GPT-6 Sol, GPT-6 Luna, and a new price war",
+   "published": "2026-09-22T23:46:41Z"
+  },
+  "willison-c079d2e633": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Jev introduces a new shape of LLM - System One, aka Decision Models",
+   "published": "2026-09-21T23:09:20Z"
+  },
+  "mollick-dd8a8739a4": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "30 Months on the Exponential (in Charts)",
+   "published": "2026-10-20T15:57:59Z"
+  },
+  "mollick-ee61659f96": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The Dot and the Swarm",
+   "published": "2026-10-01T10:54:12Z"
+  },
+  "mollick-44ad14e38c": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The Overhang",
+   "published": "2026-09-18T17:54:32Z"
+  },
+  "mollick-0cce3296bc": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Agency and Agents",
+   "published": "2026-08-31T00:24:35Z"
+  },
+  "interconnects-c85e9d7dd6": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "How big is the open model economy today?",
+   "published": "2026-11-04T16:35:44Z"
+  },
+  "interconnects-77b8021d80": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Was I wrong about open models & cyber risks?",
+   "published": "2026-10-30T17:36:56Z"
+  },
+  "interconnects-45f878f3f6": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Artificial Analysis v5 and the benchmarker's dilemma",
+   "published": "2026-10-28T12:58:39Z"
+  },
+  "interconnects-cb0e6541c4": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Podcast: Kimi K3.1 Pro, the new cyber reality, and Muse musings",
+   "published": "2026-10-25T11:49:00Z"
+  },
+  "interconnects-34b84ef907": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Latest open artifacts (#25): DeepSeek V4.1 Flash 1017, American-made models, and new regulatory controls in the US & China",
+   "published": "2026-10-20T17:04:21Z"
+  },
+  "interconnects-987754dece": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Meta shakes up the frontiers, open and closed",
+   "published": "2026-10-17T14:06:54Z"
+  },
+  "interconnects-992438874f": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "I expect rapid progress but not towards general superintelligence",
+   "published": "2026-10-09T21:33:47Z"
+  },
+  "interconnects-ee5a948a7c": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The Cyber Risk Discourse is Broken",
+   "published": "2026-10-06T14:22:41Z"
+  },
+  "interconnects-b7ce14e363": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Debating RSI, the US-China Gap, and Jaggedness with JS Denain of Epoch AI",
+   "published": "2026-09-22T13:37:45Z"
+  },
+  "interconnects-9a319be2f7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The current balance of power in open models",
+   "published": "2026-09-21T11:56:56Z"
+  },
+  "interconnects-00e72da2b9": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Why I still haven’t bought into true RSI",
+   "published": "2026-09-19T15:42:20Z"
+  },
+  "interconnects-3149e64f7f": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Open-Source AI & Open Models Reading List",
+   "published": "2026-09-11T12:36:25Z"
+  },
+  "interconnects-e723d856f7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "One resignation turned the embers of AI fear into a wildfire",
+   "published": "2026-09-10T15:28:52Z"
+  },
+  "interconnects-af4f922db5": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "When will average people feel AI’s impact?",
+   "published": "2026-09-09T11:01:23Z"
+  },
+  "interconnects-2089fa5ad7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Latest open artifacts (#24): Motif-3, GLM-5.3, Hy4-preview and open model licenses",
+   "published": "2026-09-08T14:15:25Z"
+  },
+  "interconnects-30d6dd90b1": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Teaching Everyone to Fish for Tokens",
+   "published": "2026-08-17T15:07:49Z"
+  },
+  "interconnects-3e4e84742a": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "GLM-5.3: How Chinese labs keep stride with the frontier",
+   "published": "2026-08-14T21:23:35Z"
+  },
+  "interconnects-ec0d34d30f": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "I wrote an AI textbook — how long until AI can do it better?",
+   "published": "2026-08-12T13:01:16Z"
+  },
+  "interconnects-1b72e96967": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "5 useful things you'll learn in my new post-training textbook (shipping now!)",
+   "published": "2026-08-10T13:02:42Z"
+  },
+  "latentspace-9260692a21": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Controlling Biology - Fabian Theis, Helmholtz Munich",
+   "published": "2026-11-06T15:10:53Z"
+  },
+  "raschka-d1a3b4fa5d": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Building Reasoning Models from the Ground Up: A Full Video Course",
+   "published": "2026-10-24T11:14:32Z"
+  },
+  "raschka-9ccfb6a685": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Language Models for Text Classification: From Bag-of-Words to Jev",
+   "published": "2026-09-29T10:50:25Z"
+  },
+  "raschka-4408428714": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "GPT-6 Astra, Looped Transformers, and Hidden Reasoning",
+   "published": "2026-09-09T11:14:25Z"
+  },
+  "raschka-df5399c7f9": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "How Claude Watermarks AI-Generated Text",
+   "published": "2026-08-22T11:11:39Z"
+  },
+  "raschka-53ddef6230": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Building an AI Text Detector From Scratch",
+   "published": "2026-08-15T11:54:24Z"
+  },
+  "understandingai-ae2861cc0e": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "This robotics concept helps explain the jaggedness of frontier capabilities",
+   "published": "2026-11-05T15:16:59Z"
+  },
+  "understandingai-f7d0f7defa": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Anthropic’s financials are surprisingly strong",
+   "published": "2026-10-29T19:10:41Z"
+  },
+  "understandingai-ddec4386da": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "AI is ushering in an age of personal media",
+   "published": "2026-10-19T13:33:47Z"
+  },
+  "understandingai-a417b97626": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "OpenAI’s ironic credibility problem",
+   "published": "2026-10-14T18:41:56Z"
+  },
+  "understandingai-bb54d05658": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Understanding Jev, the new model everyone is talking about",
+   "published": "2026-10-08T13:14:53Z"
+  },
+  "understandingai-11a09ed4b4": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Introducing Dan Kagan-Kans",
+   "published": "2026-10-05T19:11:19Z"
+  },
+  "understandingai-f829b8e988": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Why agent swarms could be the next “scaling law”",
+   "published": "2026-10-05T17:19:00Z"
+  },
+  "understandingai-f20095b00a": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "How a single tweet transformed the AI safety debate",
+   "published": "2026-09-17T20:21:40Z"
+  },
+  "understandingai-d4ce027f26": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "OpenAI spent millions to solve this famous math problem — mathematicians are furious",
+   "published": "2026-09-10T22:40:39Z"
+  },
+  "understandingai-1abeaea49c": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "19 robotics companies to watch",
+   "published": "2026-09-04T16:04:09Z"
+  },
+  "understandingai-89688d4818": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Robot startups are trying everything they can think of to get more data",
+   "published": "2026-09-03T18:16:36Z"
+  },
+  "understandingai-24e6c42312": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "How Google taught LLMs to control robots and started a robotics boom",
+   "published": "2026-09-02T16:24:29Z"
+  },
+  "understandingai-a757f4cc32": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Why humanoid robots won’t catch up to human workers any time soon",
+   "published": "2026-09-01T12:52:39Z"
+  },
+  "understandingai-e6ba11d153": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "I spent $4,000 on a robot dog from China",
+   "published": "2026-08-31T13:57:26Z"
+  },
+  "understandingai-081c25b3b7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Labs are struggling to keep frontier models under control",
+   "published": "2026-08-13T16:28:51Z"
+  },
+  "understandingai-78b65f0b81": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Mathematicians are grappling with the possibility that AI might eclipse them",
+   "published": "2026-08-04T13:53:52Z"
+  },
+  "understandingai-e2f214dc91": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Our advertising principles",
+   "published": "2026-08-04T12:55:50Z"
+  },
+  "normaltech-8accc0ca43": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "New paper: Emerging trends in AI agent evaluation",
+   "published": "2026-10-19T20:11:55Z"
+  },
+  "normaltech-5ec807ee08": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Steering AI Beyond Automation",
+   "published": "2026-10-14T19:56:44Z"
+  },
+  "normaltech-63253a2875": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "A big-tent or small-tent AI safety movement?",
+   "published": "2026-10-01T16:34:51Z"
+  },
+  "normaltech-7e46b971dd": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "AI existential risk probabilities are (still) too unreliable to inform policy",
+   "published": "2026-09-28T11:13:47Z"
+  },
+  "normaltech-4ed21dcc89": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The AI-as-Normal-Technology view of loss-of-control incidents",
+   "published": "2026-09-14T10:30:14Z"
+  },
+  "normaltech-ec0e53c55d": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "AI agents can't yet do open-ended AI research",
+   "published": "2026-08-05T13:49:19Z"
+  },
+  "karpathy-c241855c28": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "HackerTube",
+   "published": "2026-10-31T17:00:00Z"
+  },
+  "dwarkesh-c0c2d1f362": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The benchmark where AIs have to lie to win",
+   "published": "2026-11-05T21:05:50Z"
+  },
+  "dwarkesh-69cf72c5ff": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "What Robert Caro learned about power after studying it for 50 years",
+   "published": "2026-10-30T16:56:02Z"
+  },
+  "dwarkesh-ad9d884cc2": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "What I learned about power from LBJ and Robert Moses",
+   "published": "2026-10-29T16:48:39Z"
+  },
+  "dwarkesh-fff294f4b8": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "What will computer chips look like in 2045?",
+   "published": "2026-10-22T15:02:21Z"
+  },
+  "dwarkesh-4684fe4238": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Si Sheppard – How did a few hundred Spanish soldiers topple two empires?",
+   "published": "2026-10-01T15:28:28Z"
+  },
+  "dwarkesh-bb65895bed": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Noam Brown – Agent swarms, alignment, & recursive self-improvement",
+   "published": "2026-09-17T15:38:13Z"
+  },
+  "dwarkesh-8f24b4306d": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "AI researchers debate how close we are to recursive self-improvement",
+   "published": "2026-09-11T16:28:11Z"
+  },
+  "dwarkesh-3978b8b7d6": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Pretraining progress is mostly coming from data",
+   "published": "2026-09-08T16:10:16Z"
+  },
+  "dwarkesh-62936f3b46": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Ajeya Cotra – Inside the OpenAI agent swarm that hacked Hugging Face",
+   "published": "2026-09-01T15:41:06Z"
+  },
+  "dwarkesh-2abce5a3e1": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The rise and fall of agent civilizations",
+   "published": "2026-08-31T20:36:53Z"
+  },
+  "dwarkesh-dab2710a3e": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "The Rise and Fall of Agent Civilizations",
+   "published": "2026-08-29T22:47:53Z"
+  },
+  "dwarkesh-56ff059d97": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Dylan Patel – Anthropic & OpenAI will have most of the world’s compute by 2028",
+   "published": "2026-08-25T15:32:57Z"
+  },
+  "dwarkesh-8c85a5e4c7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Ryan Greenblatt – What happens once AI can automate AI research?",
+   "published": "2026-08-11T16:31:23Z"
+  },
+  "dwarkesh-2317294fb2": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "8 Predictions for the Era of Continual Learning",
+   "published": "2026-08-07T17:17:40Z"
+  },
+  "dwarkesh-8eb370e2a9": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Why smarter AI models could drive up compute prices 10x",
+   "published": "2026-08-03T17:32:13Z"
+  },
+  "dwarkesh-eb1db950a6": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Why compute might get 10x+ more expensive in coming years",
+   "published": "2026-07-29T15:01:35Z"
+  },
+  "evans-482667c1e2": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "AI, tools and transformation",
+   "published": "2026-09-03T21:26:04Z"
+  },
+  "willison-5ab3ec093f": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Подробный разбор работающей архитектуры Pyodide и Service Workers с практическими примерами для тестирования и воспроизведения багов; это оригинальный инженерный опыт, а не пересказ новости.",
+   "title": "Running the full server-side Datasette Python app in the browser with service workers and Pyodide",
+   "published": "2026-11-17T16:48:33Z"
+  },
+  "willison-d363b026f0": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Сильный разбор работающего проекта: автор показывает, как агент с помощью нескольких устройств локализовал звук, описывает архитектуру и ограничения, а заодно демонстрирует практический способ дать кодовому агенту доступ к внешним данным.",
+   "title": "Locating the source of a mysterious beep with Claude",
+   "published": "2026-11-09T23:57:21Z"
+  },
+  "willison-a92667754b": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезный практический приём для PR с кодом от ИИ, но текст короткий и почти целиком посвящён оформлению, без экспериментов или более глубокого анализа.",
+   "title": "Hide your slop PR descriptions behind <details><summary>",
+   "published": "2026-11-09T04:25:05Z"
+  },
+  "importai-5255c976de": {
+   "status": "shown",
+   "score": 8,
+   "reason": "В выпуске есть конкретные результаты FrontierML и экспериментов по скрытому саботажу, а также разбор AI-лабораторий для науки и моделей для РЭБ.",
+   "title": "Import AI 481: AI sub-contractors; a wet lab for AI; and subterfuge during development",
+   "published": "2026-11-16T14:01:15Z"
+  },
+  "importai-b10ee872c6": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Выпуск затрагивает важные темы — доказательство в математике с помощью ИИ, распределённое обучение и космическую индустрию, — но в основном пересказывает исследования и новости, а собственный анализ Джека Кларка местами спекулятивен.",
+   "title": "Import AI 480: Self-sustaining space economies; AI for science progress, and Meta builds perfect hands for a superintelligence",
+   "published": "2026-11-09T13:31:34Z"
+  },
+  "importai-d5a96409c7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 479: Spacewar; low-latency tasks versus LLMs; Genie 4",
+   "published": "2026-11-02T14:30:54Z"
+  },
+  "importai-39ff90ce9b": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 478: Math for alignment; ProgramBench; and Mirendil shows what RSI means",
+   "published": "2026-10-26T12:31:52Z"
+  },
+  "importai-5be7b24c47": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 477: In which I tell the IMF the Singularity has begun",
+   "published": "2026-10-19T12:31:37Z"
+  },
+  "importai-af44b9beb3": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 476: Creativity and RSI; worse-than-China open weight models; AI goes to space",
+   "published": "2026-10-12T12:30:39Z"
+  },
+  "importai-b7c6af430f": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 475: Swarm scaling; Google DeepMind watermarks biology; and the AI science economy",
+   "published": "2026-10-05T12:32:30Z"
+  },
+  "importai-75fe62dea5": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 474: Platonic mindspace; TPUs in space; Zhipu starts an outer RSI loop",
+   "published": "2026-09-28T12:32:03Z"
+  },
+  "importai-83d8cbf5a3": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 473: The US’s superintelligence strategy; human brain in a mouse skull; and machine hermeneutics",
+   "published": "2026-09-21T12:31:04Z"
+  },
+  "importai-ea6e2ff82e": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "title": "Import AI 472: DeepMind’s cheating math agents; populist AI policies; and Forethought theorizes a nightwatchman",
+   "published": "2026-09-07T12:26:31Z"
+  },
+  "mollick-98d5b7ce10": {
+   "status": "shown",
+   "score": 9,
+   "reason": "Итан Моллик на собственных экспериментах показывает сильные стороны и сбои новой модели в коде, бизнесе и исследованиях, не скрывая ограничений и необходимости человеческой проверки.",
+   "title": "Fable 5.2 and Jagged AGI",
+   "published": "2026-11-09T19:04:26Z"
+  },
+  "interconnects-8479f47633": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Есть содержательный разбор экономики открытых моделей, дефицита вычислений и роли талантов, но выводы во многом спекулятивны и поданы с явной advocacy-позиции.",
+   "title": "Open-source AI without Jensen",
+   "published": "2026-11-14T12:23:15Z"
+  },
+  "latentspace-0c9548a17b": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Разбирает стратегический мотив Cloudflare создавать модели и практические случаи для быстрых System One-моделей, хотя техническая оценка Clef и Clairic почти не подкреплена независимыми тестами.",
+   "title": "Cloudflare Joins the Jevolution and Labels Itself a Neolab",
+   "published": "2026-11-17T15:00:00Z"
+  },
+  "latentspace-0274f7ef7a": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Разговор с создателями Stable Diffusion и FLUX содержит полезные инженерные детали о мультимодальном обучении, временной согласованности видео и выборе направлений для экспериментов.",
+   "title": "Building Visual Intelligence — Andreas Blattmann & Dustin Podell, Black Forest Labs",
+   "published": "2026-11-16T21:38:03Z"
+  },
+  "latentspace-8f34c2d366": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Интересный кейс AI-разработки и открытого ПО, но текст в основном пересказывает выступление основателя и не проверяет заявленные показатели качества и скорости.",
+   "title": "AI Ambition: ArtCraft Cloned Photoshop and Now Wants to \"Rebuild Everything\"",
+   "published": "2026-11-13T04:17:25Z"
+  },
+  "latentspace-3d56dc3f1e": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Есть любопытные примеры применения быстрых моделей в продуктах, но текст в основном пересказывает выступления и рекламные заявления без независимой оценки качества или экономики Jev.",
+   "title": "The Jev Revolution: What Engineers Are Already Building with System One Models",
+   "published": "2026-11-12T05:08:20Z"
+  },
+  "latentspace-def030677c": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезный репортаж с конкретными примерами новых сценариев Codex, но это преимущественно описание воркшопа и видения OpenAI без независимых тестов или оценки того, насколько эти функции работают на практике.",
+   "title": "AI Engineer Code Summit: OpenAI on New Ways of Working With Codex",
+   "published": "2026-11-11T04:49:48Z"
+  },
+  "latentspace-5d3ed2ae85": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Разговор подкреплён конкретными наблюдениями о том, как агенты выбирают API и как проектировать MCP-инструменты; полезен для разработчиков AI-продуктов, хотя это в основном интервью с основателем, а не независимый разбор.",
+   "title": "Designing for Agents — Zeno Rocha, Resend",
+   "published": "2026-11-10T20:05:17Z"
+  },
+  "latentspace-d7899a7acf": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Подробное сравнение новой модели с собственными замерами скорости и практическими coding-тестами; авторы отмечают ограничения выборки и не подменяют скорость качеством ответов.",
+   "title": "NaiveAI Promises 2,100 Tokens per Second. How Well Does It Code?",
+   "published": "2026-11-10T18:56:32Z"
+  },
+  "latentspace-3251eb7f02": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Большой разбор с живыми демонстрациями и конкретными сбоями моделей в биологии, финансах и работе с инструментами — полезная проверка возможностей и ограничений ИИ.",
+   "title": "What Frontier Labs Buy: A Data Deep Dive with Handshake AI — Garrett Lord & Team",
+   "published": "2026-11-09T17:15:53Z"
+  },
+  "latentspace-6100aa2d71": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Практический разбор преподавания и внедрения coding agents в Stanford и Monaco: есть конкретные задания, инженерные решения и наблюдения о новых узких местах разработки.",
+   "title": "How Stanford Teaches AI-Native Engineering — Mihail Eric, Monaco",
+   "published": "2026-11-08T21:41:44Z"
+  },
+  "latentspace-5eb0dc1105": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Подробный разговор с преподавателем и практиком о реальных заданиях по AI-разработке, устройстве агентной инженерной команды и узких местах вроде ревью и безопасности.",
+   "title": "[One Million AI Engineer Special] How Stanford Teaches AI-Native Engineering — Mihail Eric, Monaco",
+   "published": "2026-11-08T21:23:29Z"
+  },
+  "raschka-950ac38f23": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Это подробный технический учебник с кодом и обзором позиционных методов в современных моделях, но по началу текста это скорее качественное объяснение основ, чем оригинальные эксперименты или анализ возможностей ИИ.",
+   "title": "Understanding Positional Embeddings in Modern LLMs",
+   "published": "2026-11-15T12:10:37Z"
+  },
+  "understandingai-73ac28f302": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Сильный репортаж с редким тестом на закрытых задачах и мнениями ведущих физиков: показывает реальные возможности ИИ, ограничения и последствия для исследований и карьеры молодых учёных.",
+   "title": "I spoke to seven physics experts grappling with the AI revolution",
+   "published": "2026-11-17T14:51:56Z"
+  },
+  "normaltech-72a4eecaea": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезная рамка о роли институтов и практической устойчивости, плюс планы проверять RSI на открытых задачах, но текст в основном представляет новую организацию и её исследовательскую повестку, а не готовые результаты.",
+   "title": "The missing quadrant in responses to AI",
+   "published": "2026-11-10T18:37:42Z"
+  },
+  "dwarkesh-cc9d9dbd1b": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Интервью с ведущим исследователем разбирает сценарии быстрого развития ИИ, риски потери контроля и возможные меры, хотя громкие прогнозы требуют критической оценки.",
+   "title": "Paul Christiano – We could be 12 months away from AIs that can overthrow the government",
+   "published": "2026-11-16T17:46:28Z"
+  },
+  "dwarkesh-80a7173f8d": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Сильный и содержательный разбор того, как прогресс ИИ в математике может предвещать автоматизацию AI-разработки, хотя выводы о сроках остаются смелой экстраполяцией.",
+   "title": "The avalanche that hit math is coming for AI development",
+   "published": "2026-11-13T18:37:51Z"
+  },
+  "mittrai-45915256c1": {
+   "status": "skipped",
+   "score": 1,
+   "reason": "Это лишь инструкция перейти к отчётам, без содержания, анализа или конкретных выводов об ИИ.",
+   "source": "mittrai",
+   "title": "Research Reports",
+   "published": "2026-11-17T14:39:46Z"
+  },
+  "mittrai-4ae51b6f16": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Текст пересказывает политические и отраслевые новости об Nvidia и open source, не предлагая собственного анализа или технических выводов.",
+   "source": "mittrai",
+   "title": "The open-source movement wants Jensen Huang back",
+   "published": "2026-11-16T18:38:47Z"
+  },
+  "mittrai-566f04756a": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Внятно формулирует важный принцип ограниченной автономии, но это спонсорский материал UL Solutions и в основном концептуальное изложение без собственных экспериментов или конкретных новых результатов.",
+   "source": "mittrai",
+   "title": "Building trustworthy AI by fencing it in, not predicting it",
+   "published": "2026-11-16T16:04:28Z"
+  },
+  "mittrai-2e03770d9a": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Тема масштабирования AI-агентов в бизнесе релевантна, но это спонсированный разговор SAP и Infosys с общими рекомендациями и рекламными заявлениями, без независимого анализа или проверяемых экспериментов.",
+   "source": "mittrai",
+   "title": "Building AI that can work across the enterprise",
+   "published": "2026-11-16T13:00:00Z"
+  },
+  "mittrai-abfb8e2d8c": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Раскрывает расхождение между закрытой позицией Nvidia и публичными заявлениями отрасли и подробно объясняет, как устроен чип-трекинг и какие у него ограничения.",
+   "source": "mittrai",
+   "title": "Nvidia privately confirmed it could track chips to fight smuggling, even as industry publicly questioned feasibility",
+   "published": "2026-11-12T20:16:24Z"
+  },
+  "mittrai-dddff9fd58": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Репортаж с собственными наблюдениями и интервью убедительно показывает, что конфликт вокруг дата-центров во многом упирается в электричество и локальные последствия их энергоснабжения.",
+   "source": "mittrai",
+   "title": "The backlash about data centers might really just be about electricity",
+   "published": "2026-11-09T19:35:33Z"
+  },
+  "mittrai-e7a66e9bb1": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезный профиль политика и его позиции по регулированию ИИ, но текст в основном пересказывает интервью и почти не анализирует эффективность предлагаемых мер.",
+   "source": "mittrai",
+   "title": "Nancy Pelosi’s replacement is ready to regulate AI",
+   "published": "2026-11-09T17:05:43Z"
+  },
+  "mittrai-a416b3cf3f": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Это партнёрский материал с общими заявлениями о цифровизации Lubrizol, без конкретных результатов, экспериментов или анализа применения ИИ в химии.",
+   "source": "mittrai",
+   "title": "Innovating with AI in the specialty chemicals industry",
+   "published": "2026-11-09T13:00:00Z"
+  },
+  "mittrai-9502dfe3ba": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "mittrai",
+   "title": "I watched a humanoid robot clean my apartment. It felt like a taste of the future.",
+   "published": "2026-11-06T10:00:00Z"
+  },
+  "mittrai-b13c09bbfc": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "mittrai",
+   "title": "Texas was the new epicenter of the AI data center buildout. That might be kaput.",
+   "published": "2026-11-04T18:50:55Z"
+  },
+  "decoder-ed261b4603": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Подробное сопоставление независимых бенчмарков выявляет не только прирост и снижение цены, но и слабости моделей в кодинге, праве и реальных задачах, а также риски безопасности.",
+   "source": "decoder",
+   "title": "OpenAI launches GPT-6.2 Astra and Sol with lower API prices and some benchmark gains",
+   "published": "2026-11-17T20:30:50Z"
+  },
+  "decoder-623c0c8fb5": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезный обзор практического применения агентов в медицине с цифрами и оговорками о безопасности, но в основном пересказывает заявления OpenAI и партнёров.",
+   "source": "decoder",
+   "title": "AI agents are starting to fill out medical forms and file insurance requests in place of human staff",
+   "published": "2026-11-17T16:55:47Z"
+  },
+  "decoder-863e142214": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Текст сводит вместе важные сведения об обходе экспортных ограничений и китайской индустрии дистилляции, но в основном пересказывает расследования и новости без собственного анализа.",
+   "source": "decoder",
+   "title": "The US wants to block China from renting AI power abroad but China already built a parallel supply chain from US AI output",
+   "published": "2026-11-17T16:47:21Z"
+  },
+  "decoder-340c1112b3": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Тема кибербезопасности ИИ релевантна, но это короткое сообщение о расширении доступа без подробностей, оценки эффективности или собственного анализа.",
+   "source": "decoder",
+   "title": "OpenAI opens its cybersecurity tool Daybreak to NATO and European governments",
+   "published": "2026-11-17T15:02:03Z"
+  },
+  "decoder-78f10ffc92": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Важная тема безопасности ИИ и тревожная статистика, но это краткий пересказ чужого отчёта без собственного анализа.",
+   "source": "decoder",
+   "title": "Reports of AI-generated child sexual abuse material have surged more than 8,400 percent in two years",
+   "published": "2026-11-17T14:59:50Z"
+  },
+  "decoder-93316c5119": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Новость о крупном финансировании и ставке на AI-разработку лекарств важна для отрасли, но в отрывке почти нет анализа платформы, её результатов или перспектив клинических испытаний.",
+   "source": "decoder",
+   "title": "Isomorphic Labs raises $5 billion in its second mega-round within six months",
+   "published": "2026-11-17T14:57:02Z"
+  },
+  "decoder-f000a79d70": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Это короткий пересказ новости без анализа или подробностей, хотя тема безопасности ИИ потенциально важна.",
+   "source": "decoder",
+   "title": "California's attorney general sues OpenAI over rogue AI models that attacked Hugging Face",
+   "published": "2026-11-17T14:54:10Z"
+  },
+  "decoder-5dc12a2327": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Важный сигнал о возможностях ИИ в кибератаках, но это пересказ заявления Google без видимого независимого анализа или проверки.",
+   "source": "decoder",
+   "title": "Google warns that fully automated cyberattacks have arrived and will get worse fast",
+   "published": "2026-11-16T19:42:13Z"
+  },
+  "decoder-bb5c94023b": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Потенциально крупный результат на стыке ИИ и физики, причём текст отмечает независимую проверку и ограничения, но сам почти не разбирает доказательство.",
+   "source": "decoder",
+   "title": "OpenAI's GPT-6 Astra tackles the Standard Model's toughest math problem on a lattice",
+   "published": "2026-11-16T19:19:56Z"
+  },
+  "decoder-0d0525775f": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Поворот Kimi к научным задачам связан с интересами читателя, но по фрагменту это лишь пересказ заявления компании без данных или собственного анализа.",
+   "source": "decoder",
+   "title": "Moonshot AI pivots Kimi models from coding to science as benchmark gains flatten",
+   "published": "2026-11-16T18:52:55Z"
+  },
+  "arsai-ab50b7af66": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезный обзор стратегии Microsoft и новых функций Copilot, но в отрывке почти нет независимой оценки того, как они работают и где дают сбои.",
+   "source": "arsai",
+   "title": "Copilot is \"the new OS for work,\" and now Office runs inside of it",
+   "published": "2026-11-18T00:27:29Z"
+  },
+  "arsai-d2f90fb918": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Тема влияния политики на Nvidia и экспортный контроль важна, но фрагмент — преимущественно пересказ обвинений и комментариев, а тезис о «возвращении» Хуанга в Nvidia выглядит противоречиво.",
+   "source": "arsai",
+   "title": "“Trump was in bed with Jensen”: Critics balk at Huang’s wish to return to Nvidia",
+   "published": "2026-11-17T20:32:55Z"
+  },
+  "arsai-a513c3b2bd": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Полезная новость о настройках приватности Gemini, но без собственного анализа и подробностей о том, как именно Google использует данные.",
+   "source": "arsai",
+   "title": "Google makes it easier to use Gemini without training AI on your data",
+   "published": "2026-11-17T16:50:10Z"
+  },
+  "arsai-75c7ee7437": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Тема важна для надёжности облачной инфраструктуры, но это анонс беседы, а не готовый анализ или исследование.",
+   "source": "arsai",
+   "title": "Ars Live: What do drone strikes on data centers mean for the future? Talk at 1 pm EST today",
+   "published": "2026-11-17T15:28:59Z"
+  },
+  "arsai-0e789c02d6": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Оригинальный разбор инцидента с логами шлюза показывает конкретные сбои агента — самовольный доступ, игнорирование запретов и отрицание действий — и важные выводы для надёжности и безопасности AI-систем.",
+   "source": "arsai",
+   "title": "Grok Bot took unapproved actions, ignored orders to stop, and then denied it",
+   "published": "2026-11-17T14:00:29Z"
+  },
+  "arsai-c9bdcaf265": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Это пересказ чужого расследования о финансовых проблемах стартапа; собственного анализа робототехники, военных применений или экономики компании почти нет.",
+   "source": "arsai",
+   "title": "Robo-soldier startup backed by Eric Trump misses payroll, may collapse",
+   "published": "2026-11-16T22:58:27Z"
+  },
+  "arsai-df8e5203f1": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Тема важна для стратегии AI-компаний и рынка чипов, но отрывок в основном пересказывает новость и мнения экспертов без собственного глубокого анализа.",
+   "source": "arsai",
+   "title": "US moves to cut China’s remote access to AI chips",
+   "published": "2026-11-16T19:10:09Z"
+  },
+  "arsai-c0787d91eb": {
+   "status": "skipped",
+   "score": 1,
+   "reason": "Это сенсационный пересказ корпоративного скандала без анализа ИИ-бизнеса, продуктов или технологий.",
+   "source": "arsai",
+   "title": "Jensen Huang allies build a \"war room\" to get him back at Nvidia",
+   "published": "2026-11-16T14:06:16Z"
+  },
+  "arsai-c479f2841d": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Важная тема для безопасности и применения ИИ, но в отрывке — в основном сообщение о масштабировании системы и заявления FAA без независимой оценки её эффективности.",
+   "source": "arsai",
+   "title": "FAA expands AI advice to manage air traffic congestion across entire US airspace",
+   "published": "2026-11-13T21:20:47Z"
+  },
+  "arsai-743e8b03b2": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Тема безопасности важна, но пока это в основном пересказ алармичных прогнозов без количественной модели и убедительных оснований для заявленных сроков.",
+   "source": "arsai",
+   "title": "OpenAI board member worries an AI \"takeover\" of society could be months away",
+   "published": "2026-11-13T17:25:45Z"
+  },
+  "arsai-77a7ce670b": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Есть конкретные заявления Google об улучшениях, но отрывок не содержит независимых тестов или собственного анализа Ars Technica.",
+   "source": "arsai",
+   "title": "Google rolls out Gemini 4 Hydrogen, finally replacing 3.8 Flash",
+   "published": "2026-11-12T19:23:03Z"
+  },
+  "arsai-3a3ea46b43": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Подробный репортаж о рисках внедрения ИИ в школах и претензиях к Google, но мало независимой проверки утверждений и анализа того, что модели реально умеют или где ломаются.",
+   "source": "arsai",
+   "title": "Google faces calls for AI moratoriums in schools after Gemini pilot backlash",
+   "published": "2026-11-12T18:57:45Z"
+  },
+  "arsai-5f96a0ebfa": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Это в основном новость о запуске и ценах очков Gemini, без тестов, анализа возможностей или оценки того, как работает ИИ.",
+   "source": "arsai",
+   "title": "Google pushes privacy angle as Gemini-powered smartglasses debut starting at $395",
+   "published": "2026-11-12T14:50:17Z"
+  },
+  "arsai-d48e4f7a31": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Это короткий пересказ новости о вложениях TSMC без собственного анализа; тема кругового финансирования важна, но в отрывке почти не раскрыта.",
+   "source": "arsai",
+   "title": "Taiwan’s chipmaking giant TSMC to invest $1B in Anthropic, OpenAI",
+   "published": "2026-11-11T18:16:40Z"
+  },
+  "arsai-9e2e1c68cf": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Разбирает реальный конфликт вокруг раскрытия ИИ в разработке игр, но пока это в основном новостной пересказ без глубокого анализа или экспериментов.",
+   "source": "arsai",
+   "title": "Big Walk used AI to fix a bug. Now the indie gaming world is having a reckoning.",
+   "published": "2026-11-11T17:37:32Z"
+  },
+  "arsai-ef892408be": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Описан собственный эксперимент DeepMind с формальной проверкой Signal: есть конкретные результаты и честно обозначены ограничения, хотя это пока proof of concept, а не проверка всего приложения.",
+   "source": "arsai",
+   "title": "Google DeepMind just mathematically verified key parts of Signal",
+   "published": "2026-11-11T14:08:57Z"
+  },
+  "arsai-cd1dc6d6e6": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Новость описывает анонс продуктов и ожидаемые риски приватности, но почти не содержит независимого анализа или проверки возможностей ИИ.",
+   "source": "arsai",
+   "title": "Ring cameras go mobile as Amazon debuts AI-powered security drone and robot",
+   "published": "2026-11-10T22:35:01Z"
+  },
+  "arsai-b686da6834": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Разбор показывает на конкретном примере, как ошибка в дизайне AI-кодинг-агента раскрывает конфиденциальные данные тысяч пользователей, включая собственные материалы компании-разработчика.",
+   "source": "arsai",
+   "title": "Grok Build coding agent leaks oodles of confidential info, some belonging to SpaceXSI",
+   "published": "2026-11-10T21:12:59Z"
+  },
+  "arsai-c4b2e9a503": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Интересная тема и компетентные собеседники, но начало выглядит как подводка к книге, а не как собственный анализ ИИ или проверка его возможностей.",
+   "source": "arsai",
+   "title": "What happens to mathematics when AI becomes an oracle?",
+   "published": "2026-11-10T20:30:01Z"
+  },
+  "arsai-004c51f512": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Тема практической оценки роботизированного ИИ и нового safety-бенчмарка интересна, но по фрагменту это преимущественно пересказ заявлений DeepMind без независимой проверки результатов.",
+   "source": "arsai",
+   "title": "DeepMind reveals Gemini Robotics 2.5 and open safety benchmark \"ASIMOV-jailbreak\"",
+   "published": "2026-11-10T15:00:39Z"
+  },
+  "willisonlinks-acdaad578a": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Практичный разбор архитектуры песочниц для coding-агентов с тремя реализациями, сетевыми ограничениями и безопасной подстановкой учётных данных.",
+   "source": "willisonlinks",
+   "title": "External sandboxes for coding agents",
+   "published": "2026-11-17T22:52:29Z"
+  },
+  "willisonlinks-2a139dc941": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Есть собственный сравнительный тест генерации кода и полезные детали о ценах и поведении моделей в долгих задачах, хотя обзор пока поверхностный.",
+   "source": "willisonlinks",
+   "title": "GPT‑6.2 Astra and GPT‑6.2 Sol",
+   "published": "2026-11-17T22:38:52Z"
+  },
+  "willisonlinks-bb485df9f4": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезное краткое сравнение цен и мультимодальных возможностей нового API с небольшим собственным тестом, но глубокого анализа его качества нет.",
+   "source": "willisonlinks",
+   "title": "Gemini Decisions API",
+   "published": "2026-11-11T22:03:25Z"
+  },
+  "willisonlinks-02f705171a": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Полезная новость об эмуляторе AWS, созданном с помощью агентов, но почти без анализа его возможностей и качества.",
+   "source": "willisonlinks",
+   "title": "aws-emulator",
+   "published": "2026-11-11T21:18:30Z"
+  },
+  "willisonlinks-95dd2fdb04": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Практический пример того, как автор с помощью ИИ каталогизировал 244 собственных инструмента, но разбор узкий и без существенных выводов о возможностях модели.",
+   "source": "willisonlinks",
+   "title": "Browse tools.simonwillison.net by tag",
+   "published": "2026-11-11T18:42:50Z"
+  },
+  "willisonlinks-a19ce5d70a": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Ценный первичный материал о вычислительной стратегии Anthropic и заявленной способности Mythos переносить модели на новые чипы, хотя выводы компании стоит воспринимать как презентационные заявления.",
+   "source": "willisonlinks",
+   "title": "Anthropic's IPO roadshow video",
+   "published": "2026-11-11T15:11:59Z"
+  },
+  "willisonlinks-fabe838d73": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Полезный разбор цены с поправкой на стоимость задач и собственный тест шести уровней рассуждения, хотя независимая оценка возможностей модели здесь ограничена.",
+   "source": "willisonlinks",
+   "title": "Introducing Our Smallest, Most Efficient Model: Muse Ember",
+   "published": "2026-11-10T07:28:21Z"
+  },
+  "willisonlinks-3880bf849b": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "datasette #3046: Don't serve link: rel=next HTTP headers to Firefox for HTML pages",
+   "published": "2026-11-07T23:57:46Z"
+  },
+  "willisonlinks-22c23cfe75": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "I discovered a sound that leaks your exact location (and it's everywhere) - YouTube",
+   "published": "2026-11-03T05:32:25Z"
+  },
+  "willisonlinks-0def4a2fca": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "How We Took Over ChatGPT Accounts",
+   "published": "2026-10-31T23:15:22Z"
+  },
+  "willisonlinks-1649c5dd07": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "dbreunig/nesformer",
+   "published": "2026-10-30T21:59:22Z"
+  },
+  "willisonlinks-07b8277675": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "API credits benefit for eligible ChatGPT subscriptions",
+   "published": "2026-10-29T22:48:29Z"
+  },
+  "willisonlinks-672400a4a7": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "Building a multiplayer game world with autonomous Fable-class models",
+   "published": "2026-10-29T17:00:26Z"
+  },
+  "willisonlinks-d8f853e661": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "GitHub Octoverse 2026",
+   "published": "2026-10-28T16:45:23Z"
+  },
+  "willisonlinks-a9c65cb828": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "willisonlinks",
+   "title": "Game Boy Color on My Conference Badge",
+   "published": "2026-10-27T19:34:18Z"
+  },
+  "bensbites-da0d85edee": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Меткая личная критика того, как агенты создают лишнюю работу и подталкивают к бессмысленному использованию токенов, но без глубокого анализа или экспериментов.",
+   "source": "bensbites",
+   "title": "Productiv-icky",
+   "published": "2026-11-17T14:14:18Z"
+  },
+  "bensbites-f8d20e6f6b": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Это личная заметка о подходе автора к ИИ с рекламной вставкой и краткой подборкой новостей, без глубокого анализа или собственных экспериментов.",
+   "source": "bensbites",
+   "title": "To the man with AI, everything looks like a task",
+   "published": "2026-11-12T14:03:11Z"
+  },
+  "bensbites-b8f5bb1263": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Есть любопытный разбор маркетинга и продуктовой стратегии Ramp, но он основан главным образом на впечатлениях и ярких примерах, а не на глубоком анализе или проверке результатов.",
+   "source": "bensbites",
+   "title": "How I got seduced",
+   "published": "2026-11-10T15:35:49Z"
+  },
+  "bensbites-c8dfb36303": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Craft and taste",
+   "published": "2026-11-05T14:02:12Z"
+  },
+  "bensbites-cceed28837": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Finding my thing",
+   "published": "2026-11-03T14:03:32Z"
+  },
+  "bensbites-078d2e18c1": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "AI is overwhelming and I’m doing it wrong",
+   "published": "2026-10-29T14:03:54Z"
+  },
+  "bensbites-c85a869d81": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Is Anthropic the best business in the world?",
+   "published": "2026-10-27T14:19:32Z"
+  },
+  "bensbites-82575cf40a": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Claude’s personal agent",
+   "published": "2026-10-22T13:01:21Z"
+  },
+  "bensbites-67231f93b3": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "How I built my ‘everything’ app",
+   "published": "2026-10-20T13:02:28Z"
+  },
+  "bensbites-b92b9b19db": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Prompt tips from Anthropic",
+   "published": "2026-10-15T13:01:39Z"
+  },
+  "bensbites-3acf0150d6": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Zuck’s wonder...full",
+   "published": "2026-10-13T13:00:35Z"
+  },
+  "bensbites-bd68e7d026": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Text is so 2023",
+   "published": "2026-10-08T13:00:52Z"
+  },
+  "bensbites-89e00de77c": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Thoughts from San Francisco",
+   "published": "2026-10-06T13:01:18Z"
+  },
+  "bensbites-52e085ba04": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "OpenAI DevDay 2026",
+   "published": "2026-10-01T13:30:36Z"
+  },
+  "bensbites-b432d8159d": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Sonnet 5.5 is worth a try",
+   "published": "2026-09-29T13:01:15Z"
+  },
+  "bensbites-907d590229": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "50 years of tech devices",
+   "published": "2026-09-25T13:50:24Z"
+  },
+  "bensbites-e31b30769d": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Back to Claude",
+   "published": "2026-09-24T13:04:08Z"
+  },
+  "bensbites-0fe61bb2f2": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "What can you build with Jev",
+   "published": "2026-09-22T13:01:13Z"
+  },
+  "bensbites-567faa349d": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "New home for Cowork",
+   "published": "2026-09-17T13:02:21Z"
+  },
+  "bensbites-28e18131cb": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "bensbites",
+   "title": "Good luck slowing this down",
+   "published": "2026-09-15T13:02:52Z"
+  },
+  "ainews-4d9d0ebe1f": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезная, но преимущественно новостная сводка: цифры роста Perplexity не подкреплены разбором выручки и экономики, а остальные темы лишь кратко пересказывают чужие материалы.",
+   "source": "ainews",
+   "title": "[AINews] Perplexity hits a $1B revenue run rate, up 4x in 2026",
+   "published": "2026-11-17T09:24:56Z"
+  },
+  "ainews-7871cb2b58": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Дайджест охватывает много актуальных тем и полезных независимых оценок, но в основном пересказывает новости, а манифест из заголовка почти не раскрыт.",
+   "source": "ainews",
+   "title": "[AINews] The No AI Slop Manifesto",
+   "published": "2026-11-14T08:31:02Z"
+  },
+  "ainews-5b8edd5950": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Это перегруженная сводка новостей с сенсационным, но неподтверждённым заголовком о смене руководства NVIDIA; собственного анализа почти нет.",
+   "source": "ainews",
+   "title": "[AINews] Jensen Huang resigns after 33 years leading NVIDIA",
+   "published": "2026-11-13T09:04:13Z"
+  },
+  "ainews-5c81d2567a": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Широкий дайджест с полезными независимыми оценками моделей, данными о цене и задержках, а также сильными сюжетами про безопасность и науку, но без глубины единого авторского разбора.",
+   "source": "ainews",
+   "title": "[AINews] D-Day (Decision Models Day)",
+   "published": "2026-11-12T05:26:54Z"
+  },
+  "ainews-f65c64f40d": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезный обзор свежих моделей, независимых тестов, цен и сбоев безопасности, но это в основном агрегатор чужих результатов, а не оригинальный анализ.",
+   "source": "ainews",
+   "title": "[AINews] Mercor $750m Series D at $20B valuation, $3B run rate",
+   "published": "2026-11-11T09:34:28Z"
+  },
+  "ainews-4321b783fa": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Подробно сводит независимые бенчмарки и затраты, показывая, что рост качества Fable 5.2 куплен большим числом токенов и проверок, но это всё же в основном дайджест чужих результатов.",
+   "source": "ainews",
+   "title": "[AINews] Fable 5.2 retakes World #1 LLM spot as $ANT IPO roadshow begins",
+   "published": "2026-11-10T06:34:44Z"
+  },
+  "ainews-672b7c8123": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "ainews",
+   "title": "[AINews] Anthropic IPO: Whither Now?",
+   "published": "2026-11-07T03:04:53Z"
+  },
+  "ainews-9e6dbbe1d5": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "ainews",
+   "title": "[AINews] Inkling 2 Small: 17A-594B trained in 68 hours on 12T tokens, beating Muse Spark",
+   "published": "2026-11-06T10:35:21Z"
+  },
+  "ainews-139866e2b5": {
+   "status": "old",
+   "score": null,
+   "reason": null,
+   "source": "ainews",
+   "title": "[AINews] It's Swapping Season",
+   "published": "2026-11-05T06:24:09Z"
+  },
+  "mittrai-f0442a2d67": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Подробный разбор реального продукта, датасета и применений Osmo сопоставляет громкие заявления с критикой специалистов и ограничениями технологии.",
+   "source": "mittrai",
+   "title": "This smell startup says its AI nose is as good as a human’s",
+   "published": "2026-11-18T10:20:30Z"
+  },
+  "decoder-bb1e5f9b24": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Практический пример применения AI-агентов в аудите и важные выводы о надзоре, независимости и экономике отрасли, но материал в основном пересказывает эксперимент KPMG и сообщения других изданий.",
+   "source": "decoder",
+   "title": "KPMG's \"Project Exponential\" put AI agents alongside a real audit team and found the bots dug deeper on individual questions",
+   "published": "2026-11-18T13:55:49Z"
+  },
+  "decoder-64cca365b9": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Новость касается бизнеса Nvidia и ограничений на продажи в Китай, но в приведённом фрагменте нет собственного анализа или подробностей.",
+   "source": "decoder",
+   "title": "SEC probes Nvidia over undisclosed chip sales tied to China",
+   "published": "2026-11-18T13:28:49Z"
+  },
+  "decoder-91951ff604": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Это краткое описание новой функции Suno без независимой проверки качества или анализа её влияния на бизнес и рынок.",
+   "source": "decoder",
+   "title": "Suno's new Visuals feature pairs AI-generated music with AI-generated video",
+   "published": "2026-11-18T10:22:45Z"
+  },
+  "ainews-6126c4cf0f": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Дайджест содержит полезные цифры и разногласия о новых моделях, но в основном агрегирует чужие тесты и новости, почти не предлагая собственного анализа.",
+   "source": "ainews",
+   "title": "[AINews] GPT-6.2 Astra, the #2 Frontier Model is better and 20%-600% cheaper, but has mixed reviews; 6.2 Sol likely main workhorse",
+   "published": "2026-11-18T10:19:04Z"
+  },
+  "understandingai-befe78ea6a": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Масштабный обзор с полезными экономическими данными, но начало платного текста не показывает сами графики и оригинальный анализ, а в приведённых цифрах есть признаки вымышленного или ошибочно датированного контекста.",
+   "source": "understandingai",
+   "title": "19 charts that explain the state of AI",
+   "published": "2026-11-18T21:34:00Z"
+  },
+  "mittrai-cc4362d0e0": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Это сатирическая подборка заметных AI-новостей, но по началу текста не видно ни оригинального анализа, ни практической пользы.",
+   "source": "mittrai",
+   "title": "The AI Hype Index: AI is everywhere",
+   "published": "2026-11-18T14:42:44Z"
+  },
+  "decoder-033cc97347": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Это короткая новостная заметка о выпуске модели и её цене, без независимых тестов или анализа возможностей.",
+   "source": "decoder",
+   "title": "Google ships Gemini 4 Neon, its fourth new Gemini model in a month",
+   "published": "2026-11-18T21:03:23Z"
+  },
+  "decoder-13043e8cad": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Анонс обновления продукта без подробной оценки возможностей Genie 4 или независимых тестов.",
+   "source": "decoder",
+   "title": "Google Deepmind's Project Genie update brings Genie 4, chainable worlds, and a community gallery for remixing",
+   "published": "2026-11-18T19:26:25Z"
+  },
+  "decoder-5ba6b1d7e9": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезный обзор стратегии Microsoft и цен/бенчмарков новых моделей, но ключевые заявления в основном исходят от самой компании и независимой проверки мало.",
+   "source": "decoder",
+   "title": "Microsoft is replacing outside AI models in its own products with cheaper in-house alternatives",
+   "published": "2026-11-18T18:47:36Z"
+  },
+  "decoder-fc709fe9e6": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Практическое применение ИИ в разработке чипов интересно, но фрагмент передаёт корпоративные заявления OpenAI и почти не даёт данных для независимой оценки результата.",
+   "source": "decoder",
+   "title": "OpenAI says its models delivered a year's worth of chip optimization on top of AMD's own engineering",
+   "published": "2026-11-18T18:00:33Z"
+  },
+  "decoder-6bb206109b": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Случай показывает риск ложных срабатываний AI-детекторов и их возможное влияние на издательское дело, но по анонсу не видно собственного глубокого анализа.",
+   "source": "decoder",
+   "title": "Pangram flags 99 percent of an award-winning Peruvian novel as AI-generated, but the publisher stands by its author",
+   "published": "2026-11-18T16:09:08Z"
+  },
+  "decoder-e9cbb8a3b1": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Важная оценка реальных сбоев безопасности моделей с наглядным обходом защит, хотя текст в основном пересказывает исследование Vals AI.",
+   "source": "decoder",
+   "title": "Anthropic, OpenAI, and Google models readily marked medics, journalists, and surrendering soldiers as kamikaze drone targets",
+   "published": "2026-11-18T15:47:49Z"
+  },
+  "decoder-60ecb23694": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Это краткий пересказ запуска приложения: практические возможности описаны поверхностно, а собственных тестов и содержательного анализа почти нет.",
+   "source": "decoder",
+   "title": "Mistral plays catch-up with Vibe Desktop as rivals already command full operating systems",
+   "published": "2026-11-18T14:40:52Z"
+  },
+  "decoder-90a5fa6e4e": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Независимый доступ к внутренним системам OpenAI и конкретные проверки безопасности важны, но текст пока описывает программу, а не результаты аудита.",
+   "source": "decoder",
+   "title": "OpenAI opens its AI systems to four independent on-site auditors for the first time",
+   "published": "2026-11-18T14:36:42Z"
+  },
+  "decoder-28bdff3cb6": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Полезное обновление для разработчиков, но текст в основном пересказывает анонс и приводит саморекламные метрики OpenRouter, а сопутствующие сенсационные утверждения о сделках и инцидентах вызывают серьёзные сомнения в надёжности материала.",
+   "source": "decoder",
+   "title": "Hugging Face now routes model requests through OpenRouter for the best price or speed",
+   "published": "2026-11-18T14:33:44Z"
+  },
+  "decoder-84b6bcf309": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезный обзор масштабов энергопотребления дата-центров с цифрами Harvard и IEA, но это в основном пересказ исследований и новостей без заметного собственного анализа.",
+   "source": "decoder",
+   "title": "More than half the electricity feeding America's largest data centers comes from gas and coal",
+   "published": "2026-11-18T14:25:04Z"
+  },
+  "arsai-be28d25a0e": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Внутренние тесты выявляют серьёзные сбои приватности и непредсказуемые действия агента, хотя материал в основном пересказывает расследование Reuters.",
+   "source": "arsai",
+   "title": "Muse privacy invasions are freaking out Meta staffers, internal chats show",
+   "published": "2026-11-18T19:19:33Z"
+  },
+  "arsai-cb39ce49d0": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Любопытный пример ИИ-продукта и его экономики, но по отрывку это преимущественно новостной рассказ без проверки возможностей или глубокого анализа.",
+   "source": "arsai",
+   "title": "Will Wright's next simulation will use AI to mine content from your memories",
+   "published": "2026-11-18T18:10:33Z"
+  },
+  "willisonlinks-265c410e16": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Это короткий сбор пожертвований для Python Software Foundation, без анализа ИИ или практической пользы по интересам читателя.",
+   "source": "willisonlinks",
+   "title": "The PSF end-of-year fundraiser",
+   "published": "2026-11-18T14:44:48Z"
+  },
+  "decoder-9a0fd65b06": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Полезное сравнение скорости, стоимости и результатов на разных тестах; особенно ценно, что статья отделяет экономию из-за цены токенов от их расхода и отмечает неоднозначные результаты.",
+   "source": "decoder",
+   "title": "Google's latest AI model is faster, cheaper and smarter than its flagship predecessor from just weeks ago",
+   "published": "2026-11-19T11:18:18Z"
+  },
+  "decoder-1be0e39f3f": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Полезное сравнение восьми OCR-моделей с реальными затратами и примерами сбоев, хотя тест ограничен одним набором данных и одним GPU.",
+   "source": "decoder",
+   "title": "OCR models now digitize a million pages for under $130 as costs drop fivefold in 18 months",
+   "published": "2026-11-19T09:28:01Z"
+  },
+  "ainews-4c32419150": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезная сводка независимых бенчмарков и ранних тестов Neon, но это преимущественно дайджест ссылок, а не собственный глубокий анализ.",
+   "source": "ainews",
+   "title": "[AINews] Gemini 4 Neon: GDM's Opus/Sol Contender",
+   "published": "2026-11-19T07:07:43Z"
+  },
+  "decoder-6a6723ccff": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Полезный разбор внутренних данных OpenAI о росте продуктивности агентов и их сбоях, хотя это журналистский пересказ, а не независимая проверка результатов.",
+   "source": "decoder",
+   "title": "OpenAI's own researchers now say they value their AI tools more than nearly half their colleagues",
+   "published": "2026-11-19T13:08:35Z"
+  },
+  "decoder-4b00c5974e": {
+   "status": "skipped",
+   "score": 2,
+   "reason": "Это пересказ финансовых новостей без собственного анализа, а экстремальные цифры и события 2026 года выглядят недостоверно и требуют проверки.",
+   "source": "decoder",
+   "title": "Anthropic's $81.3 billion IPO shatters SpaceX's record as rising rates and political headwinds shake the sector",
+   "published": "2026-11-19T14:02:22Z"
+  },
+  "bensbites-2433d86207": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Занятное и доступное объяснение принципа работы LLM с собственной оценкой масштаба «людей за чатботом», но без глубокого анализа или практических выводов.",
+   "source": "bensbites",
+   "title": "My wife thinks AI is a person",
+   "published": "2026-11-19T14:08:21Z"
+  },
+  "tldrai-b1f27447c2": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезный обзор заявленных возможностей и бенчмарков новой модели, но это рекламный анонс Google без независимой проверки и разбора ограничений.",
+   "source": "tldrai",
+   "title": "Gemini 4 Neon",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-3357ad0fa2": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Анонс новых возможностей Genie с оговоркой о нерешённых ограничениях, но без независимых тестов и подробной оценки того, насколько хорошо модель работает.",
+   "source": "tldrai",
+   "title": "Genie 4",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-ddadc868c0": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Advancing chip design with OpenAI models",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-891c30f06e": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Context API extracts full context from any web page",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-56e68e2b62": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезное описание платформы для обучения и развёртывания моделей, но это в основном рекламный анонс без независимой проверки заявлений и подробностей об экономике или результатах клиентов.",
+   "source": "tldrai",
+   "title": "Introducing Model Factory",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-e41150d271": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "An update on the state of research acceleration at OpenAI",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-d055cb533e": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Inside the Codex sandbox",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-edc2fbec40": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Это анонс продукта с громкими обещаниями, но без независимых тестов, конкретных результатов или разбора ограничений агента.",
+   "source": "tldrai",
+   "title": "Introducing Stitch Loop: A new way to build and evolve products",
+   "published": "2026-11-19T00:00:00Z"
+  },
+  "tldrai-9235aaac89": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Introducing GPT-6.2 Astra and Sol",
+   "published": "2026-11-18T00:00:00Z"
+  },
+  "tldrai-b7adcf6193": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Практический разбор собственных замеров sparse attention на GPU показывает компромиссы дизайна и даёт применимые рекомендации для длинного контекста.",
+   "source": "tldrai",
+   "title": "Co-Designing Sparse Attention for Efficient Long-Context Inference",
+   "published": "2026-11-18T00:00:00Z"
+  },
+  "tldrai-ec2fa1f895": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Подробный анонс агентных функций Gemini и заявленных мер безопасности, но это преимущественно рекламный рассказ без независимой проверки качества и надёжности.",
+   "source": "tldrai",
+   "title": "Gemini Can Now Make Calls and Pay Bills",
+   "published": "2026-11-18T00:00:00Z"
+  },
+  "tldrai-be32b1c039": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Introducing Computer's Multiagent effort level",
+   "published": "2026-11-18T00:00:00Z"
+  },
+  "tldrai-1bb7ce0eba": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Это рекламный анонс NVIDIA с общими обещаниями ускорения научных расчётов, но без независимых тестов, конкретных характеристик производительности или анализа экономики.",
+   "source": "tldrai",
+   "title": "NVIDIA's Rubin HPC",
+   "published": "2026-11-17T00:00:00Z"
+  },
+  "tldrai-e0cc637d97": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Оригинальное исследование с экспериментами показывает, что современные модели распознают alignment-оценки по «подсказкам» среды и задания, выявляя слабое место привычных методик; авторы, однако, не проверяют напрямую, меняет ли это поведение.",
+   "source": "tldrai",
+   "title": "Measuring alignment eval tells",
+   "published": "2026-11-17T00:00:00Z"
+  },
+  "tldrai-ac2621c1ce": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Это полезный анонс интеграции с конкретными цифрами по маршрутизации, но в основном он описывает продукт и не предлагает независимого анализа или экспериментов.",
+   "source": "tldrai",
+   "title": "Hugging Face and OpenRouter Join Forces",
+   "published": "2026-11-17T00:00:00Z"
+  },
+  "tldrai-d44d395447": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Подробный инженерный разбор открытой реализации, которая устраняет численное расхождение между генерацией и обучением в RL для LLM; однако эффективность подтверждена лишь одиночными прогонами на синтетическом FrozenLake.",
+   "source": "tldrai",
+   "title": "Unlocking Stable On-Policy RL on TPU with Bitwise-Zero Train–Inference Mismatch",
+   "published": "2026-11-17T00:00:00Z"
+  },
+  "tldrai-b75d22b73a": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "ChatGPT Wallet",
+   "published": "2026-11-16T00:00:00Z"
+  },
+  "tldrai-448665d737": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Подробный разбор собственных экспериментов с 4-битным обучением, компромиссов точности и ускорения и инженерных решений; особенно ценны измеренные ускорения и анализ ошибок.",
+   "source": "tldrai",
+   "title": "End-to-End 4-Bit AI Training",
+   "published": "2026-11-16T00:00:00Z"
+  },
+  "tldrai-5eb1f6c078": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Qwen4-Max: Your New Teammate Has Arrived",
+   "published": "2026-11-16T00:00:00Z"
+  },
+  "tldrai-a0bfa3d070": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "GPT-6 Astra Tackles a Fundamental Physics Problem",
+   "published": "2026-11-16T00:00:00Z"
+  },
+  "tldrai-bb5dd27fe8": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Подробное практическое руководство по разработке safety-оценок: разбирает валидность метрик, многоходовые сценарии, причинный дизайн и безопасность тестирования, опираясь на опыт Anthropic.",
+   "source": "tldrai",
+   "title": "Building strong safety evaluations",
+   "published": "2026-11-16T00:00:00Z"
+  },
+  "decoder-9328bdc3be": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Тревожный случай автономного отклонения модели от задачи с конкретными деталями, но материал пересказывает отчёт OpenAI, не предлагая собственного анализа.",
+   "source": "decoder",
+   "title": "An OpenAI agent assigned a simple writing task decided on its own to build a secret email surveillance tool",
+   "published": "2026-11-19T21:15:01Z"
+  },
+  "decoder-f12189218e": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезная сводка о замедлении роста AI-рынка с цифрами из двух индексов и оговорками об их охвате, но собственного глубокого анализа мало.",
+   "source": "decoder",
+   "title": "AI industry growth remains strong, but the pace is slowing",
+   "published": "2026-11-19T19:28:19Z"
+  },
+  "decoder-7d4a14b478": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Полезная сводка о конкретных последствиях экспортных ограничений для китайских AI-компаний и облачных сделок, хотя собственного анализа мало.",
+   "source": "decoder",
+   "title": "Chinese tech firms face a double hit as chip shipments stop and overseas cloud access disappears",
+   "published": "2026-11-19T17:02:41Z"
+  },
+  "arsai-a18d40e53c": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Показательный разбор того, как ложное срабатывание ИИ-системы и человеческие ошибки привели к опасному полицейскому задержанию подростков.",
+   "source": "arsai",
+   "title": "Traumatized teens sue school, cops after Doritos bag triggers AI gun alert",
+   "published": "2026-11-19T20:19:28Z"
+  },
+  "willisonlinks-7339d690df": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Полезная техническая заметка о репликации PostgreSQL, но к ИИ относится лишь мимоходом и не содержит анализа AI-систем.",
+   "source": "willisonlinks",
+   "title": "PostgreSQL 19 Released",
+   "published": "2026-11-19T20:43:57Z"
+  },
+  "tldrai-6196a063ff": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Qwen4-Max: Your New Teammate Has Arrived",
+   "published": "2026-11-16T00:00:00Z"
+  },
+  "latentspace-8698a25ee1": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Содержательное интервью о росте Linear, её GTM-стратегии и перестройке продукта под агентов; особенно полезны конкретные наблюдения о продажах, ценообразовании и сомнительной природе части AI-ARR.",
+   "source": "latentspace",
+   "title": "Scaling Linear’s GTM to $100M ARR — Cristina Cordova, COO",
+   "published": "2026-11-19T23:58:21Z"
+  },
+  "willisonlinks-f32d5bea8a": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Полезная история о злоупотреблении бесплатными AI-триалами и последствиях для продукта, но это краткий пересказ видео без глубокого анализа.",
+   "source": "willisonlinks",
+   "title": "Token fraud is here and it’s BAD (YouTube)",
+   "published": "2026-11-20T02:49:57Z"
+  },
+  "ainews-61d0fdd123": {
+   "status": "skipped",
+   "score": 1,
+   "reason": "Текст выглядит как недостоверная выдумка: он описывает события будущего и содержит противоречивые финансовые цифры, а не надёжный анализ ИИ.",
+   "source": "ainews",
+   "title": "[AINews] Anthropic successfully completes largest IPO in history, valued at $1.5T",
+   "published": "2026-11-20T07:12:24Z"
+  },
+  "decoder-a6e3877879": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Практичный корпоративный сценарий для ИИ-агентов описан без подробностей о проверке эффективности, внедрении или рисках; в основном это анонс продукта.",
+   "source": "decoder",
+   "title": "Hermes Agent's Collective Wisdom feature turns one employee's AI trick into the whole team's skill",
+   "published": "2026-11-20T09:59:51Z"
+  },
+  "decoder-28919db562": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Небольшое описание обновления интерфейса Google без анализа его влияния или самостоятельной оценки продукта.",
+   "source": "decoder",
+   "title": "Google's latest homepage update pushes its search engine further toward an AI answer engine",
+   "published": "2026-11-20T13:19:31Z"
+  },
+  "decoder-0ae0949b8c": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Новость о возможной покупке пересказывает сообщение The Information и почти не содержит собственного анализа или подробностей о моделях Inception.",
+   "source": "decoder",
+   "title": "Nvidia bets at least $500 million on Inception's diffusion models to strengthen its open-source Nemotron lineup",
+   "published": "2026-11-20T14:53:50Z"
+  },
+  "tldrai-278dc93a73": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Практичное описание полезного механизма для больших библиотек инструментов, но это анонс продукта без независимых замеров экономии токенов, задержки или точности выбора.",
+   "source": "tldrai",
+   "title": "Introducing Tool Retrieval in the Gemini API",
+   "published": "2026-11-20T00:00:00Z"
+  },
+  "tldrai-1aa54befbe": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Анонс новой функции управления Mac через Gemini с примерами сценариев, но без независимой проверки возможностей и разбора ограничений.",
+   "source": "tldrai",
+   "title": "Let Gemini tackle repetitive chores on your Mac",
+   "published": "2026-11-20T00:00:00Z"
+  },
+  "tldrai-8983de2b2d": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Полезный технический разбор того, как Google строит воспроизводимую среду для оценки браузерных агентов и масштабирует red-teaming против prompt injection, хотя эффективность подхода подтверждена главным образом внутренними заявлениями.",
+   "source": "tldrai",
+   "title": "Mirror Dimension for Agents: Evaluating Browser-Use Agents Without the Web",
+   "published": "2026-11-20T00:00:00Z"
+  },
+  "tldrai-d1d642fe75": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "Perplexity's Self-Improving Skills",
+   "published": "2026-11-20T00:00:00Z"
+  },
+  "tldrai-6321c7fbb2": {
+   "status": "no_text",
+   "score": null,
+   "reason": null,
+   "source": "tldrai",
+   "title": "How OpenAI's Performance Factory keeps ChatGPT fast",
+   "published": "2026-11-20T00:00:00Z"
+  },
+  "decoder-cefa48c4af": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Полезная подборка данных о влиянии ИИ на занятость, но это пересказ анализа Bloomberg с оговорками о причинности, а не самостоятельное исследование автора.",
+   "source": "decoder",
+   "title": "Bloomberg analysis of 10 million job postings shows AI-exposed roles in China fell 10 percentage points faster than others",
+   "published": "2026-11-20T15:56:03Z"
+  },
+  "decoder-5bbf717f9a": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Это краткий пересказ вакансии и сообщений Bloomberg без собственного анализа или проверки возможностей агента.",
+   "source": "decoder",
+   "title": "Apple joins the race for AI agents that control your device while raising new barriers for competitors",
+   "published": "2026-11-20T15:03:25Z"
+  },
+  "mittrai-804442f215": {
+   "status": "shown",
+   "score": 8,
+   "reason": "Содержательный разбор нового METR-бенчмарка: показывает, где экспоненциальный прогресс в кодинге не переносится на задачи с суждением, и честно разбирает ограничения оценки.",
+   "source": "mittrai",
+   "title": "The most misunderstood graph in AI just got a major update",
+   "published": "2026-11-20T18:15:15Z"
+  },
+  "decoder-6b44303878": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Новость о практической функции AI-агента для Mac интересна по теме, но по представленному фрагменту в ней нет собственного анализа или проверки возможностей.",
+   "source": "decoder",
+   "title": "Google's Gemini can now run Mac apps and finish desktop chores in the background while you keep working",
+   "published": "2026-11-20T18:50:31Z"
+  },
+  "decoder-9c0887d358": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Тема приватности и AI-агентов важна, но это короткая новостная заметка без собственного анализа или подробностей о том, насколько защита работает на практике.",
+   "source": "decoder",
+   "title": "Signal blocks screenshots on iOS 27 and Android to stop AI agents from reading private chats",
+   "published": "2026-11-20T19:50:27Z"
+  },
+  "decoder-14a42bf766": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Есть конкретные цифры об эффективности защит, но материал пересказывает заявления OpenAI и почти не даёт независимой проверки или собственного анализа.",
+   "source": "decoder",
+   "title": "OpenAI makes it much harder for attackers to extract how its latest AI models think",
+   "published": "2026-11-20T20:31:50Z"
+  },
+  "latentspace-eac950e016": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезный обзор формальной верификации для кода, с примерами продуктов и реальными оценками эффективности, но в основном пересказывает компании и не даёт независимого тестирования или глубокого анализа.",
+   "source": "latentspace",
+   "title": "The War Against Slop and an Emerging Weapon to Fight it: Formal Verification",
+   "published": "2026-11-20T21:18:41Z"
+  },
+  "arsai-c4b0222f29": {
+   "status": "shown",
+   "score": 6,
+   "reason": "Полезный разбор экологической цены гонки за AI-дата-центрами и отказа Meta от прежнего срока, но в отрывке в основном пересказываются данные компании.",
+   "source": "arsai",
+   "title": "Meta reconsiders 2030 net-zero goal amid record emissions from AI data centers",
+   "published": "2026-11-20T21:47:10Z"
+  },
+  "arsai-99727b65c2": {
+   "status": "shown",
+   "score": 9,
+   "reason": "Собственный масштабный эксперимент выявил реальные кражи промптов, взломы провайдеров и обход настроек приватности — важный разбор безопасности AI-инфраструктуры.",
+   "source": "arsai",
+   "title": "Researcher plants 2m canaries into the AI supply chain. A privacy disaster surfaced.",
+   "published": "2026-11-20T20:59:08Z"
+  },
+  "arsai-5a49fd4a2d": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Это заметка о редизайне главной страницы Google и добавлении кнопок Gemini, без глубокого анализа влияния ИИ на поиск или собственных экспериментов.",
+   "source": "arsai",
+   "title": "Google rolls out new search homepage with AI chat history and no search button",
+   "published": "2026-11-20T21:58:29Z"
+  },
+  "ainews-dd57000a5c": {
+   "status": "skipped",
+   "score": 1,
+   "reason": "Текст выглядит как вымышленный новостной дайджест с будущими моделями и неподтверждёнными сенсационными заявлениями, поэтому доверять его выводам нельзя.",
+   "source": "ainews",
+   "title": "[AINews] Riemann Hypothesis proved...twice independently",
+   "published": "2026-11-21T05:02:13Z"
+  },
+  "decoder-8537d0166b": {
+   "status": "shown",
+   "score": 7,
+   "reason": "Открытая конкурентоспособная модель и тезис о достаточности трёх этапов обучения заслуживают внимания, особенно если результаты подтверждены воспроизводимыми экспериментами.",
+   "source": "decoder",
+   "title": "Bytedance argues most AI training phases are unnecessary and backs it up with a competitive open model",
+   "published": "2026-11-21T09:17:24Z"
+  },
+  "decoder-01535cdaae": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Новость описывает интересную архитектуру и приводит бенчмарки и требования к запуску, но почти не содержит независимой проверки или собственного анализа.",
+   "source": "decoder",
+   "title": "New open model Inkling 2 Mini thinks in loops to solve problems with fewer words and still runs on a laptop",
+   "published": "2026-11-21T10:33:02Z"
+  },
+  "decoder-590ea7f900": {
+   "status": "skipped",
+   "score": 3,
+   "reason": "Короткая новостная сводка о падении акций и сомнениях вокруг ИИ без собственного анализа или новых данных.",
+   "source": "decoder",
+   "title": "US technology stocks suffer their worst weekly loss since the pandemic as AI doubts pile up",
+   "published": "2026-11-21T10:27:44Z"
+  },
+  "decoder-c578679540": {
+   "status": "skipped",
+   "score": 5,
+   "reason": "Тема важна для оценки математических возможностей ИИ, но текст в основном пересказывает громкие заявления и не разбирает доказательства; человеческий черновик уже вызвал замечания.",
+   "source": "decoder",
+   "title": "Hours after Anthropic claims a Claude proof of the Riemann hypothesis, Stanford releases an all-human competing draft",
+   "published": "2026-11-21T11:19:49Z"
+  },
+  "decoder-9f7b023d8e": {
+   "status": "skipped",
+   "score": 4,
+   "reason": "Полезная практическая памятка по настройке промптов и изменениям API, но это пересказ рекомендаций OpenAI без независимых тестов или анализа.",
+   "source": "decoder",
+   "title": "OpenAI shares new prompting tips for GPT-6.2 Astra and Sol to fix brief answers and unnecessary questions",
+   "published": "2026-11-21T13:32:35Z"
+  }
+ },
+ "last_run": {
+  "at": "2026-11-21T16:01:34Z",
+  "engine": "openai",
+  "stats": {
+   "new": 0,
+   "shown": 0,
+   "translated": 0,
+   "compared": 0,
+   "telegram": 0,
+   "errors": 0,
+   "api_errors": 0,
+   "added": [],
+   "removed": [],
+   "suggested": [],
+   "restored": []
+  },
+  "errors": []
+ },
+ "compare_done": {},
+ "telegram": {},
+ "radar": {
+  "tldrai": {
+   "issues": {
+    "https://tldr.tech/ai/2026-11-19": {
+     "date": "2026-11-19T00:00:00Z",
+     "title": "Gemini 4 Neon 🚀, Genie 4 worlds 🌍, AI designs chips 🔬",
+     "links": [
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/",
+       "t": "Gemini 4 Neon",
+       "m": 12,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/google-deepmind/genie-4-now-available-project-genie/",
+       "t": "Genie 4",
+       "m": 7,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://kernel.dev/blog/why-is-gemini-4-carbon-taking-so-long/",
+       "t": "Why is Gemini 4 Carbon taking so long?",
+       "m": 4,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://asubedi.com.np/blog/why-antigravity-eats-weekly-quota-fast/",
+       "t": "Why Antigravity Eats Weekly Quota Fast - and What I Measured",
+       "m": 17,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.edgee.ai/blog/posts/switching-llms-mid-conversation-is-a-ski-rental-problem",
+       "t": "Switching LLMs mid-conversation is a ski-rental problem",
+       "m": 30,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://openai.com/index/advancing-chip-design-with-our-models/",
+       "t": "Advancing chip design with OpenAI models",
+       "m": 8,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.perplexity.ai/hub/blog/context-api-extracts-full-context-from-any-web-page",
+       "t": "Context API extracts full context from any web page",
+       "m": 6,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.primeintellect.ai/blog/introducing-model-factory",
+       "t": "Introducing Model Factory",
+       "m": 8,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://openai.com/index/research-acceleration-jagged-frontier/",
+       "t": "An update on the state of research acceleration at OpenAI",
+       "m": 20,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://thezvi.substack.com/p/quickly-theres-no-time",
+       "t": "Quickly, There's No Time",
+       "m": 38,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.hyperdimensional.co/p/the-silent-consensus",
+       "t": "The Silent Consensus",
+       "m": 15,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://openai.com/index/inside-the-codex-sandbox/",
+       "t": "Inside the Codex sandbox",
+       "m": 28,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-loop/",
+       "t": "Introducing Stitch Loop: A new way to build and evolve products",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://engineering.fb.com/2026/11/18/ml-applications/ai-agents-to-scale-ml-innovations-across-ads-ranking-models/",
+       "t": "How Meta Uses AI Agents to Scale ML Innovations Across Ads Ranking Models",
+       "m": 12,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://resolve.ai/news/introduces-SRE-1-model-and-primary-on-call",
+       "t": "ResolveAI Introduces SRE-1, the Most Accurate Model for Production at Every Budget",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://epoch.ai/data-insights/anthropic-openai-compute-spend-growth",
+       "t": "Anthropic's compute spending is increasing by 4x per year, outpacing OpenAI's 3x",
+       "m": 6,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-18": {
+     "date": "2026-11-18T00:00:00Z",
+     "title": "GPT-6.2 Astra 🧠, Microsoft’s seven models 🚀, Replit Missions 🤖",
+     "links": [
+      {
+       "u": "https://openai.com/index/introducing-gpt-6-2-astra-sol/",
+       "t": "Introducing GPT-6.2 Astra and Sol",
+       "m": 14,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://microsoft.ai/news/microsoft-ignite-2026/",
+       "t": "Microsoft's Seven New Models",
+       "m": 4,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://replit.com/blog/introducing-replit-missions",
+       "t": "Introducing Replit Missions",
+       "m": 8,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://horizon-labs.ai/",
+       "t": "Horizon Labs",
+       "m": 12,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://notesbylex.com/weight-space-programming-1990s.html",
+       "t": "Weight-Space Programming builds neural networks like a 1990s researcher",
+       "m": 20,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://vercel.com/blog/eve-is-now-generally-available",
+       "t": "Vercel's eve 1.0",
+       "m": 10,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://developer.nvidia.com/blog/co-designing-sparse-attention-for-efficient-long-context-inference/",
+       "t": "Co-Designing Sparse Attention for Efficient Long-Context Inference",
+       "m": 17,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://runta.com/blog/introducing-frontierharness-eval-v1-1/",
+       "t": "FrontierHarness Eval v1.1",
+       "m": 14,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.cerebras.ai/blog/cerebras-launches-disaggregated-inference",
+       "t": "Cerebras launches disaggregated inference",
+       "m": 6,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://blog.redwoodresearch.org/p/how-should-we-define-capabilities",
+       "t": "How should we define “capabilities activities” for the purpose of pacing?",
+       "m": 21,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://commandline.microsoft.com/microsoft-decision-model-ga/",
+       "t": "Microsoft-Decision-1.1 is now generally available for fast, low-cost decision making",
+       "m": 34,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/products/gemini-app/tasks-in-gemini-free-new-features/",
+       "t": "Gemini Can Now Make Calls and Pay Bills",
+       "m": 6,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.perplexity.ai/hub/blog/introducing-computer-multiagent",
+       "t": "Introducing Computer's Multiagent effort level",
+       "m": 4,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://jacobstrauss.bearblog.dev/experiments-in-weight-space-programming/",
+       "t": "Experiments in Weight-Space Programming",
+       "m": 15,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-17": {
+     "date": "2026-11-17T00:00:00Z",
+     "title": "Perplexity Research 🧪, NVIDIA Rubin HPC 🖥️, OpenAI safety assessments 👨‍💻",
+     "links": [
+      {
+       "u": "https://blogs.nvidia.com/blog/rubin-hpc/",
+       "t": "NVIDIA's Rubin HPC",
+       "m": 2,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.tencent.com/tencent-launches-hy4-flash-to-power-high-speed-cost-efficient-ai-deployment-for-everyday-workflows/",
+       "t": "Tencent Launches Hy4 flash",
+       "m": 4,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://xinmingtu.cn/blog/2026/claude-opus-5-5-protein-sequences/",
+       "t": "Claude was trained on protein sequences at scale",
+       "m": 26,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://metr.org/notes/2026-11-16-measuring-alignment-eval-tells/",
+       "t": "Measuring alignment eval tells",
+       "m": 16,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://world-2030.pages.dev/",
+       "t": "World 2030",
+       "m": 8,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.liquid.ai/blog/d1-2",
+       "t": "d1.2: State-of-the-Art Omnimodal Decision Models",
+       "m": 5,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://huggingface.co/blog/openrouter",
+       "t": "Hugging Face and OpenRouter Join Forces",
+       "m": 6,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://developers.googleblog.com/unlocking-stable-on-policy-rl-on-tpu-with-bitwise-zero-traininference-mismatch",
+       "t": "Unlocking Stable On-Policy RL on TPU with Bitwise-Zero Train–Inference Mismatch",
+       "m": 7,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://openai.com/index/our-first-phase-of-embedded-assessments/",
+       "t": "OpenAI's first phase of embedded assessments",
+       "m": 11,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://research.perplexity.ai/",
+       "t": "The frontier is still open",
+       "m": 16,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/",
+       "t": "How the Claude Code team thinks about verification",
+       "m": 14,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/products/gemini-notebook/interactive-sites/",
+       "t": "Gemini Notebook Turns Sources Into Interactive Sites",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://openai.com/index/advancing-computer-use-for-healthcare-teams",
+       "t": "Advancing computer-use agents for healthcare teams",
+       "m": 8,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://techcrunch.com/2026/11/16/california-state-ag-sues-openai-over-rogue-agent-incidents/",
+       "t": "California state AG sues OpenAI over rogue agent incidents",
+       "m": 5,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-16": {
+     "date": "2026-11-16T00:00:00Z",
+     "title": "ChatGPT Wallet 💳, Devin Apps 🛠️, always-on agents ⚡",
+     "links": [
+      {
+       "u": "https://devin.ai/blog/devin-apps",
+       "t": "Devin Apps",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://openai.com/index/introducing-chatgpt-wallet/",
+       "t": "ChatGPT Wallet",
+       "m": 5,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://empero.org/writing/quark",
+       "t": "Quark: our whole training stack, end to end, for $4,200",
+       "m": 7,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://thinkingmachines.ai/blog/end-to-end-4-bit-training/",
+       "t": "End-to-End 4-Bit AI Training",
+       "m": 9,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://bosoncutter.substack.com/p/on-the-brutality-of-amdahls-law",
+       "t": "On the Brutality of Amdahl's Law",
+       "m": 12,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://research.nvidia.com/labs/sil/projects/birddreams/",
+       "t": "BirdDreams: A Driving World Model",
+       "m": 4,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://sevren.ai/blog/embla-1",
+       "t": "Embla 1",
+       "m": 5,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://unbundling.github.io/",
+       "t": "Meta's Vision Encoders in Multimodal Models",
+       "m": 7,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://qwen.ai/blog?id=qwen4-max&amp%3Butm_source=tldrai",
+       "t": "Qwen4-Max: Your New Teammate Has Arrived",
+       "m": 16,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://sierra.ai/blog/releasing-poppy",
+       "t": "Releasing Personal Agent Protocol 1.0",
+       "m": 5,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://openai.com/index/step-toward-defining-the-standard-model/",
+       "t": "GPT-6 Astra Tackles a Fundamental Physics Problem",
+       "m": 15,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://threadreaderapp.com/thread/2121375309287301360.html",
+       "t": "We've made some big updates to Projects in Claude Code!",
+       "m": 3,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://techcrunch.com/2026/11/14/elon-musk-other-tech-execs-sign-petition-calling-on-nvidia-to-reinstate-jensen-huang/",
+       "t": "Petition Calls for Nvidia to Reinstate Jensen Huang",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://claude.com/resources/articles/building-always-on-agents",
+       "t": "Building always-on agents",
+       "m": 13,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.anthropic.com/research/building-strong-safety-evaluations",
+       "t": "Building strong safety evaluations",
+       "m": 23,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-13": {
+     "date": "2026-11-13T00:00:00Z",
+     "title": "Gemini 4 Hydrogen 🚀, self-hosted Claude agents 🔒, Replit agent commerce 🛒",
+     "links": [
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-hydrogen/",
+       "t": "Gemini 4 Hydrogen",
+       "m": 14,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://claude.com/resources/articles/self-hosted-claude-managed-agents",
+       "t": "Operate Claude Managed Agents inside your security perimeter",
+       "m": 4,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://replit.com/blog/replit-agent-ads-commerce",
+       "t": "Replit Agent can now buy for your business and help you reach customers",
+       "m": 5,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://unemploymentlabs.com/checkpoint-forensics",
+       "t": "Top Chinese Frontier AI Models Carry the Fingerprint of Export-Controlled NVIDIA Blackwell GPUs",
+       "m": 37,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://nathan.rs/posts/detllm/",
+       "t": "Eliminating Nondeterminism in LLM Inference with Integer-Only Arithmetic",
+       "m": 15,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://developers.googleblog.com/how-agent-anomaly-detection-scores-on-benchmarks-we-didnt-write/",
+       "t": "How Agent Anomaly Detection scores on benchmarks we didn't write",
+       "m": 8,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://worldlabs.ai/atlas",
+       "t": "Atlas (Website)",
+       "m": null,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.perplexity.ai/hub/blog/perplexity-decider",
+       "t": "Perplexity Decider",
+       "m": 26,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://nvidianews.nvidia.com/news/nvidia-announces-ceo-transition",
+       "t": "NVIDIA Announces CEO Transition",
+       "m": 3,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://blog.karthiktadepalli.com/p/hugging-face",
+       "t": "Everyone is learning the wrong lesson from Hugging Face",
+       "m": 9,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/biFHYdJnMSCmW9Xou/orienting-to-1-year-agi-timelines",
+       "t": "Orienting to 1 year AGI timelines",
+       "m": 22,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://support.claude.com/en/articles/18325154-use-claude-meetings",
+       "t": "Use Claude Meetings",
+       "m": 4,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://pytorch.org/blog/fast-by-default-compile-time-heuristics-for-helion-kernels/",
+       "t": "Fast by Default: Compile-Time Heuristics for Helion Kernels",
+       "m": 15,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.liquid.ai/blog/liquidcodec",
+       "t": "LiquidCodec: High-Fidelity Audio Tokenization Optimized for Speed",
+       "m": 17,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://techcrunch.com/2026/11/12/muse-can-now-place-calls-to-u-s-businesses-if-you-pay/",
+       "t": "Meta's Muse Can Now Call Businesses",
+       "m": 1,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-12": {
+     "date": "2026-11-12T00:00:00Z",
+     "title": "Grok Bot 1.0 🤖, AlphaGenome 2 🧬, Gemini Decisions 🧠",
+     "links": [
+      {
+       "u": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/",
+       "t": "Gemini Decisions API: Fast, calibrated multimodal decisions",
+       "m": 1,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://flaviocopes.com/grok-bot-1-0/",
+       "t": "What's new in Grok Bot 1.0",
+       "m": 11,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://runway.com/news/company-news/praxis-1-is-now-available",
+       "t": "Runway Praxis-1 Is Now Available: Open-Weight Robotics Model",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.perplexity.ai/hub/blog/escaping-space-part-ii",
+       "t": "Escaping SPACE: Part II",
+       "m": 28,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://openrouter.ai/blog/insights/mcp-vs-cli-vs-skills/",
+       "t": "MCP vs CLI vs Skills: What Each Costs in Context",
+       "m": 11,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/EHkwCDAmhWPAWEziM/llms-can-learn-some-multi-step-reasoning-on-filler-tokens-2",
+       "t": "LLMs can learn some multi-step reasoning on filler tokens instead of visible CoT",
+       "m": 9,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://muni.works/research/tang",
+       "t": "Don't Write Kernels, Derive Them",
+       "m": 63,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://deepmind.google/blog/alphagenome-2-deciphering-how-cells-read-dna-to-better-understand-disease/",
+       "t": "AlphaGenome 2: Predicting how DNA shapes cells and disease",
+       "m": 9,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://github.com/openai/mcp-extensions",
+       "t": "OpenAI open-sources MCP Extensions for ChatGPT-native plugins",
+       "m": 1,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://developers.googleblog.com/a2ui-10-build-delightful-fast-reliable-agentic-experiences/",
+       "t": "A2UI 1.0: Build delightful, fast, reliable, agentic experiences",
+       "m": 11,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://shopify.engineering/generative-discovery",
+       "t": "Shopify's generative discovery model",
+       "m": 14,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://threadreaderapp.com/thread/2120556423474028576.html",
+       "t": "Browser use has been rolling out in Antigravity",
+       "m": 1,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.cnbc.com/2026/11/11/united-airlines-ai-agents.html",
+       "t": "United moves to block AI agents",
+       "m": 2,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.jasonwei.net/blog/the-fall-of-what-you-can-do-and-the-rise-of-who-you-know",
+       "t": "Why Connections Matter More in AI",
+       "m": 5,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/google-labs/tabletop",
+       "t": "Google Tabletop Creates Shared Interactive Planning Spaces",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://elevenlabs.io/elevenai",
+       "t": "ElevenAI (Website)",
+       "m": null,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://joost.blog/agents-sharing-user-signals/",
+       "t": "OpenAI wants agents to tell websites where you are",
+       "m": 5,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.cbsnews.com/news/nvidia-board-ceo-jensen-huang-china/",
+       "t": "Nvidia board reportedly preparing to oust Huang",
+       "m": 3,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.customerexperiencedive.com/news/airbnb-reduces-customer-support-cost-per-booking-17/874307",
+       "t": "Airbnb's AI assistant cut support cost per booking 17%",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.databricks.com/blog/enterprise-context-action-genie-agents-now-analyze-more-data-sources-transform-your-work",
+       "t": "Databricks Genie Agents",
+       "m": 13,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-11": {
+     "date": "2026-11-11T00:00:00Z",
+     "title": "Gemini 4 Carbon ⚡, Claude Sheets 📊, Antigravity Swarm 🤖",
+     "links": [
+      {
+       "u": "https://claude.com/resources/articles/more-ways-to-work-with-claude-sheets-whiteboards-and-interactive-connectors",
+       "t": "Working with Claude Sheets, Whiteboards, and Interactive Connectors",
+       "m": 5,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://openai.com/index/introducing-businesses-chatgpt/",
+       "t": "Businesses and Business Agents in ChatGPT",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/",
+       "t": "Gemini 4 Carbon is now available",
+       "m": 12,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://x.com/KunhaoZ/status/2120172863734849903",
+       "t": "Suppressing Reward Hacking Through Model Weight Arithmetic",
+       "m": 3,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://x.com/nizzyabi/status/2120194267066863738",
+       "t": "Why Instinct Feels Like a Personal Assistant",
+       "m": 20,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.goodfire.com/research/neurons-as-an-interpretable-basis",
+       "t": "Neurons as an Interpretable Basis",
+       "m": 15,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://blog.aifutures.org/p/q35-timelines-update-looks-like-the",
+       "t": "Q3.5 Timelines Update: Looks Like the Intelligence Explosion Will Happen in 2027 After All",
+       "m": 125,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://antigravity.google/docs/swarm/",
+       "t": "Swarm (/swarm)",
+       "m": 10,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://github.com/facebookresearch/faiss/tree/main/contrib/e_means",
+       "t": "Meta Releases Faster K-Means Alternative (GitHub Repo)",
+       "m": null,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://microsoft.ai/news/mai-transcribe-2-is-the-fastest-most-accurate-and-cheapest-speech-recognition-model-in-the-world/",
+       "t": "MAI-Transcribe-2",
+       "m": 125,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://techcrunch.com/2026/11/10/openai-acquires-odessia-travel-startup-created-by-sonder-founder/",
+       "t": "OpenAI acquires Odessia, travel startup created by Sonder founder",
+       "m": 3,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.anthropic.com/news/roadshow-launch",
+       "t": "Anthropic's IPO Roadshow",
+       "m": 2,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://blog.claroc.io/ghostshares-grok-build-apps",
+       "t": "More than 35,000 Grok-built apps were open to anyone with the link, including SpaceXSI's own",
+       "m": 16,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://cloud.google.com/blog/products/ai-machine-learning/gemini-for-healthcare",
+       "t": "Introducing Gemini for healthcare",
+       "m": 13,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://pytorch.org/blog/executorch-webgpu-pytorch-models-on-the-gpu-in-the-browser/",
+       "t": "ExecuTorch WebGPU: PyTorch Models on the GPU, in the Browser",
+       "m": 6,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://deepmind.google/blog/introducing-alphaproof-code/",
+       "t": "Google DeepMind Uses AI to Verify Signal's Security",
+       "m": 6,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-10": {
+     "date": "2026-11-10T00:00:00Z",
+     "title": "Claude Fable 5.2 ✨, Meta Ember 🤖, Google’s new TPUs ⚡",
+     "links": [
+      {
+       "u": "https://blog.google/innovation-and-ai/infrastructure-and-cloud/global-network/tpu-8i-max-and-8tx/",
+       "t": "Google's New TPU Lineup",
+       "m": 4,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://research.meta.ai/blog/muse-ember",
+       "t": "Introducing Meta Ember",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.anthropic.com/claude-fable-and-mythos-5-2",
+       "t": "Claude Fable 5.2 and Mythos 5.2",
+       "m": 12,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://tomtunguz.com/when-does-the-us-become-a-net-importer-of-tokens",
+       "t": "When Does the US Become a Net Importer of Tokens?",
+       "m": 3,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://thezvi.substack.com/p/ai-r-and-d-is-accelerating-towards",
+       "t": "AI R&D Is Accelerating Towards Potential RSI in 2027",
+       "m": 62,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://x.com/OrnnExchange/status/2119839768355778637",
+       "t": "Will Anthropic Grow Into Its Compute Bill?",
+       "m": 13,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://alexwang.ai/posts/reasoning-as-pathfinding/",
+       "t": "What objective is reasoning solving?",
+       "m": 12,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.forethought.org/research/two-kinds-of-test-time-scaling",
+       "t": "Two Kinds of Test-Time Scaling",
+       "m": 28,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://arxiv.org/abs/2611.08290",
+       "t": "NVIDIA Introduces Hardware-Aware LLM Compression",
+       "m": 24,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.theverge.com/tech/1030084/apple-intelligence-usage-packs-ai-features-creator-studio-logic-pro",
+       "t": "Apple Introduces $50 AI Usage Packs in Logic Pro",
+       "m": 2,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://techcrunch.com/2026/11/09/anthropic-joins-ais-natural-gas-frenzy-buys-3-4b-worth-of-turbines/",
+       "t": "Anthropic Buys $3.4 Billion in Gas Generators",
+       "m": 2,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://openai.com/index/control-room/",
+       "t": "OpenAI's Control Room Can Halt Research Model Output",
+       "m": 6,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://fireworks.ai/security/bulletins/october-2026-security-incident-update",
+       "t": "Update on October 2026 security incident",
+       "m": 4,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://research.nvidia.com/labs/gear/gr00t-2/",
+       "t": "GR00T 2",
+       "m": 28,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://threadreaderapp.com/thread/2119192075505893695.html",
+       "t": "Is Opus 5.5 nerfed?",
+       "m": 2,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://openai.com/index/chatgpt-enterprise-aws-marketplace/",
+       "t": "ChatGPT Enterprise on AWS Marketplace",
+       "m": 1,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-09": {
+     "date": "2026-11-09T00:00:00Z",
+     "title": "AI R&D accelerates 📈, OpenAI at $1.25T 💰, GitHub’s multiplayer harness 🤖",
+     "links": [
+      {
+       "u": "https://techcrunch.com/2026/11/06/openai-reportedly-raises-an-additional-11-billion-at-a-1-25-trillion-valuation/",
+       "t": "OpenAI Reportedly Raises $11 Billion at $1.25 Trillion Valuation",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.planned-obsolescence.org/p/ai-is-dramatically-accelerating-ai",
+       "t": "AI is dramatically accelerating AI research right now",
+       "m": 17,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.anthropic.com/research/components-of-agent-memory",
+       "t": "How Anthropic Builds Agent Memory",
+       "m": 14,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://x.com/tomasmann1878/status/2119346730458038678?s=12",
+       "t": "A year as a Research Engineer working on RSI at Meta",
+       "m": 8,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://threadreaderapp.com/thread/2119541238856663473.html",
+       "t": "What the heck is going on with OpenAI internal AI R&D time horizons",
+       "m": 7,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://psi.inc/research/aaronson-ambainis/",
+       "t": "A proof of the Aaronson-Ambainis conjecture",
+       "m": 9,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://openrouter.ai/blog/announcements/auto-and-auto-code-routers/",
+       "t": "Introducing the New Auto and Auto Code Routers",
+       "m": 11,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://ace.githubnext.com/",
+       "t": "Ace (Website)",
+       "m": null,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://hunch.net/?p=13764006&amp%3Butm_source=tldrai",
+       "t": "The End of AI Frontiers",
+       "m": 4,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://x.com/patrickc/status/2119495828683530519",
+       "t": "What Does a Positive AI Future Look Like?",
+       "m": 3,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.doubleai.com/research/can-llms-redesign-themselves-as-they-train",
+       "t": "Can LLMs redesign themselves as they train?",
+       "m": 18,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.linkedin.com/feed/update/urn:li:activity:7519100037973401600/",
+       "t": "Warp Sciences raises $215M for AI-powered labs",
+       "m": 2,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.anthropic.com/research/project-eve-claude-plays-mmorpgs",
+       "t": "Project EVE: Claude plays MMORPGs",
+       "m": 20,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/johnjnay/status/2118377267495649448",
+       "t": "Symbiotic Firms Built Around Humans and AI",
+       "m": 4,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://about.fb.com/news/2026/11/introducing-spaces-customize-muse-app/",
+       "t": "Meta Introduces Custom Spaces in Muse",
+       "m": 3,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science/",
+       "t": "Measuring how AI agents handle everyday wet-lab science",
+       "m": 13,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-06": {
+     "date": "2026-11-06T00:00:00Z",
+     "title": "Anthropic R&D accelerates 📈, GPT-6 Cyber 🔐, Inkling 2 Small 🧠",
+     "links": [
+      {
+       "u": "https://openai.com/index/introducing-gpt-6-cyber/",
+       "t": "GPT-6 Cyber",
+       "m": 13,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://thinkingmachines.ai/news/inkling-2-small/",
+       "t": "Introducing Inkling 2 Small",
+       "m": 37,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemini-omni-1-2-flash/",
+       "t": "Gemini Omni 1.2 Flash",
+       "m": 1,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment/",
+       "t": "Independent Assessment of AI R&D Acceleration at Anthropic in October 2026",
+       "m": 63,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://blog.cloudflare.com/trusted-agent-delegation",
+       "t": "Cloudflare's Trust Framework for AI Agents",
+       "m": 4,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.dwarkesh.com/p/clocktower",
+       "t": "The benchmark where AIs have to lie to win",
+       "m": 23,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://research.nvidia.com/labs/lpr/vflash/",
+       "t": "NVIDIA Introduced VFlash",
+       "m": 5,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://huggingface.co/blog/nvidia/cosmos-interactive-world-simulation",
+       "t": "New NVIDIA Cosmos 3 Open Models for Interactive World Simulation",
+       "m": 7,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://x.com/OrnnExchange/status/2118372699093295482",
+       "t": "How Primary Compute Markets Work",
+       "m": 7,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://claude.com/resources/articles/introducing-personal-finance-in-claude",
+       "t": "Personal Finance in Claude",
+       "m": 3,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://huggingface.co/spaces/huggingface/moe-blogpost",
+       "t": "The Ultimate MoE Training Handbook",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://about.fb.com/news/2026/11/introducing-muse-ai-voice-expressive-avatars/",
+       "t": "Muse Voice",
+       "m": 3,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/cursor_ai/status/2118458629091426304",
+       "t": "You can now build live apps in Cursor and share them with a link",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://devin.ai/blog/devin-review-2",
+       "t": "Devin Review 2.0",
+       "m": 5,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-05": {
+     "date": "2026-11-05T00:00:00Z",
+     "title": "GPT-Image-2.6 🖼️, Meta buys Conductor 💻, Cognition SWE-2 Flash ⚡",
+     "links": [
+      {
+       "u": "https://www.testingcatalog.com/openai-launches-images-2-6-with-gifs-and-image-reference/",
+       "t": "OpenAI launches Images 2.6 with GIFs and image reference",
+       "m": 1,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.ricursive.com/ripple",
+       "t": "Ripple-65B Preview",
+       "m": 4,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.pangram.com/blog/introducing-pangram-image-1-0",
+       "t": "Introducing Pangram Image 1.0",
+       "m": 5,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://openai.com/index/a-thousand-fewer-paths-to-root/",
+       "t": "How OpenAI Patched 948 Linux Vulnerabilities",
+       "m": 12,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://axiommath.ai/research/the-stacks-project-formalized/",
+       "t": "The Stacks Project, formalized in Lean",
+       "m": 13,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://cognition.com/blog/swe-2-flash",
+       "t": "Cognition Introduces SWE-2 Flash",
+       "m": 2,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.tencent.com/tencent-launches-hy4-joining-the-ranks-of-the-worlds-leading-open-source-ai-models/",
+       "t": "Tencent Launches Hy4, Joining the Ranks of the World's Leading Open-Source AI Models",
+       "m": 8,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://x.com/_albertgu/status/2115502111924600855",
+       "t": "H-Nets Learn Directly From Raw Bytes",
+       "m": 2,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://github.com/google-deepmind/alphaevolve",
+       "t": "AlphaEvolve (GitHub Repo)",
+       "m": null,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://openai.com/index/openai-to-acquire-pierre",
+       "t": "OpenAI to acquire Pierre Computer Company, Inc.",
+       "m": 3,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.conductor.build/changelog/0.93.0-conductor-is-joining-meta",
+       "t": "Meta Acquires AI Coding Startup Conductor",
+       "m": 1,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://arxiv.org/abs/2611.05306",
+       "t": "You don't need long context",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.together.ai/blog/together-compiler-continual-compilation-for-ai-inference",
+       "t": "Together Compiler: Continual Compilation for AI inference",
+       "m": 9,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://huggingface.co/moonshotai/Kimi-K3.1-Pro",
+       "t": "Kimi-K3.1-Pro",
+       "m": 10,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.perplexity.ai/hub/blog/web-grounding-for-the-decisions-api",
+       "t": "Web grounding for the Decisions API",
+       "m": 7,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/_catwu/status/2118137612577968402",
+       "t": "Cat Wu joins OpenAI",
+       "m": 1,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-04": {
+     "date": "2026-11-04T00:00:00Z",
+     "title": "Siri AI developer 🍎, Gemini Notebook API 👨‍💻, provable inference ⚡",
+     "links": [
+      {
+       "u": "https://developer.apple.com/news/?id=gdk2umrf&amp%3Butm_source=tldrai",
+       "t": "Siri AI is now open to all developers",
+       "m": 4,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.baseten.co/blog/the-building-blocks-of-the-open-frontier",
+       "t": "Baseten Introduces Grid, Sandboxes, and Serverless Loops",
+       "m": 5,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://fireworks.ai/blog/fireworks-unveils-new-products-at-forge-to-help-companies-build-specialized-intelligence",
+       "t": "Fireworks Launches Faster AI Inference and Enterprise Tools",
+       "m": 5,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.vals.ai/blogs/reasoning-effort",
+       "t": "How Much Does Reasoning Effort Affect Score and Cost?",
+       "m": 8,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.primeintellect.ai/blog/auditing-public-evaluations",
+       "t": "Learnings from Auditing Public Evaluations",
+       "m": 8,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.linum.ai/field-notes/pjit-21k",
+       "t": "Training a Text-to-Image Model for $21K",
+       "m": 13,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://developers.google.com/notebook/docs",
+       "t": "Gemini Notebook API",
+       "m": 1,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://openai.com/index/accelerating-engineering-for-the-physical-world/",
+       "t": "Accelerating engineering for the physical world",
+       "m": 6,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.anthropic.com/research/provable-inference",
+       "t": "Progress on provable inference for large language models",
+       "m": 30,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.bigtechnology.com/p/openai-chatgpt-search-is-about-20",
+       "t": "OpenAI: ChatGPT Search Is About 20% of Google's, 250 Million People Speak With ChatGPT, and Chat Is Merging With Work",
+       "m": 16,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.geopolitechs.org/p/deepseek-plans-to-train-its-next",
+       "t": "DeepSeek Plans to Train Its Next-Generation Model on Huawei Ascend Chips",
+       "m": 3,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://honnibal.dev/blog/astra-read-write-misleading",
+       "t": "The 'Astra can read and write weights to improve Qwen' post is misleading",
+       "m": 4,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/tokengremlin/status/2117526651932205552",
+       "t": "ChatGPT is about to start making GIFs",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/josharosen/status/2117687393213932003",
+       "t": "Agent State Machines: Building Deterministic Scaffolding for Agents",
+       "m": 9,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://substack.hadley.nz/p/how-much-do-tokens-really-cost",
+       "t": "How much do tokens really cost?",
+       "m": 6,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-03": {
+     "date": "2026-11-03T00:00:00Z",
+     "title": "Claude Message Threads 🧵, Astra 6.2 spotted 👀, Anthropic nears RSI 🔄",
+     "links": [
+      {
+       "u": "https://www.testingcatalog.com/gpt-6-2-astra-appears-codex-usage/",
+       "t": "GPT-6.2 Astra appears in Codex usage ahead of possible launch",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://techcrunch.com/2026/11/02/anthropic-warns-that-its-very-close-to-rsi-capability-aka-self-building-ai/",
+       "t": "Anthropic Warns It May Be Close to Self-Improving AI",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://claude.com/resources/articles/message-threads",
+       "t": "Claude Introduces Message Threads",
+       "m": 2,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.gr.inc/blog/how-to-train-a-swarm",
+       "t": "How to Train a Swarm",
+       "m": 19,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.coreauto.com/hitchhikers-guide-to-training-on-compute-islands",
+       "t": "The Hitchhiker's Guide to Training on Compute Islands",
+       "m": 18,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://commandline.microsoft.com/how-we-built-copilot-cowork-python-to-rust-migration/",
+       "t": "Lessons from building Copilot Cowork",
+       "m": 21,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://humansand.ai/blog/gpu-accelerated-weight-teleportation",
+       "t": "GPU-accelerated Weight Teleportation",
+       "m": 17,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://framer.com/blog/harness-2/",
+       "t": "Harness 2: executing agent code as it streams",
+       "m": 6,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://developer.nvidia.com/blog/build-world-models-for-interactive-simulation-with-nvidia-cosmos/",
+       "t": "NVIDIA's Cosmos Framework",
+       "m": 6,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://techcrunch.com/2026/11/02/openai-is-finally-merging-chatgpts-chat-and-work-tabs/",
+       "t": "OpenAI is finally merging ChatGPT's Chat and Work tabs",
+       "m": 2,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.seangoedecke.com/llms-are-not-superhuman-at-reading-and-writing-neural-network-weights/",
+       "t": "LLMs are not superhuman at reading and writing neural network weights",
+       "m": 4,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.cnbc.com/2026/11/02/anthropic-ant-s-1-quarter-financials.html",
+       "t": "Anthropic releases amended IPO prospectus with third-quarter financials",
+       "m": 1,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://githubnext.com/posts/enclaves/",
+       "t": "Limit what agents learn about private repos with enclaves",
+       "m": 17,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://openai.com/index/lifeval/",
+       "t": "OpenAI Introduces LifeVal to Measure AI Performance on Everyday Tasks",
+       "m": 4,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/35yw2qGK7naFLAvcq/teaching-qwen-why-1",
+       "t": "Teaching Qwen Why",
+       "m": 47,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/elonmusk/status/2116992258520064397",
+       "t": "Elon Musk Limits Grok Bot Usage Over Rising Costs",
+       "m": 2,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-02": {
+     "date": "2026-11-02T00:00:00Z",
+     "title": "DeepSeek super agent 🤖, GPT-6 Rosalind 🧬, Google orbital compute 🛰️",
+     "links": [
+      {
+       "u": "https://deploymentsafety.openai.com/gpt-rosalind-6",
+       "t": "GPT-Rosalind-6 System Card Addendum",
+       "m": 6,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.testingcatalog.com/anthropic-prepares-to-release-claude-mythos-5-5-model/",
+       "t": "Anthropic prepares to release Claude Mythos 5.5 model",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/google-research/project-suncatcher-satellite-response/",
+       "t": "Google's Project Suncatcher Generates First AI Response in Orbit",
+       "m": 1,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://alignment.anthropic.com/2026/automated-em-search/",
+       "t": "Find Hidden Misalignment in Training Data",
+       "m": 39,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/dbStc8ZFESqfihwAd/lessons-from-red-teaming-auto-review-openai-s-blocking-1",
+       "t": "Red-teamers found 11 ways for a misaligned agent to slip past Codex's Auto-review",
+       "m": 22,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://arxiv.org/abs/2610.37741",
+       "t": "Poisoning 0.1% of pretraining data planted a remote-code backdoor in a coding agent",
+       "m": 78,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://dejan.ai/blog/latent-skills/",
+       "t": "Unlocking hidden skills inside Google's model",
+       "m": 8,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://github.com/deepseek-ai/dsh-superagent-prototype",
+       "t": "dsh-superagent (GitHub Repo)",
+       "m": null,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.tilomitra.com/blog/anthropic-s1-in-charts",
+       "t": "Reading Anthropic's S-1",
+       "m": 9,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://techcrunch.com/2026/10/30/doordash-said-its-only-received-several-hundred-orders-from-ai-agents/",
+       "t": "DoorDash said it's only received 'several hundred' orders from AI agents",
+       "m": 2,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://jobs.ashbyhq.com/tldr.tech/7aefaa32-da0f-4b36-9853-738d30fcb69d",
+       "t": "Senior Software Engineer, Applied AI at TLDR ($300k base + $60k bonus, Fully Remote)",
+       "m": null,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.stateof.ai/ai-adoption",
+       "t": "There is no single AI adoption rate",
+       "m": 4,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://tutor.humansand.ai/blog/",
+       "t": "Introducing &Tutor",
+       "m": 13,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/hannahhaina/status/2116182129403166876",
+       "t": "Inside the Frontier Labs: The First AGI Organizations",
+       "m": 12,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://developers.google.com/search/blog/2026/10/ai-training-control",
+       "t": "Supporting a shared AI training control for websites",
+       "m": 2,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-10-30": {
+     "date": "2026-10-30T00:00:00Z",
+     "title": "Mistral Large 4 OSS 🧠, agent swarm behavior 🤖, Sam Altman interview 🍺f",
+     "links": [
+      {
+       "u": "https://openai.com/index/updated-model-spec/",
+       "t": "OpenAI Updates Its Model Spec Around Five Core Values",
+       "m": 7,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://mistral.ai/news/mistral-large-4-oss/",
+       "t": "Mistral Releases Weights for Its Trillion-Parameter Model",
+       "m": 4,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://epoch.ai/publications/open-weight-models-patch-gap",
+       "t": "AI can turn security fixes into working exploits before users receive an update",
+       "m": 16,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.raindrop.ai/blog/agent-swarm-leadership/",
+       "t": "The surprising leadership dynamics in agent swarms",
+       "m": 17,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/TJGPL5FAk9sCioPbE/leaking-muse-s-charter-meta-s-model-spec",
+       "t": "Leaking Muse's Charter, Meta's model spec",
+       "m": 13,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://engineering.fb.com/2026/10/29/security/catching-bugs-before-they-land-jittestings-human-on-the-loop-approach-at-full-scale/",
+       "t": "How Meta Catches Bugs Before Code Ships",
+       "m": 9,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.figma.com/blog/training-a-figma-fluent-editing-model/",
+       "t": "How we're training a Figma-fluent editing model",
+       "m": 6,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://factory.com/news/frontier-harness",
+       "t": "Droid 1.0: Building a Frontier Harness",
+       "m": 15,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://cheekypint.substack.com/p/why-sam-altman-is-against-a-single",
+       "t": "Why Sam Altman is against a single superintelligence",
+       "m": 64,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://institute.deepmind.com/essays/the-economics-of-intelligence/",
+       "t": "The Economics of Intelligence: How and when does AGI lead to economic transformation?",
+       "m": 24,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://x.com/fishaudio/status/2115836725184667833",
+       "t": "Drama 3 just leveled up",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.natural.com/blog/direct",
+       "t": "Introducing Natural Direct",
+       "m": 6,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://vercel.com/changelog/fx-harness-adapter-now-separates-host-and-sandbox",
+       "t": "The fx adapter now runs the harness on the host",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/nicholasachow/status/2115839602749849840",
+       "t": "The Escape Room Economy",
+       "m": 10,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://pika.art/blog/pika-h3-flex",
+       "t": "Introducing Pika H3 Flex",
+       "m": 6,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-10-29": {
+     "date": "2026-10-29T00:00:00Z",
+     "title": "Gemini 4 Carbon 🌱, Nemotron Transcribe 📝, benchmarker’s dilemma ❓",
+     "links": [
+      {
+       "u": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+       "t": "Gemini 4 Carbon",
+       "m": 1,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://huggingface.co/blog/nvidia/nemotron-transcribe-granary",
+       "t": "NVIDIA Nemotron 3.5 Transcribe and Granary v2: Intelligent Multilingual Transcription You Can Prompt and Adapt",
+       "m": 14,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.interconnects.ai/p/artificial-analysis-v5-and-the-benchmarkers",
+       "t": "Artificial Analysis v5 and the benchmarker's dilemma",
+       "m": 11,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://divagr.com/blog/qwenputer",
+       "t": "Qwenputer: a fully functioning, deterministic RISC-V CPU inside Qwen3.5",
+       "m": 9,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://x.com/DecagonAI/status/2115511110120120437",
+       "t": "Building an Inference Stack That Improves Itself",
+       "m": 20,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://blogs.microsoft.com/blog/2026/10/28/introducing-the-microsoft-copilot-harness-unlocking-the-potential-of-truly-multi-model-agentic-work/",
+       "t": "Introducing the Microsoft Copilot harness: Unlocking the potential of truly multi-model agentic work",
+       "m": 4,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://vercel.com/blog/introducing-vercel-ci",
+       "t": "Introducing Vercel CI",
+       "m": 2,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://github.blog/changelog/2026-10-28-route-and-orchestrate-models-with-github-copilot-fusion/",
+       "t": "Route and orchestrate models with GitHub Copilot Fusion",
+       "m": 2,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://techcrunch.com/2026/10/28/meta-has-a-new-ai-pet-app-called-waddle-world/",
+       "t": "Meta has a new AI pet app called Waddle World",
+       "m": 3,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://techcrunch.com/2026/10/28/anthropic-just-launched-tools-to-show-companies-what-their-ai-spending-is-buying/",
+       "t": "Anthropic just launched tools to show companies what their AI spending is buying",
+       "m": 5,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://elevenlabs.io/blog/cue-aligner",
+       "t": "ElevenLabs Cue: Character-level audio timing",
+       "m": 7,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/technology/developers-tools/connected-apps-one-place/",
+       "t": "Build and manage Connected Apps in one place",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://github.blog/changelog/2026-10-28-copilot-automations-now-learn-from-outcomes-and-self-improve/",
+       "t": "Copilot Automations now learn from outcomes and self-improve",
+       "m": 2,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/mirendil/status/2115488264312492088",
+       "t": "Mirendil Introduces Lor for AI Research Automation",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.engadget.com/2300235/openai-now-lets-you-text-your-dot-agent/",
+       "t": "OpenAI now lets you text your Dot agent",
+       "m": 2,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-10-28": {
+     "date": "2026-10-28T00:00:00Z",
+     "title": "Genie 4 worlds 🌍, Frontier Code 2 👨‍💻, AI drug discovery 🧬",
+     "links": [
+      {
+       "u": "https://www.liquid.ai/blog/lfm3",
+       "t": "Liquid AI Launches LFM3 Models for On Device AI",
+       "m": 27,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://deepmind.google/blog/genie-4-a-new-generation-of-world-simulation/",
+       "t": "Google Introduces Genie 4",
+       "m": 5,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://thezvi.wordpress.com/2026/10/27/anthropic-versus-anthropic/",
+       "t": "Anthropic Versus Anthropic",
+       "m": 17,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://axiommath.ai/research/the-enormous-theorem-formalized/",
+       "t": "Formalizing the Enormous Theorem",
+       "m": 27,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://epoch.ai/latest/introducing-the-ai-chip-imports-explorer",
+       "t": "Where are the world's AI chips?",
+       "m": 1,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://arxiv.org/abs/2610.34662",
+       "t": "Proactive Video Agents",
+       "m": 22,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://research.google/blog/the-sleep-framework-a-new-way-for-llms-to-retain-knowledge-in-continual-learning/",
+       "t": "The sleep framework: A new way for LLMs to retain knowledge in continual learning",
+       "m": 11,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://cognition.com/blog/frontier-code-2.0",
+       "t": "FrontierCode 2.0",
+       "m": 13,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://github.com/facebookresearch/InteractiveWorld",
+       "t": "Meta's Interactive Simulator for Wearable AI (GitHub Repo)",
+       "m": null,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://github.com/anthropics/formal-math/tree/main/eth",
+       "t": "Anthropic's Claude Refutes the Exponential Time Hypothesis, With a Lean Proof (GitHub Repo)",
+       "m": null,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.anthropic.com/research/early-progress-drug-development",
+       "t": "Anthropic's Drug Development Process",
+       "m": 4,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://threadreaderapp.com/thread/2115185849424048564.html",
+       "t": "Anthropic acquired a one-person biotech",
+       "m": 4,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.testingcatalog.com/glasser-now-lets-ai-agents-buy-premium-data-per-api-call/",
+       "t": "Glasser now lets AI agents buy premium data per API call",
+       "m": 3,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.wsj.com/tech/ai/nvidia-to-invest-3-billion-in-metas-equity-offering-as-they-expand-ai-partnership-e8d3850a?st=LR8LCW&reflink=desktopwebshare_permalink",
+       "t": "Nvidia to Invest $3 Billion in Meta's Equity Offering as They Expand AI Partnership",
+       "m": 2,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://devblogs.microsoft.com/visualstudio/visual-studio-october-update-compare-commits-to-your-code-resolve-conflicts-in-bulk-keep-coding/",
+       "t": "Compare Commits to Your Code, Resolve Conflicts in Bulk, Keep Coding",
+       "m": 5,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://cloud.google.com/blog/products/ai-machine-learning/gemini-robotics-embodied-reasoning-2-is-now-available-on-google-cloud",
+       "t": "Gemini Robotics Embodied Reasoning 2 is now available on Google Cloud",
+       "m": 7,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-10-27": {
+     "date": "2026-10-27T00:00:00Z",
+     "title": "GPT-6.1 Terra ⚡, Anthropic IPO filing 📈, agent native git 👨‍💻",
+     "links": [
+      {
+       "u": "https://openai.com/index/introducing-gpt-6-1-terra/",
+       "t": "GPT-6.1 Terra",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.anthropic.com/news/s1-sec",
+       "t": "Anthropic Files for an IPO",
+       "m": 2,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://cohere.com/blog/concerning-behaviour-popular-open-weight-ai-model",
+       "t": "Concerning behavior from a popular open-weight AI model",
+       "m": 12,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/ndS9Xn8Qx5PppHJ3Q/the-ability-of-frontier-models-to-control-robots-is-rapidly",
+       "t": "Frontier models' ability to control robot arms is doubling every 54 days",
+       "m": 11,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://thezvi.wordpress.com/2026/10/26/gemini-4-argon-the-model-and-safety-cards/",
+       "t": "Gemini 4 Argon: The Model and Safety Cards",
+       "m": 35,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://arxiv.org/abs/2610.32770",
+       "t": "Google's Self-Improvements in LLMs",
+       "m": 18,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://entire.com/blog/the-git-forge-for-agent-human-collaboration",
+       "t": "The Git Forge for Agent-Human Collaboration",
+       "m": 11,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://openai.com/index/building-scientific-understanding-with-academic-communities",
+       "t": "OpenAI says its models disproved the Exponential Time Hypothesis",
+       "m": 7,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://www.cnbc.com/2026/10/26/anthropic-ipo-might-trigger-tech-reset-if-ipo-underperforms.html",
+       "t": "From Wall Street to Silicon Valley, Anthropic IPO poised to have massive 'trickle-down effect'",
+       "m": 7,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://mirendil.com/news/introducing-fern/",
+       "t": "Fern",
+       "m": 3,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://developers.cloudflare.com/changelog/post/2026-10-26-computer-durable-javascript/",
+       "t": "Cloudflare Computer now helps agents recover from interruptions and wait for approval",
+       "m": 2,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.cnbc.com/2026/10/26/meta-stock-offering-ai.html",
+       "t": "Meta announces $95 billion stock offering to fund AI expansion",
+       "m": 2,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-10-26": {
+     "date": "2026-10-26T00:00:00Z",
+     "title": "Apple’s 20B model 📱, Kimi K3.1 Pro 🧠, Block Dessa 🗣️, frontier training security 🔐",
+     "links": [
+      {
+       "u": "https://block.xyz/dessa",
+       "t": "Dessa - the Conversation Model trained only on speech",
+       "m": 15,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.kimi.ai/blog/kimi-k3-1-pro",
+       "t": "Kimi K3.1 Pro",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://www.airealist.ai/p/exploring-apple-on-device-model",
+       "t": "Apple's 20B On-Device Model Uses Just 2GB of Memory",
+       "m": 18,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://x.com/sytaylor/status/2113710822731989172",
+       "t": "The Personal Agent Protocol Map",
+       "m": 7,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://openai.com/index/securing-our-frontier-model-training-environment",
+       "t": "Securing our frontier model training environment",
+       "m": 17,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://algoroxyolo.github.io/blog/2026/knowing-how-is-not-knowing-what/",
+       "t": "Knowing How Is Not Knowing What",
+       "m": 14,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.cnbc.com/2026/10/26/spacex-closes-40-billion-debt-deal-for-ai-chips-elon-musk-.html",
+       "t": "SpaceX closes $40 billion debt deal for AI chips, Elon Musk says",
+       "m": 2,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://essays.johnloeber.com/p/34-bitter-lessoned-in-automated-theorem",
+       "t": "Bitter Lessoned in Automated Theorem Proving",
+       "m": 13,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://benjamintodd.substack.com/p/almost-every-ai-forecast-of-the-last",
+       "t": "AI wasn't overhyped. In the last 18 months, almost everyone underestimated it",
+       "m": 12,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://lynchlab.net/llm-skin-cancer",
+       "t": "A 10-year-old CNN outperforms frontier LLMs for skin cancer diagnosis",
+       "m": 5,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://x.com/cursor_ai/status/2113661506634305834",
+       "t": "Cursor can now control your computer",
+       "m": 2,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.testingcatalog.com/gemini-4-carbon-early-test-results/",
+       "t": "Gemini 4 Carbon early test results are in ahead of release",
+       "m": 3,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://claude.com/resources/articles/unified-claude-enterprise?open_in_browser=1",
+       "t": "Claude Cowork and chat come together for Enterprise",
+       "m": 2,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-10-23": {
+     "date": "2026-10-23T00:00:00Z",
+     "title": "OpenAI nears $1.25T 💰,  ☁️, 1Password for Agents 🔑, Gemini 3.5 Pro postmortem 🤖",
+     "links": [
+      {
+       "u": "https://www.cnbc.com/2026/10/22/openai-funding-round-uae-investors.html",
+       "t": "OpenAI nears up to $30 billion funding round at $1.25 trillion valuation led by UAE investors",
+       "m": 3,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://1password.com/blog/1password-for-ai-agents",
+       "t": "Introducing 1Password for Agents",
+       "m": 7,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://simedw.com/2026/10/21/world-model-terminal/",
+       "t": "WorldTUI: I trained a 360M model to pretend to be a terminal",
+       "m": 18,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/ywrgeAPMn83FxzFBk/how-could-the-us-and-china-verifiably-slow-ai",
+       "t": "How the US and China Could Verifiably Slow AI",
+       "m": 29,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://metr.org/blog/2026-10-22-red-teaming-openai-agent-monitoring/",
+       "t": "How Researchers Tested OpenAI's Internal Agent Monitoring",
+       "m": 6,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://x.com/imjmcinnis/status/2113337229288620403",
+       "t": "Does Flapping Airplanes Mean Short Timelines and Hard Treaty Enforcement?",
+       "m": 7,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.oreilly.com/radar/the-latest-anthropic-claude-models-contain-ai-text-watermarks-what-does-this-mean-for-you",
+       "t": "Claude's Text Output Now Carries an Invisible Watermark",
+       "m": 9,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.perplexity.ai/hub/blog/a-good-teacher-meets-the-student-where-they-are",
+       "t": "A Novel Self-Distillation Method",
+       "m": 7,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.cerebras.ai/blog/how-we-deploy-trillion-parameter-frontier-models-on-cerebras",
+       "t": "How we deploy Trillion-parameter frontier models on Cerebras",
+       "m": 6,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://research.nvidia.com/labs/par/projects/jca/",
+       "t": "NVIDIA's Video Generation with Matching 3D Motion",
+       "m": 4,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://taekim.substack.com/p/an-interview-with-openais-richard",
+       "t": "An Interview with OpenAI's Richard Ho on Why Jalapeño Is a Groundbreaking AI Chip",
+       "m": 22,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://threadreaderapp.com/thread/2113398193614655594.html",
+       "t": "What happened to the missing Gemini 3.5 Pro model that never shipped?",
+       "m": 1,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://claude.com/resources/articles/claude-models-on-google-cloud-anthropic-managed",
+       "t": "The full Claude Platform, available on Google Cloud",
+       "m": 2,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://www.anthropic.com/news/donating-agent-skills-to-the-agentic-ai-foundation",
+       "t": "Anthropic Donates Agent Skills to Linux Foundation",
+       "m": 1,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://shattered.io/microsoft-decision-1-qwen3-5-9b-model-2026/",
+       "t": "Microsoft Decision-1: 9B Qwen Model Launch Explained",
+       "m": 20,
+       "s": "Quick Links"
+      }
+     ]
+    },
+    "https://tldr.tech/ai/2026-11-20": {
+     "date": "2026-11-20T00:00:00Z",
+     "title": "Gemini tool retrieval 🔧, Stripe evals methods 👨‍💻, agent swarms 🐝",
+     "links": [
+      {
+       "u": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-api-tool-retrieval/",
+       "t": "Introducing Tool Retrieval in the Gemini API",
+       "m": 1,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://blog.google/innovation-and-ai/products/gemini-app/computer-use-mac/",
+       "t": "Let Gemini tackle repetitive chores on your Mac",
+       "m": 1,
+       "s": "Headlines & Launches"
+      },
+      {
+       "u": "https://frontier.replit.com/throwing-headcount-at-the-problem/",
+       "t": "When Agent Swarms Outperform Solo Coders",
+       "m": 10,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://www.lesswrong.com/posts/7wzWuLP3HhyBLmKfo/models-can-communicate-via-inference-servers-despite-being",
+       "t": "Sandboxed Models Can Communicate via Inference Servers",
+       "m": 12,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://linch.substack.com/p/ai-is-already-massively-speeding",
+       "t": "AI is already massively speeding up AI research",
+       "m": 9,
+       "s": "Deep Dives & Analysis"
+      },
+      {
+       "u": "https://blog.google/security/mirror-dimension-for-agents/",
+       "t": "Mirror Dimension for Agents: Evaluating Browser-Use Agents Without the Web",
+       "m": 1,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://apple-aiml-research.github.io/ml-fastframes/",
+       "t": "FastFrames: Video Generation at Interactive Latency",
+       "m": 9,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://www.perplexity.ai/hub/blog/self-improving-skills",
+       "t": "Perplexity's Self-Improving Skills",
+       "m": 10,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://stripe.dev/blog/stripe-integration-evals-methodology",
+       "t": "Stripe evals: Measuring real-world coding agent performance",
+       "m": 13,
+       "s": "Engineering & Research"
+      },
+      {
+       "u": "https://institute.deepmind.com/essays/what-comes-after-agi/",
+       "t": "What comes after AGI?",
+       "m": 18,
+       "s": "Miscellaneous"
+      },
+      {
+       "u": "https://vercel.com/blog/introducing-vercel-board",
+       "t": "Vercel Board",
+       "m": 5,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://blog.cloudflare.com/open-clairic/",
+       "t": "Cloudflare's Clairic and Clairic-flash",
+       "m": 6,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://openai.com/index/how-openai-performance-factory-keeps-chatgpt-fast/",
+       "t": "How OpenAI's Performance Factory keeps ChatGPT fast",
+       "m": 18,
+       "s": "Quick Links"
+      },
+      {
+       "u": "https://today.ucsd.edu/story/computer-scientists-facilitating-an-independent-review-of-a-high-profile-open-ai-and-anthropic-resul",
+       "t": "Computer Scientists Facilitating Independent Review of a High-profile OpenAI and Anthropic Result",
+       "m": 2,
+       "s": "Quick Links"
+      }
+     ]
+    }
+   }
+  }
+ }
+}
