@@ -32,7 +32,12 @@ MIN_SIDE = 32
 MAX_BYTES = 2_000_000
 REFRESH_DAYS = 30
 RETRY_DAYS = 7
-MAX_PER_RUN = 12        # источников за один прогон (каждый — до нескольких запросов)
+MAX_PER_RUN = 30        # источников за один прогон (каждый — до 10 коротких запросов)
+GOOD_SIDE = 150         # нашли картинку такого размера — дальше не ищем
+ALG = 2                 # версия поиска: значки, найденные прежней версией, пересматриваются сразу
+# значки платформ, а не издателей: буква W от WordPress, медвежонок Bear Blog — лучше плитка с буквами
+GENERIC = (("s0.wp.com", "/i/"), ("wordpress.com", "/i/"), ("bearblog.dev", "/apple-touch-icon"),
+           ("bearblog.dev", "/favicon"))
 UA = {"User-Agent": "Mozilla/5.0 (ai-digest; personal RSS reader)"}
 
 
@@ -50,6 +55,20 @@ def http_get(url: str) -> bytes:
 def _size_of(sizes: str | None) -> int:
     m = re.findall(r"(\d+)\s*x\s*(\d+)", sizes or "", re.I)
     return max((min(int(a), int(b)) for a, b in m), default=0)
+
+
+def is_generic(url: str) -> bool:
+    p = urlparse(url)
+    host = p.netloc.lower()
+    return any((host == h or host.endswith("." + h)) and p.path.startswith(path) for h, path in GENERIC)
+
+
+def _full_size(url: str) -> str | None:
+    """У WordPress значок в ленте — «…png?w=32»; без параметров это исходник 512×512."""
+    p = urlparse(url)
+    if re.search(r"(^|&)(w|h|resize|fit|size)=", p.query) and re.search(r"\.(png|jpe?g|webp)$", p.path, re.I):
+        return p._replace(query="").geturl()
+    return None
 
 
 def candidates(site: str, page: str | None, feed_xml: str | None) -> list[str]:
@@ -76,16 +95,17 @@ def candidates(site: str, page: str | None, feed_xml: str | None) -> list[str]:
             scored.append((500, urljoin(site, img)))
     origin = "{0.scheme}://{0.netloc}".format(urlparse(site))
     scored += [(300, origin + "/apple-touch-icon.png"), (8, origin + "/favicon.ico")]
+    scored += [(score + 1, full) for score, url in list(scored) if (full := _full_size(url))]
     out, seen = [], set()
     for _, url in sorted(scored, key=lambda x: -x[0]):
-        if url not in seen:
+        if url not in seen and not is_generic(url):
             seen.add(url)
             out.append(url)
     return out
 
 
-def normalize(raw: bytes) -> bytes | None:
-    """Квадратный PNG SIZE×SIZE или None, если картинка не годится."""
+def normalize(raw: bytes, with_side: bool = False):
+    """Квадратный PNG SIZE×SIZE или None, если картинка не годится (with_side — ещё и исходный размер)."""
     try:
         im = Image.open(io.BytesIO(raw))
         im.load()
@@ -99,7 +119,7 @@ def normalize(raw: bytes) -> bytes | None:
     im = im.resize((SIZE, SIZE), Image.LANCZOS)
     buf = io.BytesIO()
     im.save(buf, "PNG", optimize=True)
-    return buf.getvalue()
+    return (buf.getvalue(), side) if with_side else buf.getvalue()
 
 
 def find_icon(source: dict, get) -> tuple[bytes, str] | None:
@@ -114,14 +134,25 @@ def find_icon(source: dict, get) -> tuple[bytes, str] | None:
             feed_xml = get(source["url"]).decode("utf-8", "replace")
         except Exception:  # noqa: BLE001
             pass
-    for url in candidates(site, page, feed_xml)[:6]:
+    urls = candidates(site, page, feed_xml)
+    home = feedparser.parse(feed_xml).feed.get("link", "") if feed_xml else ""
+    if page is None and home and urlparse(home).netloc != urlparse(site).netloc:
+        # сайт закрыт для серверов (Substack отвечает 403), а лента живёт на другом домене — смотрим его главную
         try:
-            png = normalize(get(url))
+            urls += [u for u in candidates(home, get(home).decode("utf-8", "replace"), None) if u not in urls]
+        except Exception:  # noqa: BLE001
+            pass
+    best = None  # (исходный размер, png, адрес): берём самую крупную годную картинку, а не первую попавшуюся
+    for url in urls[:8]:
+        try:
+            got = normalize(get(url), with_side=True)
         except Exception:  # noqa: BLE001
             continue
-        if png:
-            return png, url
-    return None
+        if got and (best is None or got[1] > best[0]):
+            best = (got[1], got[0], url)
+            if got[1] >= GOOD_SIDE:
+                break
+    return (best[1], best[2]) if best else None
 
 
 def refresh(root: Path, book, get=None, now: datetime | None = None, extra: list[dict] | None = None) -> int:
@@ -135,19 +166,22 @@ def refresh(root: Path, book, get=None, now: datetime | None = None, extra: list
         m = meta.get(s["id"], {})
         at = datetime.strptime(m["at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc) if m.get("at") else None
         wait = RETRY_DAYS if m.get("fail") else REFRESH_DAYS
-        if (at is None or now - at > timedelta(days=wait)) and (s.get("site") or s.get("url")):
+        stale = at is None or now - at > timedelta(days=wait) or m.get("alg", 1) < ALG
+        if stale and (s.get("site") or s.get("url")):
             todo.append(s)
     done = 0
     for s in todo[:MAX_PER_RUN]:
         found = find_icon(s, get)
         if not found:
-            meta[s["id"]] = {"fail": True, "at": stamp}
+            meta[s["id"]] = {"fail": True, "at": stamp, "alg": ALG}
+            (root / "icons" / f"{s['id']}.png").unlink(missing_ok=True)
             log.info("Значок %s не найден — останется плитка с буквами", s["id"])
             continue
         png, src = found
         (root / "icons").mkdir(parents=True, exist_ok=True)
         (root / "icons" / f"{s['id']}.png").write_bytes(png)
-        meta[s["id"]] = {"file": f"icons/{s['id']}.png", "v": hashlib.sha1(png).hexdigest()[:8], "src": src, "at": stamp}
+        meta[s["id"]] = {"file": f"icons/{s['id']}.png", "v": hashlib.sha1(png).hexdigest()[:8], "src": src, "at": stamp,
+                         "alg": ALG}
         log.info("Значок %s: %s", s["id"], src)
         done += 1
     return done

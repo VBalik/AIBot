@@ -39,6 +39,12 @@ def check_candidates():
                    "https://a.test/favicon-192.png", "https://a.test/favicon-32.png", "https://a.test/favicon.ico"], got
     # без страницы (сайт закрыт для серверов) — картинка ленты и запасные адреса
     assert icons.candidates("https://a.test/x/", None, feed)[0] == "https://cdn.test/logo.png"
+    # значки платформ отбрасываются; у значка WordPress «?w=32» сначала пробуется исходник без параметров
+    wp = feed.replace("https://cdn.test/logo.png", "https://wp.test/cropped-logo.png?w=32")
+    got = icons.candidates("https://wp.test/", '<link rel="apple-touch-icon" href="https://s0.wp.com/i/webclip.png">', wp)
+    assert got[:2] == ["https://wp.test/cropped-logo.png", "https://wp.test/cropped-logo.png?w=32"], got
+    assert not any("s0.wp.com" in u for u in got)
+    assert icons.is_generic("https://karpathy.bearblog.dev/apple-touch-icon.png")
     print("значки: порядок поиска — apple-touch-icon, картинка ленты, крупные favicon, /favicon.ico — ok")
 
 
@@ -76,6 +82,23 @@ def fake_get(url):
     return WEB[url]
 
 
+def check_best():
+    # берётся самая крупная годная картинка: favicon 48 px уступает исходнику 512 px из той же ленты
+    web = {"https://b.test": b'<html><head><link rel="icon" sizes="48x48" href="/f48.png"></head></html>',
+           "https://b.test/feed": b'<?xml version="1.0"?><rss version="2.0"><channel><title>B</title><link>https://b.test</link><image><url>https://b.test/logo.png?w=32</url><title>B</title><link>https://b.test</link></image></channel></rss>',
+           "https://b.test/f48.png": png(48, 48), "https://b.test/logo.png?w=32": png(32, 32), "https://b.test/logo.png": png(512, 512)}
+    got = icons.find_icon({"id": "b", "site": "https://b.test", "url": "https://b.test/feed"}, lambda u: web[u])
+    assert got and got[1] == "https://b.test/logo.png", got
+    # главная закрыта (403), лента на другом домене — значок берётся с главной этого домена
+    web2 = {"https://mirror.test/feed": b'<?xml version="1.0"?><rss version="2.0"><channel><title>M</title><link>https://mirror.test/</link></channel></rss>',
+            "https://mirror.test/": b'<html><head><link rel="apple-touch-icon" href="/touch.png"></head></html>',
+            "https://mirror.test/touch.png": png(180, 180)}
+    got = icons.find_icon({"id": "m", "site": "https://closed.substack.test", "url": "https://mirror.test/feed"},
+                          lambda u: web2[u] if u in web2 else (_ for _ in ()).throw(RuntimeError("403")))
+    assert got and got[1] == "https://mirror.test/touch.png", got
+    print("значки: самая крупная картинка, исходник вместо «?w=32», запасная главная с домена ленты — ok")
+
+
 def check_refresh():
     root = Path(tempfile.mkdtemp())
     book = SourceBook(root / "sources.json", seed=SEED)
@@ -93,12 +116,19 @@ def check_refresh():
     # через день: ничего не скачивается; через 8 дней — повторная попытка только для неудачного
     CALLS.clear()
     assert icons.refresh(root, book, fake_get, now + timedelta(days=1), extra=cand) == 0 and CALLS == []
+    # значок, найденный прежней версией поиска (без alg), пересматривается сразу
+    book.data["icons"]["good"].pop("alg")
+    CALLS.clear()
+    icons.refresh(root, book, fake_get, now + timedelta(days=1), extra=cand)
+    assert any("good.test" in u for u in CALLS) and book.data["icons"]["good"]["alg"] == icons.ALG
+    meta = book.data["icons"]
+    CALLS.clear()
     icons.refresh(root, book, fake_get, now + timedelta(days=8), extra=cand)
     assert CALLS and all("closed.test" in u for u in CALLS), CALLS
     # через 31 день значки обновляются; новый логотип — новый хэш, страница не возьмёт старый из кэша
     WEB["https://good.test/t.png"] = png(180, 180, (10, 160, 60, 255))
     old_v = meta["good"]["v"]
-    icons.refresh(root, book, fake_get, now + timedelta(days=31), extra=cand)
+    icons.refresh(root, book, fake_get, now + timedelta(days=32), extra=cand)
     assert book.data["icons"]["good"]["v"] != old_v
     # сведения сохраняются вместе со списком источников
     book.save()
@@ -108,5 +138,6 @@ def check_refresh():
 
 check_candidates()
 check_normalize()
+check_best()
 check_refresh()
 print("ВСЕ ПРОВЕРКИ ЗНАЧКОВ ПРОЙДЕНЫ")
