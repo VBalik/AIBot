@@ -52,7 +52,13 @@ def stub_external(ctx):
     ctx.route("https://fonts.googleapis.com/**", lambda r: (GOOGLE_FONT_HITS.append(r.request.url), r.abort()))
     ctx.route("https://fonts.gstatic.com/**", lambda r: (GOOGLE_FONT_HITS.append(r.request.url), r.abort()))
     ctx.route("https://substackcdn.com/**", lambda r: r.fulfill(status=200, content_type="image/png", body=PNG))
+    # счётчик просмотров (функция Netlify): здесь его нет, отвечает имитация
+    ctx.route("**/api/views**", lambda r: (VIEWS.append(r.request.method),
+                                           r.fulfill(status=200, json={"day": 5, "today": 3, "total": 41, "since": None})))
     return ctx
+
+
+VIEWS = []
 
 
 # ---------- имитация GitHub API (закрытый репозиторий с оценками) ----------
@@ -126,6 +132,13 @@ with sync_playwright() as p:
     assert page.evaluate("document.getElementById('pager').scrollLeft") == 0
     assert page.inner_text("#tab-news .cnt") == "1" and page.inner_text("#tab-analysis .cnt") == "3"
     assert page.inner_text("#updated").startswith("Сервер проверял источники")
+    # справа под шестерёнкой — версия и просмотры «сегодня/всего»; браузер под управлением программы не считается
+    page.wait_for_function("document.getElementById('release').textContent.endsWith('3/41')")
+    assert page.inner_text("#release") == "22.11.2 3/41", page.inner_text("#release")
+    assert VIEWS and set(VIEWS) == {"GET"}, VIEWS
+    gear = page.locator("#open-settings svg").bounding_box()
+    rel = page.locator("#release").bounding_box()
+    assert abs((gear["x"] + gear["width"]) - (rel["x"] + rel["width"])) < 2.5 and rel["y"] > gear["y"] + gear["height"] - 4, (gear, rel)
     page.wait_for_function(FONT_LOADED, timeout=10000)  # свой шрифт загрузился и используется
     for sel in (".brand", ".entry-abstract", ".entry-title"):
         fam = page.evaluate(f"getComputedStyle(document.querySelector({sel!r})).fontFamily")
@@ -173,9 +186,20 @@ with sync_playwright() as p:
     assert "Джек Кларк" in page.inner_text("#pane-analysis .source-note")
     total = page.locator('#pane-analysis button[data-f="all"] .n').inner_text()
     assert f"Показаны только его тексты: 1 из {total}" in page.inner_text("#pane-analysis .filter-on")
+    # выбранный источник — зелёная рамка цвета кружка с числом, остальные приглушены
+    up = page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--up').trim()")
+    ring = page.evaluate("""getComputedStyle(document.querySelector('#pane-analysis button[data-f="importai"] .tile')).boxShadow""")
+    badge_bg = page.evaluate("""getComputedStyle(document.querySelector('#pane-analysis button[data-f="importai"] .n')).backgroundColor""")
+    rgb = "rgb(%d, %d, %d)" % tuple(int(up[i:i + 2], 16) for i in (1, 3, 5))
+    assert rgb in ring and badge_bg == rgb, (up, ring, badge_bg)
+    page.wait_for_timeout(250)
+    dim = lambda f: float(page.evaluate(f"""getComputedStyle(document.querySelector('#pane-analysis button[data-f="{f}"] .tile')).opacity"""))
+    assert dim("all") < .5 and dim("interconnects") < .5 and dim("importai") == 1
+    page.screenshot(path=str(OUT / "1f-filter-green.png"), clip={"x": 0, "y": tb["y"] - 30, "width": 390, "height": 200})
     page.click("#pane-analysis [data-show-all]")  # «Показать все» прямо под описанием источника
     assert page.locator("#pane-analysis .entry").count() == int(total)
     assert page.get_attribute('#pane-analysis button[data-f="all"]', "aria-pressed") == "true"
+    assert page.locator("#pane-analysis .filters.filtered").count() == 0  # «Все»: ничего не приглушено
     # фильтр не переживает перезапуск приложения: после перезагрузки снова все тексты
     page.click('#pane-analysis button[data-f="importai"]')
     page.reload()

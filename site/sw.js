@@ -9,7 +9,7 @@
  * Страница присылает сообщение {type: "cache-images", urls: [...]}: SW докачивает иллюстрации в фоне,
  * чтобы они были доступны офлайн, даже если статью ещё не открывали.
  */
-const VERSION = "v4";
+const VERSION = "v5";
 const SHELL = `shell-${VERSION}`;
 const DATA = "data";
 const FONTS = "fonts";
@@ -88,6 +88,7 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  if (url.origin === self.location.origin && url.pathname.startsWith("/api/")) return;  // счётчик просмотров — только из сети
 
   if (isFeed(url)) {
     event.respondWith(networkFirst(req, DATA, noQuery(req.url), 8000));

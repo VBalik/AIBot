@@ -1,0 +1,8 @@
+{
+  "name": "aibot-site",
+  "private": true,
+  "description": "Зависимости функций Netlify (счётчик просмотров хранит числа в Netlify Blobs). Сборщик дайджеста — на Python, см. requirements.txt.",
+  "dependencies": {
+    "@netlify/blobs": "11.1.6"
+  }
+}

@@ -97,7 +97,11 @@ button { font: inherit; color: inherit; }
 .iconbtn.busy svg { animation: spin .9s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .iconbtn.busy svg { animation: none; opacity: .5; } }
 .iconbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
-.status { max-width: 88rem; margin: .125rem auto 0; font-size: .75rem; color: var(--ink-2); min-height: 1.1rem; }
+.status { max-width: 88rem; margin: .125rem auto 0; font-size: .75rem; color: var(--ink-2); min-height: 1.1rem;
+  display: flex; align-items: flex-start; gap: .75rem; }
+.status-main { margin: 0; flex: 1; min-width: 0; }
+/* справа под шестерёнкой — версия и просмотры «сегодня/всего», как в «Глобусе Воланда» */
+.status-side { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
 .status .off { color: var(--accent); font-weight: 500; }
 
 .seg {
@@ -167,14 +171,17 @@ button { font: inherit; color: inherit; }
 /* число текстов на плитках-фильтрах — кружок у правого верхнего угла, поверх значка */
 .filters .tile .n { top: -.4375rem; right: -.4375rem; z-index: 1; min-width: 1.125rem; height: 1.125rem; padding: 0 .3125rem;
   box-sizing: border-box; display: grid; place-items: center; border-radius: .5625rem; opacity: 1;
-  background: var(--ink); color: var(--paper); font: 600 .625rem/1 var(--sans); }
+  background: var(--up); color: var(--on-accent); font: 600 .625rem/1 var(--sans); }  /* зелёный кружок — просьба Валерия 22.11.2026 */
 .tile.sm { width: 2.25rem; height: 2.25rem; font-size: .9375rem; border-radius: .3125rem; }
 .tile.all { --h: 176; font: 600 .875rem/1 var(--sans); }
 
 .filters { margin: 0 calc(-1 * var(--c-pad, 1.25rem)); padding: .625rem var(--c-pad, 1.25rem) .5rem; display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; }
 .filters::-webkit-scrollbar { display: none; }
 .filters button { all: unset; cursor: pointer; border-radius: .375rem; }
-.filters button[aria-pressed="true"] .tile { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px hsl(var(--h) 45% 45%); }
+/* выбранный источник — яркая зелёная рамка того же цвета, что кружок с числом; когда выбран один источник,
+   остальные приглушены (просьба Валерия 22.11.2026) */
+.filters button[aria-pressed="true"] .tile { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4.5px var(--up); }
+.filters.filtered button[aria-pressed="false"] .tile { opacity: .42; filter: grayscale(.6); transition: opacity .15s, filter .15s; }
 .filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .source-note { min-height: 2.5rem; margin: .375rem 0 1.25rem; font-size: .875rem; color: var(--ink-2); }
 .source-note b { color: var(--ink); font-weight: 600; }
@@ -460,7 +467,8 @@ html:not(.owner) .owner-only { display: none !important; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.77 4.94L10.25 2.56A9.6 9.6 0 0 1 13.75 2.56L14.23 4.94A7.4 7.4 0 0 1 15.42 5.44L17.44 4.09A9.6 9.6 0 0 1 19.91 6.56L18.56 8.58A7.4 7.4 0 0 1 19.06 9.77L21.44 10.25A9.6 9.6 0 0 1 21.44 13.75L19.06 14.23A7.4 7.4 0 0 1 18.56 15.42L19.91 17.44A9.6 9.6 0 0 1 17.44 19.91L15.42 18.56A7.4 7.4 0 0 1 14.23 19.06L13.75 21.44A9.6 9.6 0 0 1 10.25 21.44L9.77 19.06A7.4 7.4 0 0 1 8.58 18.56L6.56 19.91A9.6 9.6 0 0 1 4.09 17.44L5.44 15.42A7.4 7.4 0 0 1 4.94 14.23L2.56 13.75A9.6 9.6 0 0 1 2.56 10.25L4.94 9.77A7.4 7.4 0 0 1 5.44 8.58L4.09 6.56A9.6 9.6 0 0 1 6.56 4.09L8.58 5.44A7.4 7.4 0 0 1 9.77 4.94Z"/><circle cx="12" cy="12" r="3.1"/></svg>
       </button>
     </div>
-    <p class="status" aria-live="polite"><span id="updated"></span> <span id="offline-status"></span></p>
+    <div class="status"><p class="status-main" aria-live="polite"><span id="updated"></span> <span id="offline-status"></span></p>
+      <span class="status-side" id="release" title="Версия приложения и просмотры: сегодня / всего"></span></div>
     <div class="seg" role="tablist" aria-label="Разделы">
       <button type="button" role="tab" id="tab-news" data-kind="news" aria-controls="pane-news" aria-selected="true">Новости<span class="cnt"></span></button>
       <button type="button" role="tab" id="tab-analysis" data-kind="analysis" aria-controls="pane-analysis" aria-selected="false">Аналитика<span class="cnt"></span></button>
@@ -578,6 +586,7 @@ html:not(.owner) .owner-only { display: none !important; }
     <p><button type="button" class="linkbtn" id="forget">Забыть пароль на этом устройстве</button></p>
     <h3>О дайджесте</h3>
     <p class="hint" id="app-version" style="touch-action: manipulation; -webkit-user-select: none; user-select: none"></p>
+    <p class="hint">Справа вверху, под шестерёнкой, — версия приложения и просмотры дайджеста: сегодня / всего. О читателях не хранится ничего, кроме этих чисел.</p>
     <p class="hint">Абстракты и переводы сделаны ИИ, модель указана в конце каждого перевода. Тексты принадлежат авторам,
       у каждого есть ссылка на оригинал. Сервер обновляет ленту каждый час и сам переводит новые тексты.</p>
   </div>
@@ -593,7 +602,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-22.1";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "2026-11-22.2";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -943,6 +952,7 @@ async function refresh(manual) {
       added.forEach((it) => freshIds.add(it.id));
       renderAll(true);
       checkAppUpdate();
+      loadViews(false);
       if (manual || added.length) toast(added.length ? `${added.length} ${plural(added.length, "новый текст", "новых текста", "новых текстов")}` : "Новых текстов нет");
       syncOffline();
       pullOthers().then(() => renderAll(true));
@@ -957,6 +967,45 @@ async function refresh(manual) {
 }
 setInterval(() => { if (!document.hidden) refresh(false); }, HOUR);
 
+/* ---------- версия и просмотры: справа под шестерёнкой, как в «Глобусе Воланда» ----------
+   Открытие страницы засчитывается один раз (netlify/functions/views.mjs хранит только числа).
+   Не считаются: перезагрузка ради новой версии (это тот же просмотр), браузер под управлением
+   программы (тесты) и страница, которую так и не показали. «Сегодня» — с полуночи по часам читателя. */
+const RELEASE = (() => {
+  const m = APP_VERSION.match(/^\d{4}-(\d{2})-(\d{2})\.(\d+)$/);
+  return m ? `${m[2]}.${m[1]}.${m[3]}` : APP_VERSION;  // 2026-11-22.2 → 22.11.2
+})();
+let viewsLine = "";
+function showRelease() { $("#release").textContent = viewsLine ? `${RELEASE} ${viewsLine}` : RELEASE; }
+async function loadViews(count) {
+  if (location.protocol === "file:") return;
+  try {
+    const r = await fetch(`/api/views?tz=${-new Date().getTimezoneOffset()}`, { method: count ? "POST" : "GET", cache: "no-store" });
+    if (!r.ok) return;
+    const d = await r.json();
+    const today = Number.isFinite(d.today) ? d.today : d.day;
+    if (Number.isFinite(today) && Number.isFinite(d.total)) { viewsLine = `${today}/${d.total}`; showRelease(); }
+  } catch {}  // нет сети или счётчика — только версия
+}
+function countView() {
+  let reloaded = false;
+  try { reloaded = sessionStorage.getItem("aid.reloaded") === "1"; sessionStorage.removeItem("aid.reloaded"); } catch {}
+  const count = !reloaded && navigator.webdriver !== true;
+  let done = false;
+  const go = () => {
+    if (done || document.visibilityState !== "visible") return;
+    done = true;
+    document.removeEventListener("visibilitychange", go);
+    loadViews(count);
+  };
+  document.addEventListener("visibilitychange", go);
+  go();
+}
+function reloadForUpdate() {
+  try { sessionStorage.setItem("aid.reloaded", "1"); } catch {}
+  location.reload();
+}
+
 // новая версия страницы: перезагрузиться, если статья не открыта (иначе — при закрытии)
 let updatePending = false;
 async function checkAppUpdate() {
@@ -966,7 +1015,7 @@ async function checkAppUpdate() {
     const m = (await r.text()).match(/const APP_VERSION = "([^"]+)"/);
     if (m && m[1] !== APP_VERSION) {
       updatePending = true;
-      if (reader.hidden && $$(".sheet").every((sh) => sh.hidden)) location.reload();
+      if (reader.hidden && $$(".sheet").every((sh) => sh.hidden)) reloadForUpdate();
     }
   } catch {}
 }
@@ -998,6 +1047,7 @@ function renderPane(kind) {
   let html = btn("all", null, n, "Все источники раздела");
   for (const s of srcs) html += btn(s.id, s, counts[s.id] || 0, s.name);
   $(".filters", pane).innerHTML = html;
+  $(".filters", pane).classList.toggle("filtered", f !== "all");
 
   const note = $(".source-note", pane);
   if (f === "all") {
@@ -1255,7 +1305,7 @@ function openReader(id, push) {
 
 function closeReader() {
   if (reader.hidden) return;
-  if (updatePending) { stopReading(); location.reload(); return; }
+  if (updatePending) { stopReading(); reloadForUpdate(); return; }
   stopReading();
   reader.hidden = true;
   closeSheet($("#sheet-aa"));
@@ -1705,6 +1755,8 @@ window.addEventListener("offline", renderOfflineStatus);
 window.addEventListener("pagehide", () => { pauseReading(); store.put("aid.fb", mine); flushSync(); });
 
 markTab(current);
+showRelease();
+countView();
 load();
 </script>
 </body>
