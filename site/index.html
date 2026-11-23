@@ -602,7 +602,7 @@ const HUES = [196, 24, 148, 262, 336, 88, 178, 46, 296, 222, 8, 120, 60];
 const KINDS = ["news", "analysis"];
 const KIND_RU = { news: "Новости", analysis: "Аналитика" };
 const HOUR = 3600e3;
-const APP_VERSION = "2026-11-22.2";  // меняется с каждым выпуском страницы: так приложение узнаёт, что пора перезагрузиться
+const APP_VERSION = "1.0";  // номер выпуска: каждый выложенный выпуск страницы +1 после точки (1.0, 1.1 … 1.9, 1.10); по нему приложение узнаёт, что пора перезагрузиться
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -971,10 +971,7 @@ setInterval(() => { if (!document.hidden) refresh(false); }, HOUR);
    Открытие страницы засчитывается один раз (netlify/functions/views.mjs хранит только числа).
    Не считаются: перезагрузка ради новой версии (это тот же просмотр), браузер под управлением
    программы (тесты) и страница, которую так и не показали. «Сегодня» — с полуночи по часам читателя. */
-const RELEASE = (() => {
-  const m = APP_VERSION.match(/^\d{4}-(\d{2})-(\d{2})\.(\d+)$/);
-  return m ? `${m[2]}.${m[1]}.${m[3]}` : APP_VERSION;  // 2026-11-22.2 → 22.11.2
-})();
+const RELEASE = APP_VERSION;
 let viewsLine = "";
 function showRelease() { $("#release").textContent = viewsLine ? `${RELEASE} ${viewsLine}` : RELEASE; }
 async function loadViews(count) {

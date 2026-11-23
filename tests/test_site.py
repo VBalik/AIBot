@@ -134,7 +134,7 @@ with sync_playwright() as p:
     assert page.inner_text("#updated").startswith("Сервер проверял источники")
     # справа под шестерёнкой — версия и просмотры «сегодня/всего»; браузер под управлением программы не считается
     page.wait_for_function("document.getElementById('release').textContent.endsWith('3/41')")
-    assert page.inner_text("#release") == "22.11.2 3/41", page.inner_text("#release")
+    assert page.inner_text("#release") == "1.0 3/41", page.inner_text("#release")
     assert VIEWS and set(VIEWS) == {"GET"}, VIEWS
     gear = page.locator("#open-settings svg").bounding_box()
     rel = page.locator("#release").bounding_box()
