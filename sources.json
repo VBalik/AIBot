@@ -1,0 +1,596 @@
+{
+ "version": 1,
+ "active": [
+  {
+   "id": "willison",
+   "symbol": "Sw",
+   "name": "Simon Willison",
+   "author": "Саймон Уиллисон",
+   "about": "Сооснователь Django руками тестирует новые модели и агентов, пишет о безопасности и ограничениях",
+   "url": "https://simonwillison.net/atom/entries/",
+   "site": "https://simonwillison.net",
+   "paywall": false,
+   "hue": 196,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "importai",
+   "symbol": "Ia",
+   "name": "Import AI",
+   "author": "Джек Кларк",
+   "about": "Сооснователь Anthropic еженедельно разбирает исследования и их последствия для мира",
+   "url": "https://jack-clark.net/feed/",
+   "site": "https://importai.substack.com",
+   "paywall": false,
+   "hue": 24,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "mollick",
+   "symbol": "Mo",
+   "name": "One Useful Thing",
+   "author": "Итан Моллик",
+   "about": "Профессор Уортона: как ИИ меняет работу, обучение и бизнес — с экспериментами",
+   "url": "https://www.oneusefulthing.org/feed",
+   "site": "https://www.oneusefulthing.org",
+   "hue": 148,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "interconnects",
+   "symbol": "Ic",
+   "name": "Interconnects",
+   "author": "Натан Ламберт",
+   "about": "Исследователь AI2 о том, как обучают модели, об открытых моделях и бенчмарках",
+   "url": "https://www.interconnects.ai/feed",
+   "site": "https://www.interconnects.ai",
+   "hue": 262,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "latentspace",
+   "symbol": "Ls",
+   "name": "Latent Space",
+   "author": "swyx и Алессио Фанелли",
+   "about": "AI-инженерия и бизнес: интервью с основателями и инженерами ведущих AI-компаний",
+   "url": "https://www.latent.space/feed",
+   "site": "https://www.latent.space",
+   "exclude": "^\\s*\\[AINews\\]",
+   "hue": 336,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "raschka",
+   "symbol": "Ra",
+   "name": "Ahead of AI",
+   "author": "Себастьян Рашка",
+   "about": "Глубокие и ясные разборы архитектур LLM и свежих научных работ",
+   "url": "https://magazine.sebastianraschka.com/feed",
+   "site": "https://magazine.sebastianraschka.com",
+   "hue": 88,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "understandingai",
+   "symbol": "Ua",
+   "name": "Understanding AI",
+   "author": "Тимоти Б. Ли",
+   "about": "Технический журналист объясняет, что на самом деле происходит в индустрии ИИ",
+   "url": "https://www.understandingai.org/feed",
+   "site": "https://www.understandingai.org",
+   "hue": 178,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "normaltech",
+   "symbol": "Nt",
+   "name": "AI as Normal Technology",
+   "author": "Арвинд Нараянан и Саяш Капур",
+   "about": "Профессора Принстона — трезвый взгляд на возможности, риски и будущее ИИ",
+   "url": "https://www.normaltech.ai/feed",
+   "site": "https://www.normaltech.ai",
+   "hue": 46,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "karpathy",
+   "symbol": "Ka",
+   "name": "Andrej Karpathy",
+   "author": "Андрей Карпатый",
+   "about": "Сооснователь OpenAI, экс-глава AI в Tesla: редкие, но ключевые тексты",
+   "url": "https://karpathy.bearblog.dev/feed/",
+   "site": "https://karpathy.bearblog.dev",
+   "paywall": false,
+   "hue": 296,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "dwarkesh",
+   "symbol": "Dw",
+   "name": "Dwarkesh Podcast",
+   "author": "Дваркеш Патель",
+   "about": "Долгие интервью с ведущими умами ИИ о том, куда всё движется",
+   "url": "https://www.dwarkesh.com/feed",
+   "site": "https://www.dwarkesh.com",
+   "hue": 222,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "evans",
+   "symbol": "Be",
+   "name": "Benedict Evans",
+   "author": "Бенедикт Эванс",
+   "about": "Аналитик технологических рынков: стратегия, бизнес-модели и экономика ИИ",
+   "url": "https://www.ben-evans.com/benedictevans?format=rss",
+   "site": "https://www.ben-evans.com",
+   "paywall": false,
+   "hue": 8,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed",
+   "kind": "analysis"
+  },
+  {
+   "id": "mittrai",
+   "kind": "news",
+   "symbol": "Mt",
+   "name": "MIT Technology Review",
+   "author": "редакция MIT Technology Review",
+   "about": "Журнал MIT: репортажи и расследования о том, как ИИ меняет индустрии и общество",
+   "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+   "site": "https://www.technologyreview.com/topic/artificial-intelligence/",
+   "paywall": false,
+   "hue": 120,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed"
+  },
+  {
+   "id": "decoder",
+   "kind": "news",
+   "symbol": "Dc",
+   "name": "The Decoder",
+   "author": "редакция The Decoder",
+   "about": "Ежедневные новости ИИ: релизы моделей, исследования, индустрия",
+   "url": "https://the-decoder.com/feed/",
+   "site": "https://the-decoder.com",
+   "paywall": false,
+   "fetch_article": true,
+   "hue": 60,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed"
+  },
+  {
+   "id": "arsai",
+   "kind": "news",
+   "symbol": "Ar",
+   "name": "Ars Technica AI",
+   "author": "Бендж Эдвардс и редакция Ars Technica",
+   "about": "Подробные новости об ИИ с трезвым взглядом на хайп",
+   "url": "https://arstechnica.com/ai/feed/",
+   "site": "https://arstechnica.com/ai/",
+   "paywall": false,
+   "fetch_article": true,
+   "hue": 280,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed"
+  },
+  {
+   "id": "willisonlinks",
+   "kind": "news",
+   "symbol": "Wl",
+   "name": "Simon Willison: ссылки",
+   "author": "Саймон Уиллисон",
+   "about": "Короткие комментарии к главным событиям дня: релизы, инструменты, исследования",
+   "url": "https://simonwillison.net/atom/links/",
+   "site": "https://simonwillison.net",
+   "paywall": false,
+   "hue": 100,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed"
+  },
+  {
+   "id": "bensbites",
+   "kind": "news",
+   "symbol": "Bb",
+   "name": "Ben's Bites",
+   "author": "Бен Тосселл",
+   "about": "Рассылка о новинках ИИ: продукты, инструменты, сделки — коротко и по делу",
+   "url": "https://www.bensbites.com/feed",
+   "site": "https://www.bensbites.com",
+   "hue": 240,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed"
+  },
+  {
+   "id": "ainews",
+   "kind": "news",
+   "symbol": "An",
+   "name": "AINews",
+   "author": "swyx и smol.ai",
+   "about": "Ежедневная сводка того, что обсуждало AI-сообщество: X, Reddit, Discord",
+   "url": "https://www.latent.space/feed",
+   "site": "https://news.smol.ai",
+   "include": "^\\s*\\[AINews\\]",
+   "paywall": false,
+   "max_chars": 15000,
+   "hue": 32,
+   "added": "2026-11-17T00:00:00Z",
+   "origin": "seed"
+  },
+  {
+   "id": "tldrai",
+   "kind": "news",
+   "symbol": "Tl",
+   "name": "TLDR AI",
+   "author": "редакция TLDR",
+   "about": "Из ежедневной подборки берутся только первоисточники: блоги лабораторий и исследовательских центров",
+   "url": "https://tldr.tech/api/rss/ai",
+   "site": "https://tldr.tech/ai",
+   "paywall": false,
+   "fetch_article": true,
+   "article_min": 500,
+   "radar": "tldr",
+   "min_score": 7,
+   "max_per_issue": 4,
+   "lookback_days": 4,
+   "hue": 160,
+   "added": "2026-11-19T16:13:56Z",
+   "origin": "seed"
+  }
+ ],
+ "removed": [],
+ "history": [
+  {
+   "at": "2026-11-18T06:10:19Z",
+   "kind": "suggested",
+   "id": "deepmind",
+   "name": "Google DeepMind Blog",
+   "why": "сильный кандидат в раздел «новости» (9.0 из 10): Стоит добавить с выборочной фильтрацией: собственные исследования, технические подробности и научные приложения дают ценность сверх новостных пересказов действующих источников. Однако это корпоративный блог: заявления о превосходстве моделей требуют независимой проверки, а рядовые продуктовые анонсы можно пропускать."
+  },
+  {
+   "at": "2026-11-18T06:13:36Z",
+   "kind": "suggested",
+   "id": "msresearch",
+   "name": "Microsoft Research Blog",
+   "why": "сильный кандидат в раздел «новости» (8.0 из 10): Стоит добавить как первоисточник исследовательских новостей: собственные эксперименты, методы и инструменты дополняют действующую подборку. Нужен строгий отбор технических публикаций: корпоративная подача, анонсы и обзорные интервью снижают среднюю ценность ленты, а заявления об эффективности требуют независимой проверки."
+  },
+  {
+   "at": "2026-11-18T06:13:36Z",
+   "kind": "suggested",
+   "id": "secondthoughts",
+   "name": "Second Thoughts",
+   "why": "сильный кандидат в раздел «аналитика» (8.0 из 10): Стоит добавить: автор предлагает самостоятельный инженерный взгляд на реальные ограничения ИИ и отделяет впечатляющие демонстрации от доказанного экономического эффекта. Темы частично пересекаются с действующими источниками; при отборе лучше предпочитать большие разборы коротким реакциям и отчётам с конференций."
+  },
+  {
+   "at": "2026-11-25T06:01:27Z",
+   "kind": "suggested",
+   "id": "metr",
+   "name": "METR",
+   "why": "сильный кандидат в раздел «аналитика» (9.2 из 10): Стоит добавить: первичные исследования возможностей моделей и ограничений тестирования напрямую отвечают интересам читателя и дают больше деталей, чем пересказы в действующих источниках. Учитывайте узкий фокус на автономных агентах и рисках ускорения AI R&D, а также ограничения проверяемости выводов в отчётах с закрытыми данными и редакциями лабораторий."
+  }
+ ],
+ "candidates": [
+  {
+   "id": "metr",
+   "kind": "analysis",
+   "name": "METR",
+   "site": "https://metr.org",
+   "total": 9.25,
+   "verdict": "Стоит добавить: первичные исследования возможностей моделей и ограничений тестирования напрямую отвечают интересам читателя и дают больше деталей, чем пересказы в действующих источниках. Учитывайте узкий фокус на автономных агентах и рисках ускорения AI R&D, а также ограничения проверяемости выводов в отчётах с закрытыми данными и редакциями лабораторий.",
+   "at": "2026-11-25T06:01:27Z"
+  },
+  {
+   "id": "msresearch",
+   "kind": "news",
+   "name": "Microsoft Research Blog",
+   "site": "https://www.microsoft.com/en-us/research/blog/",
+   "total": 8.0,
+   "verdict": "Стоит добавить как первоисточник исследовательских новостей: собственные эксперименты, методы и инструменты дополняют действующую подборку. Нужен строгий отбор технических публикаций: корпоративная подача, анонсы и обзорные интервью снижают среднюю ценность ленты, а заявления об эффективности требуют независимой проверки."
+  },
+  {
+   "id": "secondthoughts",
+   "kind": "analysis",
+   "name": "Second Thoughts",
+   "site": "https://secondthoughts.ai",
+   "total": 8.0,
+   "verdict": "Стоит добавить: автор предлагает самостоятельный инженерный взгляд на реальные ограничения ИИ и отделяет впечатляющие демонстрации от доказанного экономического эффекта. Темы частично пересекаются с действующими источниками; при отборе лучше предпочитать большие разборы коротким реакциям и отчётам с конференций."
+  },
+  {
+   "id": "ronacher",
+   "kind": "analysis",
+   "name": "Armin Ronacher",
+   "site": "https://lucumr.pocoo.org",
+   "total": 8.0,
+   "verdict": "Стоит добавить: сильный инженер-практик с собственными экспериментами и содержательными разборами инструментов, а не пересказами релизов. Заметно пересекается с Simon Willison, но добавляет самостоятельный взгляд на архитектуру агентов; общие рассуждения и тексты вне ИИ стоит отбирать избирательно."
+  },
+  {
+   "id": "aifutures",
+   "kind": "analysis",
+   "name": "AI Futures Project",
+   "site": "https://blog.ai-futures.org",
+   "total": 7.5,
+   "verdict": "Стоит добавить как специализированный источник: команда строит и пересматривает собственные прогнозные модели, разбирает допущения и предлагает конкретные механизмы регулирования. Однако близкий «интеллектуальный взрыв» здесь — центральная гипотеза, а не установленный факт; тексты полезнее отбирать за расчёты и аргументы, чем за срочность прогнозов.",
+   "at": "2026-11-25T06:01:27Z"
+  },
+  {
+   "id": "registerspill",
+   "kind": "analysis",
+   "name": "Register Spill",
+   "site": "https://registerspill.thorstenball.com",
+   "total": 7.25,
+   "verdict": "Стоит добавить выборочно: собственный опыт разработки и применения агентов дополняет тесты Simon Willison взглядом изнутри продуктовой команды. Но рассылка смешивает содержательные наблюдения с подборками ссылок и личными заметками, а заинтересованность автора в Amp требует осторожности к обобщениям о превосходстве агентов.",
+   "at": "2026-11-25T06:01:27Z"
+  },
+  {
+   "id": "hyperdimensional",
+   "kind": "analysis",
+   "name": "Hyperdimensional",
+   "site": "https://www.hyperdimensional.co",
+   "total": 7.0,
+   "verdict": "Стоит добавить выборочно: Болл предлагает самостоятельный взгляд на управление ИИ и институциональные последствия его развития, дополняющий технические источники. Однако здесь мало практических экспериментов и прикладного бизнеса; выраженную позицию против ограничительного регулирования и указанную в свежих текстах работу в OpenAI следует учитывать при отборе."
+  },
+  {
+   "id": "lesswrong",
+   "kind": "analysis",
+   "name": "LessWrong",
+   "site": "https://lesswrong.com",
+   "total": 6.75,
+   "verdict": "Ценный источник первичных идей об AI safety, который дополняет действующую подборку, но авторитет авторов и доказательность текстов сильно различаются. Стоит брать выборочно сильные технические и исследовательские публикации: общая лента перегружена внутренними обсуждениями, спекуляциями и нерелевантными заметками.",
+   "at": "2026-11-25T06:01:27Z"
+  },
+  {
+   "id": "goedecke",
+   "kind": "analysis",
+   "name": "Sean Goedecke",
+   "site": "https://www.seangoedecke.com",
+   "total": 6.5,
+   "verdict": "Стоит добавить выборочно: самостоятельный инженерный взгляд на применение LLM и организационные последствия ИИ дополняет существующие источники. Однако значительная часть блога посвящена обычной разработке и корпоративной жизни, а категоричные выводы не всегда подкреплены систематическими проверками."
+  }
+ ],
+ "last_review": "2026-11-25T06:01:27Z",
+ "news_seeded": true,
+ "evaluated": {
+  "vergeai": "2026-11-18T06:10:19Z",
+  "venturebeat": "2026-11-18T06:10:19Z",
+  "techcrunchai": "2026-11-18T06:10:19Z",
+  "lastweekinai": "2026-11-18T06:10:19Z",
+  "openainews": "2026-11-18T06:10:19Z",
+  "deepmind": "2026-11-18T06:10:19Z",
+  "googleai": "2026-11-18T06:10:19Z",
+  "huggingface": "2026-11-18T06:10:19Z",
+  "tldrai": "2026-11-18T06:10:19Z",
+  "wiredai": "2026-11-18T06:10:19Z",
+  "nvidiablog": "2026-11-18T06:10:19Z",
+  "msresearch": "2026-11-18T06:13:36Z",
+  "lilianweng": "2026-11-18T06:13:36Z",
+  "chiphuyen": "2026-11-18T06:13:36Z",
+  "eugeneyan": "2026-11-18T06:13:36Z",
+  "hamel": "2026-11-18T06:13:36Z",
+  "thegradient": "2026-11-18T06:13:36Z",
+  "epoch": "2026-11-18T06:13:36Z",
+  "hyperdimensional": "2026-11-18T06:13:36Z",
+  "risingtide": "2026-11-18T06:13:36Z",
+  "brundage": "2026-11-18T06:13:36Z",
+  "secondthoughts": "2026-11-18T06:13:36Z",
+  "answerai": "2026-11-18T06:13:36Z",
+  "cameronwolfe": "2026-11-18T06:13:36Z",
+  "ronacher": "2026-11-18T06:13:36Z",
+  "geoffreylitt": "2026-11-18T06:13:36Z",
+  "goedecke": "2026-11-18T06:13:36Z",
+  "registerspill": "2026-11-25T06:01:27Z",
+  "powerlaw": "2026-11-25T06:01:27Z",
+  "exponentialview": "2026-11-25T06:01:27Z",
+  "garymarcus": "2026-11-25T06:01:27Z",
+  "aifutures": "2026-11-25T06:01:27Z",
+  "zvi": "2026-11-25T06:01:27Z",
+  "lesswrong": "2026-11-25T06:01:27Z",
+  "metr": "2026-11-25T06:01:27Z"
+ },
+ "late_seeded": [
+  "tldrai"
+ ],
+ "icons": {
+  "willison": {
+   "fail": true,
+   "at": "2026-11-28T09:01:21Z",
+   "alg": 3
+  },
+  "importai": {
+   "file": "icons/importai.png",
+   "v": "cb0eeee5",
+   "src": "https://substackcdn.com/image/fetch/$s_!6y6u!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F031520ec-8765-4d1b-a233-67c6fdb6258a%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "mollick": {
+   "file": "icons/mollick.png",
+   "v": "56bbe827",
+   "src": "https://substackcdn.com/image/fetch/$s_!_x4x!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F233e9990-95ea-44ab-afc4-5abfe44f24d4%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "interconnects": {
+   "file": "icons/interconnects.png",
+   "v": "d0ec60fc",
+   "src": "https://substackcdn.com/image/fetch/$s_!uWV7!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F6f0da424-dc5e-43bf-ae0d-56b947e43c23%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "latentspace": {
+   "file": "icons/latentspace.png",
+   "v": "62877199",
+   "src": "https://latent.space/brand/latent-space-icon.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "raschka": {
+   "file": "icons/raschka.png",
+   "v": "f9f0a2fb",
+   "src": "https://substackcdn.com/image/fetch/$s_!VgZ6!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F342e39ec-514c-4b4d-8a76-6acf0cbd8248%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "understandingai": {
+   "file": "icons/understandingai.png",
+   "v": "5c3cf050",
+   "src": "https://substackcdn.com/image/fetch/$s_!UC7F!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F80f04690-7ee3-44ef-a00d-1da793bac57e%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "normaltech": {
+   "file": "icons/normaltech.png",
+   "v": "07eecace",
+   "src": "https://substackcdn.com/image/fetch/$s_!cdE8!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F713f0145-87bd-4647-ade0-973e7a090a2a%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "karpathy": {
+   "fail": true,
+   "at": "2026-11-28T09:01:21Z",
+   "alg": 3
+  },
+  "dwarkesh": {
+   "file": "icons/dwarkesh.png",
+   "v": "31813569",
+   "src": "https://substackcdn.com/image/fetch/$s_!HtI2!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F2ba3bcc4-643d-4197-98f2-e7439f9ae2d1%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "evans": {
+   "file": "icons/evans.png",
+   "v": "6e3a1496",
+   "src": "https://images.squarespace-cdn.com/content/v1/50363cf324ac8e905e7df861/ebdb4645-db93-4967-881d-db698ee59c2c/favicon.ico?format=100w",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "mittrai": {
+   "file": "icons/mittrai.png",
+   "v": "7d7bab8d",
+   "src": "https://wp.technologyreview.com/wp-content/uploads/2024/09/cropped-TR-Logo-Block-Centered-R.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "decoder": {
+   "file": "icons/decoder.png",
+   "v": "7737321f",
+   "src": "https://the-decoder.com/resources/favicons/apple-touch-icon-180x180.png?v=3",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "arsai": {
+   "file": "icons/arsai.png",
+   "v": "4e5bb851",
+   "src": "https://cdn.arstechnica.net/wp-content/uploads/2016/10/cropped-ars-logo-512_480-300x300.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "willisonlinks": {
+   "fail": true,
+   "at": "2026-11-28T09:01:21Z",
+   "alg": 3
+  },
+  "bensbites": {
+   "file": "icons/bensbites.png",
+   "v": "3081f212",
+   "src": "https://substackcdn.com/image/fetch/$s_!ELyo!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F85c950eb-55ff-48a1-859e-a94889b4fc9f%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "ainews": {
+   "file": "icons/ainews.png",
+   "v": "62877199",
+   "src": "https://latent.space/brand/latent-space-icon.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "tldrai": {
+   "file": "icons/tldrai.png",
+   "v": "2bfdc57d",
+   "src": "https://tldr.tech/apple-touch-icon-kf.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "msresearch": {
+   "file": "icons/msresearch.png",
+   "v": "a64544f0",
+   "src": "https://www.microsoft.com/favicon.ico",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "secondthoughts": {
+   "file": "icons/secondthoughts.png",
+   "v": "1f898178",
+   "src": "https://substackcdn.com/image/fetch/$s_!InBr!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F80b91dc2-10ff-4e4a-9841-483cbff50061%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "ronacher": {
+   "file": "icons/ronacher.png",
+   "v": "281795ca",
+   "src": "https://lucumr.pocoo.org/static/avatar-small.jpg",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "hyperdimensional": {
+   "file": "icons/hyperdimensional.png",
+   "v": "54547de1",
+   "src": "https://substackcdn.com/image/fetch/$s_!Abm1!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F850a5a61-b8d0-45bf-9fc5-cf35bc15d137%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "goedecke": {
+   "file": "icons/goedecke.png",
+   "v": "2f3bcff3",
+   "src": "https://www.seangoedecke.com/apple-touch-icon.png",
+   "at": "2026-11-21T08:41:00Z",
+   "alg": 3
+  },
+  "metr": {
+   "file": "icons/metr.png",
+   "v": "af51686b",
+   "src": "https://metr.org/assets/images/favicon/apple-touch-icon.png",
+   "at": "2026-11-25T07:01:18Z",
+   "alg": 3
+  },
+  "aifutures": {
+   "file": "icons/aifutures.png",
+   "v": "c78f39a5",
+   "src": "https://substackcdn.com/image/fetch/$s_!DNx-!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F9f987c2f-db07-4bfb-bc19-18cea6b34b55%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-25T07:01:18Z",
+   "alg": 3
+  },
+  "registerspill": {
+   "file": "icons/registerspill.png",
+   "v": "fa391bb9",
+   "src": "https://substackcdn.com/image/fetch/$s_!_BSD!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F739b9dad-50d5-47bb-b804-491a05807afd%2Fapple-touch-icon-1024x1024.png",
+   "at": "2026-11-25T07:01:18Z",
+   "alg": 3
+  },
+  "lesswrong": {
+   "file": "icons/lesswrong.png",
+   "v": "51f05a4f",
+   "src": "https://res.cloudinary.com/lesswrong-2-0/image/upload/v1497915096/favicon_lncumn.ico",
+   "at": "2026-11-25T07:01:18Z",
+   "alg": 3
+  }
+ }
+}
